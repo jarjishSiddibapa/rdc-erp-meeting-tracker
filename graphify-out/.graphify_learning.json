@@ -1,0 +1,182 @@
+{
+  "generated_at": "2026-08-25T10:15:10.419911+00:00",
+  "nodes": {
+    "antd": {
+      "code_fingerprint": "d8480f069ade56599b8b0f6e9da2d014f9b4fb4b71b1f2f0ba7ec1fcdb400096",
+      "label": "antd",
+      "last": "2026-08-25T09:56:25.946278+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T09:56:25.946278+00:00",
+          "outcome": "useful",
+          "q": "Use https://github.com/Leonxlnx/taste-skill to improve the UI of our web application, keep it smooth and lightweight."
+        }
+      ],
+      "score": 0.999699341,
+      "source_file": "frontend/package.json",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_package_frontend_manifest": {
+      "code_fingerprint": "d8480f069ade56599b8b0f6e9da2d014f9b4fb4b71b1f2f0ba7ec1fcdb400096",
+      "label": "Frontend Package Manifest",
+      "last": "2026-08-25T09:56:25.946278+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T09:56:25.946278+00:00",
+          "outcome": "useful",
+          "q": "Use https://github.com/Leonxlnx/taste-skill to improve the UI of our web application, keep it smooth and lightweight."
+        }
+      ],
+      "score": 0.999699341,
+      "source_file": "frontend/package.json",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_components_srdetail": {
+      "code_fingerprint": "c7d54043f14c71bf819ddb7dacc22de13355e89ebb9100d38db160fb7f0d05d0",
+      "label": "SRDetail.jsx",
+      "last": "2026-08-25T10:11:49.729385+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T10:11:49.729385+00:00",
+          "outcome": "useful",
+          "q": "Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible."
+        }
+      ],
+      "score": 0.999946333,
+      "source_file": "frontend/src/components/SRDetail.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_pages_backupsettings": {
+      "code_fingerprint": "fabc958fdfe51a09876f52a000a4d99f79de3898e65ebfeccb93e31dea5a132f",
+      "label": "BackupSettings.jsx",
+      "last": "2026-08-25T10:11:49.729385+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T10:11:49.729385+00:00",
+          "outcome": "useful",
+          "q": "Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible."
+        }
+      ],
+      "score": 0.999946333,
+      "source_file": "frontend/src/pages/BackupSettings.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_pages_dashboardhome": {
+      "code_fingerprint": "c2efca35cc65b4ee607e4c8e3fc9b0baac22d005565321effee0158537b0079b",
+      "label": "DashboardHome.jsx",
+      "last": "2026-08-25T10:11:49.729385+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T10:11:49.729385+00:00",
+          "outcome": "useful",
+          "q": "Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible."
+        }
+      ],
+      "score": 0.999946333,
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_pages_login_login": {
+      "code_fingerprint": "fec7493cefe169de9b740bca12dc3b11d2f11b8d7b4a0c5c035886daab9d4124",
+      "label": "Login()",
+      "last": "2026-08-25T09:56:25.946278+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T09:56:25.946278+00:00",
+          "outcome": "useful",
+          "q": "Use https://github.com/Leonxlnx/taste-skill to improve the UI of our web application, keep it smooth and lightweight."
+        }
+      ],
+      "score": 0.999699341,
+      "source_file": "frontend/src/pages/Login.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_pages_reports": {
+      "code_fingerprint": "55b43ad858f482e0471ce32af9709fd630314e8f0f78654c497d0063eb1b5f1d",
+      "label": "Reports.jsx",
+      "last": "2026-08-25T10:11:49.729385+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T10:11:49.729385+00:00",
+          "outcome": "useful",
+          "q": "Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible."
+        }
+      ],
+      "score": 0.999946333,
+      "source_file": "frontend/src/pages/Reports.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_pages_srpage": {
+      "code_fingerprint": "1cfa1e67a8afaec427c66e9133aee15c5497e5ad4151299643a43cc385c87d85",
+      "label": "SRPage.jsx",
+      "last": "2026-08-25T10:11:49.729385+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T10:11:49.729385+00:00",
+          "outcome": "useful",
+          "q": "Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible."
+        }
+      ],
+      "score": 0.999946333,
+      "source_file": "frontend/src/pages/SRPage.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_pages_updatetasks": {
+      "code_fingerprint": "249e832ab138447ac3181accfdc20703fee423a7bc14396859232bcdf8c7f84a",
+      "label": "UpdateTasks.jsx",
+      "last": "2026-08-25T10:11:49.729385+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T10:11:49.729385+00:00",
+          "outcome": "useful",
+          "q": "Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible."
+        }
+      ],
+      "score": 0.999946333,
+      "source_file": "frontend/src/pages/UpdateTasks.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_pages_updatetasks_pagecoverage": {
+      "code_fingerprint": "249e832ab138447ac3181accfdc20703fee423a7bc14396859232bcdf8c7f84a",
+      "label": "PageCoverage()",
+      "last": "2026-08-25T09:56:25.946278+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T09:56:25.946278+00:00",
+          "outcome": "useful",
+          "q": "Use https://github.com/Leonxlnx/taste-skill to improve the UI of our web application, keep it smooth and lightweight."
+        }
+      ],
+      "score": 0.999699341,
+      "source_file": "frontend/src/pages/UpdateTasks.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "frontend_src_pages_usermanagement": {
+      "code_fingerprint": "76aba44e63d679b113aa34e78cc506e402e224fedfa80066cadc4da647b20914",
+      "label": "UserManagement.jsx",
+      "last": "2026-08-25T10:11:49.729385+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-25T10:11:49.729385+00:00",
+          "outcome": "useful",
+          "q": "Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible."
+        }
+      ],
+      "score": 0.999946333,
+      "source_file": "frontend/src/pages/UserManagement.jsx",
+      "status": "tentative",
+      "uses": 1
+    }
+  },
+  "version": 1
+}

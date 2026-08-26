@@ -1,0 +1,50 @@
+# Secrets and machine-specific environment files
+**/.env
+**/.env.*
+!**/.env.example
+*.local
+
+# Dependencies and generated frontend output
+**/node_modules/
+frontend/dist/
+frontend/public/login-bg.webp
+
+# Runtime data, database exports, uploads, and logs
+backend/data/
+backend/db-backup/
+backend/logs/
+backend/uploads/
+backend/tmp/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+
+# Temporary parser output
+parse-result.json
+
+# Editor and OS metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Machine-specific agent configuration
+.claude/
+.codex/hooks.json
+
+# Graphify transient state (the maintained graph outputs remain tracked)
+graphify-out/cache/
+graphify-out/memory/
+graphify-out/20*/
+graphify-out/.graphify_python
+graphify-out/.graphify_root
+graphify-out/cost.json
+
+# Local archives
+*.zip
+*.7z
+*.rar

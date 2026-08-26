@@ -1,0 +1,7 @@
+# Graphify/Codex setup metadata is not application content.
+.codex/
+.agents/
+.claude/
+AGENTS.md
+CLAUDE.md
+graphify-out/
