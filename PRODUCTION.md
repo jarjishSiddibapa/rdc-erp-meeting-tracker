@@ -47,7 +47,7 @@ For access from other LAN computers, allow inbound TCP port `777` in Windows Fir
 Keep the existing startup task, but make sure it uses these settings:
 
 - **Program/script:** `C:\Windows\System32\cmd.exe`
-- **Arguments:** `/d /c ""C:\path\to\rdc-erp-meeting-tracker\start-all.bat""`
+- **Arguments:** `/d /c ""C:\path\to\rdc-erp-meeting-tracker\start-all.bat" --scheduled"`
 - **Start in:** `C:\path\to\rdc-erp-meeting-tracker`
 - **Trigger:** At system startup, preferably delayed by 30 seconds so MySQL and networking can initialize.
 - **Security:** Run whether the user is logged on or not, using an account that can read the project, connect to MySQL, write backup/log folders, and run `node.exe` and `mysqldump.exe`.
@@ -55,7 +55,9 @@ Keep the existing startup task, but make sure it uses these settings:
 - **Concurrent runs:** If the task is already running, do not start a new instance.
 - **Time limit:** Do not stop the task merely because it has run for a long time; it is the application server.
 
-`start-all.bat` intentionally does not use `start`, open another console, rebuild files, or pause after a failure. Node remains attached to the task, and the batch file returns Node's exit code so Task Scheduler can detect and restart failures.
+`start-all.bat` intentionally does not use `start`, open another console, or rebuild files. A manual double-click pauses when the application stops so errors remain visible. Task Scheduler must pass `--scheduled`; in that mode Node remains attached to the task and the batch file returns Node's exit code immediately so Scheduler can detect and restart failures.
+
+If a manual build or start fails, the window remains open and the scripts also record the outcome in `production-build.log` or `production-startup.log` in the project root. These runtime logs are excluded from Git.
 
 ## Installing future updates
 

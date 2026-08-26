@@ -28,7 +28,7 @@ echo Pulling the latest main branch without creating a merge commit...
 git pull --ff-only origin main
 if errorlevel 1 exit /b 1
 
-call "%PROJECT_ROOT%build.bat"
+call "%PROJECT_ROOT%build.bat" --no-pause
 if errorlevel 1 exit /b 1
 
 echo Production update completed. Start the scheduled application task now.
