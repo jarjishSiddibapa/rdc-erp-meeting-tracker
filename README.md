@@ -37,6 +37,8 @@ Prerequisites: Node.js, npm, and MySQL.
 
 Database schema creation and migrations run automatically when the backend starts. Runtime databases, SQL backups, logs, generated frontend files, dependency folders, and environment secrets are intentionally excluded from Git.
 
+For the production Windows machine, including the Task Scheduler configuration and safe update procedure, see [PRODUCTION.md](PRODUCTION.md).
+
 ## Useful commands
 
 ```powershell
