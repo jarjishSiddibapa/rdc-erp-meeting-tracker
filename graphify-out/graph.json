@@ -161,7 +161,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_db_pool",
-      "community": 18,
+      "community": 17,
       "community_name": "pool.js",
       "norm_label": "pool.js"
     },
@@ -172,7 +172,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_db_pool_mysql",
-      "community": 18,
+      "community": 17,
       "community_name": "pool.js",
       "norm_label": "mysql"
     },
@@ -183,7 +183,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "backend_db_pool_pool",
-      "community": 18,
+      "community": 17,
       "community_name": "pool.js",
       "norm_label": "pool"
     },
@@ -194,8 +194,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_middleware_auth",
-      "community": 19,
-      "community_name": "csv-import.js",
+      "community": 18,
+      "community_name": "middleware/auth.js",
       "norm_label": "middleware/auth.js"
     },
     {
@@ -205,8 +205,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_middleware_auth_jwt",
-      "community": 19,
-      "community_name": "csv-import.js",
+      "community": 18,
+      "community_name": "middleware/auth.js",
       "norm_label": "jwt"
     },
     {
@@ -217,8 +217,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_middleware_auth_authenticate",
-      "community": 19,
-      "community_name": "csv-import.js",
+      "community": 18,
+      "community_name": "middleware/auth.js",
       "norm_label": "authenticate()"
     },
     {
@@ -229,8 +229,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_middleware_auth_requirerole",
-      "community": 19,
-      "community_name": "csv-import.js",
+      "community": 18,
+      "community_name": "middleware/auth.js",
       "norm_label": "requirerole()"
     },
     {
@@ -747,7 +747,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "routes/auth.js"
     },
     {
@@ -758,7 +758,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_express",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "express"
     },
     {
@@ -769,7 +769,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_crypto",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "crypto"
     },
     {
@@ -780,7 +780,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_bcrypt",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "bcrypt"
     },
     {
@@ -791,7 +791,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_jwt",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "jwt"
     },
     {
@@ -802,7 +802,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_pool",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ pool }"
     },
     {
@@ -813,7 +813,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_authenticate",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ authenticate }"
     },
     {
@@ -824,7 +824,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_sendpasswordresetemail",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ sendpasswordresetemail }"
     },
     {
@@ -835,7 +835,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_email_regex",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ email_regex }"
     },
     {
@@ -846,7 +846,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_hashtoken_createresettoken",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ hashtoken, createresettoken }"
     },
     {
@@ -857,7 +857,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_router",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "router"
     },
     {
@@ -1527,7 +1527,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "reports.js"
     },
     {
@@ -1538,7 +1538,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports_express",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "express"
     },
     {
@@ -1549,7 +1549,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports_pool",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "{ pool }"
     },
     {
@@ -1560,7 +1560,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports_authenticate",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "{ authenticate }"
     },
     {
@@ -1571,7 +1571,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports_router",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "router"
     },
     {
@@ -1741,7 +1741,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "stats.js"
     },
     {
@@ -1752,7 +1752,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_express",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "express"
     },
     {
@@ -1763,7 +1763,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_pool",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "{ pool }"
     },
     {
@@ -1774,7 +1774,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_authenticate",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "{ authenticate }"
     },
     {
@@ -1785,31 +1785,31 @@
       "_origin": "ast",
       "id": "backend_routes_stats_router",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "router"
     },
     {
       "label": "catStats()",
       "file_type": "code",
       "source_file": "backend/routes/stats.js",
-      "source_location": "L28",
+      "source_location": "L43",
       "_callable": true,
       "_origin": "ast",
       "id": "backend_routes_stats_catstats",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "catstats()"
     },
     {
       "label": "pendingByPerson()",
       "file_type": "code",
       "source_file": "backend/routes/stats.js",
-      "source_location": "L51",
+      "source_location": "L75",
       "_callable": true,
       "_origin": "ast",
       "id": "backend_routes_stats_pendingbyperson",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "pendingbyperson()"
     },
     {
@@ -1819,7 +1819,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_routes_users",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "users.js"
     },
@@ -1830,7 +1830,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_routes_users_express",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "express"
     },
@@ -1841,7 +1841,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "backend_routes_users_bcrypt",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "bcrypt"
     },
@@ -1852,7 +1852,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "backend_routes_users_pool",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ pool }"
     },
@@ -1863,7 +1863,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "backend_routes_users_authenticate_requirerole",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ authenticate, requirerole }"
     },
@@ -1874,7 +1874,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "backend_routes_users_rdc_email_regex",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ rdc_email_regex }"
     },
@@ -1885,7 +1885,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "backend_routes_users_generaterandompassword",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ generaterandompassword }"
     },
@@ -1896,7 +1896,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "backend_routes_users_createresettoken",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ createresettoken }"
     },
@@ -1907,7 +1907,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "backend_routes_users_sendwelcomeemail",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ sendwelcomeemail }"
     },
@@ -1918,7 +1918,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "backend_routes_users_router",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "router"
     },
@@ -1929,7 +1929,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "backend_routes_users_valid_roles",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "valid_roles"
     },
@@ -1941,7 +1941,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_routes_users_provisionuser",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "provisionuser()"
     },
@@ -2768,7 +2768,7 @@
       "_origin": "ast",
       "id": "backend_services_mailer",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "mailer.js"
     },
     {
@@ -2779,7 +2779,7 @@
       "_origin": "ast",
       "id": "backend_services_mailer_nodemailer",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "nodemailer"
     },
     {
@@ -2790,7 +2790,7 @@
       "_origin": "ast",
       "id": "backend_services_mailer_transporter",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "transporter"
     },
     {
@@ -2814,7 +2814,7 @@
       "_origin": "ast",
       "id": "backend_services_mailer_sendpasswordresetemail",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "sendpasswordresetemail()"
     },
     {
@@ -2825,7 +2825,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_services_mailer_sendwelcomeemail",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "sendwelcomeemail()"
     },
@@ -2836,7 +2836,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_password",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "password.js"
     },
@@ -2847,7 +2847,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_password_crypto",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "crypto"
     },
@@ -2859,7 +2859,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_utils_password_generaterandompassword",
-      "community": 13,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "generaterandompassword()"
     },
@@ -2870,8 +2870,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_resettoken",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "resettoken.js"
     },
     {
@@ -2881,8 +2881,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_resettoken_crypto",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "crypto"
     },
     {
@@ -2892,8 +2892,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "backend_utils_resettoken_pool",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "{ pool }"
     },
     {
@@ -2904,8 +2904,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_utils_resettoken_hashtoken",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "hashtoken()"
     },
     {
@@ -2916,8 +2916,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_utils_resettoken_createresettoken",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "createresettoken()"
     },
     {
@@ -2928,7 +2928,7 @@
       "_origin": "ast",
       "id": "backend_utils_validation",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "validation.js"
     },
     {
@@ -2971,7 +2971,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ref_react",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "react"
     },
@@ -3422,8 +3422,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "frontend_package_dependencies_xlsx",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "xlsx"
     },
     {
@@ -3433,8 +3433,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "xlsx",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "xlsx"
     },
     {
@@ -3566,7 +3566,7 @@
       "_origin": "ast",
       "id": "frontend_src_app",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "app.jsx"
     },
     {
@@ -3577,7 +3577,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_login",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "login"
     },
     {
@@ -3588,7 +3588,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_forgotpassword",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "forgotpassword"
     },
     {
@@ -3599,7 +3599,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_resetpassword",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "resetpassword"
     },
     {
@@ -3610,7 +3610,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_dashboard",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "dashboard"
     },
     {
@@ -3622,7 +3622,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_pagefallback",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "pagefallback()"
     },
     {
@@ -3634,7 +3634,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_protectedroute",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "protectedroute()"
     },
     {
@@ -3646,7 +3646,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_publicroute",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "publicroute()"
     },
     {
@@ -3658,7 +3658,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_approutes",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "approutes()"
     },
     {
@@ -3670,7 +3670,7 @@
       "_origin": "ast",
       "id": "frontend_src_app_app",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "app()"
     },
     {
@@ -3727,8 +3727,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_commentcell",
-      "community": 0,
-      "community_name": "SRPage.jsx",
+      "community": 24,
+      "community_name": "Reports.jsx",
       "norm_label": "commentcell.jsx"
     },
     {
@@ -3739,8 +3739,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_commentcell_fmtdt",
-      "community": 0,
-      "community_name": "SRPage.jsx",
+      "community": 24,
+      "community_name": "Reports.jsx",
       "norm_label": "fmtdt()"
     },
     {
@@ -3751,8 +3751,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_commentcell_commentcell",
-      "community": 0,
-      "community_name": "SRPage.jsx",
+      "community": 24,
+      "community_name": "Reports.jsx",
       "norm_label": "commentcell()"
     },
     {
@@ -3762,7 +3762,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_loginscene",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "loginscene.jsx"
     },
@@ -3774,7 +3774,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_floatingicosahedron",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "floatingicosahedron()"
     },
@@ -3786,7 +3786,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_particles",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "particles()"
     },
@@ -3798,7 +3798,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_loginscene",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "loginscene()"
     },
@@ -3947,8 +3947,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_srform",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "srform.jsx"
     },
     {
@@ -3958,8 +3958,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_components_srform_base_statuses",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "base_statuses"
     },
     {
@@ -3969,8 +3969,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "frontend_src_components_srform_all_statuses",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "all_statuses"
     },
     {
@@ -3980,8 +3980,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_components_srform_sr_types",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "sr_types"
     },
     {
@@ -3992,8 +3992,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_dateval",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "dateval()"
     },
     {
@@ -4004,8 +4004,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_fmtdate",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "fmtdate()"
     },
     {
@@ -4016,8 +4016,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_usedistinctoptions",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "usedistinctoptions()"
     },
     {
@@ -4028,8 +4028,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_filteroption",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "filteroption()"
     },
     {
@@ -4040,8 +4040,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_srform",
-      "community": 2,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "SRForm.jsx",
       "norm_label": "srform()"
     },
     {
@@ -4063,8 +4063,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_ambientbackground_ambientbackground",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "ambientbackground()"
     },
     {
@@ -4097,8 +4097,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_brandbutton",
-      "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community": 13,
+      "community_name": "react",
       "norm_label": "brandbutton.jsx"
     },
     {
@@ -4109,8 +4109,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_brandbutton_brandbutton",
-      "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community": 13,
+      "community_name": "react",
       "norm_label": "brandbutton()"
     },
     {
@@ -4331,8 +4331,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_magneticbutton",
-      "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community": 13,
+      "community_name": "react",
       "norm_label": "magneticbutton.jsx"
     },
     {
@@ -4343,8 +4343,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_magneticbutton_magneticbutton",
-      "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community": 13,
+      "community_name": "react",
       "norm_label": "magneticbutton()"
     },
     {
@@ -4377,8 +4377,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal",
-      "community": 5,
-      "community_name": "DashboardHome.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "reveal.jsx"
     },
     {
@@ -4389,8 +4389,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal_reveal",
-      "community": 5,
-      "community_name": "DashboardHome.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "reveal()"
     },
     {
@@ -4401,8 +4401,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal_revealgroup",
-      "community": 5,
-      "community_name": "DashboardHome.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "revealgroup()"
     },
     {
@@ -4412,8 +4412,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_tiltcard",
-      "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "tiltcard.jsx"
     },
     {
@@ -4424,8 +4424,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_tiltcard_tiltcard",
-      "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "tiltcard()"
     },
     {
@@ -4436,7 +4436,7 @@
       "_origin": "ast",
       "id": "frontend_src_context_authcontext",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "authcontext.jsx"
     },
     {
@@ -4447,7 +4447,7 @@
       "_origin": "ast",
       "id": "frontend_src_context_authcontext_authcontext",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "authcontext"
     },
     {
@@ -4459,7 +4459,7 @@
       "_origin": "ast",
       "id": "frontend_src_context_authcontext_authprovider",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "authprovider()"
     },
     {
@@ -4471,7 +4471,7 @@
       "_origin": "ast",
       "id": "frontend_src_context_authcontext_useauth",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "useauth()"
     },
     {
@@ -4482,7 +4482,7 @@
       "_origin": "ast",
       "id": "frontend_src_main",
       "community": 2,
-      "community_name": "react",
+      "community_name": "useAuth",
       "norm_label": "main.jsx"
     },
     {
@@ -4493,7 +4493,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_backupsettings",
       "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community_name": "UserManagement.jsx",
       "norm_label": "backupsettings.jsx"
     },
     {
@@ -4505,7 +4505,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_backupsettings_formatbytes",
       "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community_name": "UserManagement.jsx",
       "norm_label": "formatbytes()"
     },
     {
@@ -4516,7 +4516,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_backupsettings_status_tag",
       "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community_name": "UserManagement.jsx",
       "norm_label": "status_tag"
     },
     {
@@ -4528,7 +4528,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_backupsettings_backupsettings",
       "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community_name": "UserManagement.jsx",
       "norm_label": "backupsettings()"
     },
     {
@@ -4538,7 +4538,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_changepassword",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "changepassword.jsx"
     },
@@ -4550,7 +4550,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_changepassword_changepassword",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "changepassword()"
     },
@@ -4561,8 +4561,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "dashboard.jsx"
     },
     {
@@ -4572,8 +4572,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_srpage",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "srpage"
     },
     {
@@ -4583,8 +4583,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_usermanagement",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "usermanagement"
     },
     {
@@ -4594,8 +4594,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_changepassword",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "changepassword"
     },
     {
@@ -4605,8 +4605,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_updatetasks",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "updatetasks"
     },
     {
@@ -4616,8 +4616,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_backupsettings",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "backupsettings"
     },
     {
@@ -4627,8 +4627,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_reports",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "reports"
     },
     {
@@ -4638,8 +4638,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_role_colors",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "role_colors"
     },
     {
@@ -4649,8 +4649,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_menu_items",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "menu_items"
     },
     {
@@ -4660,8 +4660,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_titles",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "titles"
     },
     {
@@ -4671,8 +4671,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_all_keys",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "all_keys"
     },
     {
@@ -4683,8 +4683,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_dashboard",
-      "community": 2,
-      "community_name": "react",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "dashboard()"
     },
     {
@@ -4699,10 +4699,21 @@
       "norm_label": "dashboardhome.jsx"
     },
     {
+      "label": "MONTHS",
+      "file_type": "code",
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "frontend_src_pages_dashboardhome_months",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
+      "norm_label": "months"
+    },
+    {
       "label": "PALETTE",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_palette",
       "community": 5,
@@ -4713,7 +4724,7 @@
       "label": "StatCard()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L31",
+      "source_location": "L30",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_statcard",
@@ -4725,7 +4736,7 @@
       "label": "SectionHeader()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L44",
+      "source_location": "L55",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_sectionheader",
@@ -4737,7 +4748,7 @@
       "label": "ColHeader()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L56",
+      "source_location": "L67",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_colheader",
@@ -4746,10 +4757,34 @@
       "norm_label": "colheader()"
     },
     {
+      "label": "ComparisonValue()",
+      "file_type": "code",
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "source_location": "L78",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_pages_dashboardhome_comparisonvalue",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
+      "norm_label": "comparisonvalue()"
+    },
+    {
+      "label": "PeriodSummary()",
+      "file_type": "code",
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "source_location": "L103",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_pages_dashboardhome_periodsummary",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
+      "norm_label": "periodsummary()"
+    },
+    {
       "label": "PendingTable()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L67",
+      "source_location": "L120",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_pendingtable",
@@ -4761,7 +4796,7 @@
       "label": "DashboardHome()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L187",
+      "source_location": "L222",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_dashboardhome",
@@ -4776,7 +4811,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_forgotpassword",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "forgotpassword.jsx"
     },
@@ -4788,7 +4823,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_forgotpassword_forgotpassword",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "forgotpassword()"
     },
@@ -4891,7 +4926,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_resetpassword",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "resetpassword.jsx"
     },
@@ -4903,7 +4938,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_resetpassword_resetpassword",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "resetpassword()"
     },
@@ -5017,8 +5052,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_srpage",
-      "community": 24,
-      "community_name": "Reports.jsx",
+      "community": 0,
+      "community_name": "SRPage.jsx",
       "norm_label": "srpage()"
     },
     {
@@ -5157,8 +5192,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_updatetasks_updatefrommanageengine",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "updatefrommanageengine()"
     },
     {
@@ -5180,8 +5215,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "usermanagement.jsx"
     },
     {
@@ -5191,8 +5226,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_role_colors",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "role_colors"
     },
     {
@@ -5202,8 +5237,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_bulk_user_fields",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "bulk_user_fields"
     },
     {
@@ -5214,8 +5249,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_bulkaddusersmodal",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "bulkaddusersmodal()"
     },
     {
@@ -5226,8 +5261,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_usermanagement",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "usermanagement()"
     },
     {
@@ -5237,8 +5272,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_services_api",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "api.js"
     },
     {
@@ -5248,8 +5283,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_src_services_api_api",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "api"
     },
     {
@@ -5259,7 +5294,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "frontend_src_services_api_authapi",
-      "community": 2,
+      "community": 13,
       "community_name": "react",
       "norm_label": "authapi"
     },
@@ -5270,8 +5305,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "frontend_src_services_api_srapi",
-      "community": 0,
-      "community_name": "SRPage.jsx",
+      "community": 24,
+      "community_name": "Reports.jsx",
       "norm_label": "srapi"
     },
     {
@@ -5292,8 +5327,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "frontend_src_services_api_reportsapi",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 24,
+      "community_name": "Reports.jsx",
       "norm_label": "reportsapi"
     },
     {
@@ -5303,8 +5338,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "frontend_src_services_api_deloitteimportapi",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "deloitteimportapi"
     },
     {
@@ -5314,8 +5349,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "frontend_src_services_api_csvimportapi",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "csvimportapi"
     },
     {
@@ -5325,8 +5360,8 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "frontend_src_services_api_manageengineimportapi",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "manageengineimportapi"
     },
     {
@@ -5336,8 +5371,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "frontend_src_services_api_userapi",
-      "community": 23,
-      "community_name": "api.js",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "userapi"
     },
     {
@@ -5348,7 +5383,7 @@
       "_origin": "ast",
       "id": "frontend_src_services_api_backupapi",
       "community": 22,
-      "community_name": "BackupSettings.jsx",
+      "community_name": "UserManagement.jsx",
       "norm_label": "backupapi"
     },
     {
@@ -5358,8 +5393,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_utils_excelio",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "excelio.js"
     },
     {
@@ -5369,8 +5404,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_excel_epoch_utc",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "excel_epoch_utc"
     },
     {
@@ -5381,8 +5416,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_datestringtoexcelserial",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "datestringtoexcelserial()"
     },
     {
@@ -5393,8 +5428,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_excelserialtodatestring",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "excelserialtodatestring()"
     },
     {
@@ -5405,8 +5440,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_readworkbook",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "readworkbook()"
     },
     {
@@ -5417,8 +5452,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_buildsheet",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "buildsheet()"
     },
     {
@@ -5429,8 +5464,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_readsheetasfields",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "readsheetasfields()"
     },
     {
@@ -5440,8 +5475,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "exportexcel.js"
     },
     {
@@ -5452,8 +5487,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_fmtdate",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "fmtdate()"
     },
     {
@@ -5464,8 +5499,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_fmtdatetime",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "fmtdatetime()"
     },
     {
@@ -5475,8 +5510,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_digitization_columns",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "digitization_columns"
     },
     {
@@ -5486,8 +5521,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_sr_columns",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "sr_columns"
     },
     {
@@ -5498,8 +5533,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_exportsrstoexcel",
-      "community": 6,
-      "community_name": "dependencies",
+      "community": 23,
+      "community_name": "excelIO.js",
       "norm_label": "exportsrstoexcel()"
     },
     {
@@ -5509,8 +5544,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_utils_pagination",
-      "community": 24,
-      "community_name": "Reports.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "pagination.js"
     },
     {
@@ -5521,8 +5556,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_pagination_paginationconfig",
-      "community": 24,
-      "community_name": "Reports.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "paginationconfig()"
     },
     {
@@ -5533,8 +5568,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_pagination_compactpaginationconfig",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "compactpaginationconfig()"
     },
     {
@@ -8680,7 +8715,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/routes/stats.js",
-      "source_location": "L28",
+      "source_location": "L43",
       "weight": 1.0,
       "_origin": "ast",
       "source": "backend_routes_stats",
@@ -8702,7 +8737,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/routes/stats.js",
-      "source_location": "L51",
+      "source_location": "L75",
       "weight": 1.0,
       "_origin": "ast",
       "source": "backend_routes_stats",
@@ -13838,7 +13873,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L56",
+      "source_location": "L67",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -13849,7 +13884,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L187",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_pages_dashboardhome",
+      "target": "frontend_src_pages_dashboardhome_comparisonvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "source_location": "L222",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -13860,7 +13906,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L21",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_pages_dashboardhome",
+      "target": "frontend_src_pages_dashboardhome_months",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "source_location": "L22",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -13871,7 +13928,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L67",
+      "source_location": "L120",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -13882,7 +13939,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L44",
+      "source_location": "L103",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_pages_dashboardhome",
+      "target": "frontend_src_pages_dashboardhome_periodsummary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "source_location": "L55",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -13893,7 +13961,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L31",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -15250,5 +15318,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5ec0e74db50d5f6bd0369d15504c88e00319301d"
+  "built_at_commit": "d27aec8b0138f616c0f02d4db4e75416bf41a6f9"
 }

@@ -45,9 +45,9 @@
     "semantic_hash": "d1e377e30be05751350021f4439a0363"
   },
   "backend/routes/stats.js": {
-    "mtime": 1787219374.4538083,
-    "ast_hash": "de13660f5c033f76fd0a626f09554a09",
-    "semantic_hash": "de13660f5c033f76fd0a626f09554a09"
+    "mtime": 1787736002.6341262,
+    "ast_hash": "d65e68778aad35ff5bb33ff47b0b32bd",
+    "semantic_hash": ""
   },
   "backend/routes/users.js": {
     "mtime": 1786620511.410266,
@@ -155,9 +155,9 @@
     "semantic_hash": "6cf5201dc9d2e045505717911a1db84a"
   },
   "frontend/src/pages/DashboardHome.jsx": {
-    "mtime": 1787223004.8314028,
-    "ast_hash": "f37258ef40cdcaa31ec8fe95a24a832c",
-    "semantic_hash": "f37258ef40cdcaa31ec8fe95a24a832c"
+    "mtime": 1787736234.7059999,
+    "ast_hash": "95f4ea2a3384f7b65e1ec88b5a2a6914",
+    "semantic_hash": ""
   },
   "frontend/src/pages/ForgotPassword.jsx": {
     "mtime": 1785559938.6565883,
