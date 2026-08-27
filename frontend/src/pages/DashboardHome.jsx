@@ -27,7 +27,7 @@ const PALETTE = {
   closedWeek: '#3ecf5c',
 };
 
-function StatCard({ title, value, icon, color, formula, comparison }) {
+function StatCard({ title, value, icon, color, formula }) {
   return (
     <TiltCard style={{ height: '100%', borderRadius: 10 }}>
       <Card size="small" style={{ background: color, border: 'none', height: '100%', borderRadius: 10 }} className="shadow-soft">
@@ -42,11 +42,6 @@ function StatCard({ title, value, icon, color, formula, comparison }) {
         <div style={{ color: '#fff', fontSize: 26, fontWeight: 700, marginTop: 4, lineHeight: 1.2 }}>
           <AnimatedCounter value={value ?? 0} />
         </div>
-        {comparison && (
-          <div style={{ color: 'rgba(255,255,255,.9)', fontSize: 11, marginTop: 4 }}>
-            {comparison}
-          </div>
-        )}
       </Card>
     </TiltCard>
   );
@@ -75,32 +70,7 @@ function ColHeader({ label, formula, bold }) {
   );
 }
 
-function ComparisonValue({ current, previous, previousLabel, tone = 'blue', changeMeaning }) {
-  const currentValue = Number(current) || 0;
-  const previousValue = Number(previous) || 0;
-  const difference = currentValue - previousValue;
-  const differenceColor = difference > 0
-    ? (changeMeaning === 'workload' ? '#cf1322' : '#237804')
-    : difference < 0
-      ? (changeMeaning === 'workload' ? '#237804' : '#cf1322')
-      : '#8c8c8c';
-
-  return (
-    <Space direction="vertical" size={0}>
-      <Space size={5}>
-        <Tag color={tone} style={{ fontWeight: 800, marginInlineEnd: 0 }}>{currentValue}</Tag>
-        <Text style={{ color: differenceColor, fontSize: 11, fontWeight: 600 }}>
-          {difference > 0 ? `+${difference}` : difference}
-        </Text>
-      </Space>
-      <Text type="secondary" style={{ fontSize: 11, whiteSpace: 'nowrap' }}>
-        {previousLabel}: {previousValue}
-      </Text>
-    </Space>
-  );
-}
-
-function PeriodSummary({ periods }) {
+function ComparisonStrip({ periods, sr }) {
   if (!periods?.current?.start || !periods?.previous?.start) return null;
   const formatDate = (value) => {
     const [, month, day] = value.split('-').map(Number);
@@ -108,11 +78,52 @@ function PeriodSummary({ periods }) {
   };
   const label = (period) => `${formatDate(period.start)} - ${formatDate(period.end)}`;
 
+  const Metric = ({ name, previousLabel, previous, currentLabel, current }) => (
+    <div style={{ minWidth: 0 }}>
+      <Text type="secondary" style={{ display: 'block', fontSize: 11 }}>{name}</Text>
+      <Space size={7} align="baseline" wrap>
+        <span style={{ whiteSpace: 'nowrap' }}>
+          <Text type="secondary" style={{ fontSize: 11 }}>{previousLabel}</Text>{' '}
+          <Text strong style={{ fontSize: 17 }}>{Number(previous) || 0}</Text>
+        </span>
+        <Text type="secondary">→</Text>
+        <span style={{ whiteSpace: 'nowrap' }}>
+          <Text type="secondary" style={{ fontSize: 11 }}>{currentLabel}</Text>{' '}
+          <Text strong style={{ fontSize: 17, color: BRAND }}>{Number(current) || 0}</Text>
+        </span>
+      </Space>
+    </div>
+  );
+
   return (
-    <div style={{ marginBottom: 10, color: '#595959', fontSize: 12 }}>
-      <Text strong>Current 7 days:</Text> {label(periods.current)}
-      <span style={{ margin: '0 10px', color: '#bfbfbf' }}>|</span>
-      <Text strong>Previous 7 days:</Text> {label(periods.previous)}
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
+      gap: 12,
+      alignItems: 'center',
+      marginTop: 12,
+      padding: '10px 12px',
+      border: '1px solid #e5e7e6',
+      borderRadius: 9,
+      background: '#fbfcfb',
+    }}>
+      <div>
+        <Space size={5}>
+          <Text strong>7-day comparison</Text>
+          <Tooltip title="Pending compares the open workload at the start of the current period with now. Added and Closed compare the previous 7 days with the current 7 days.">
+            <InfoCircleOutlined style={{ color: '#8c8c8c', fontSize: 12 }} />
+          </Tooltip>
+        </Space>
+        <Text type="secondary" style={{ display: 'block', fontSize: 11, whiteSpace: 'nowrap' }}>
+          {label(periods.previous)} → {label(periods.current)}
+        </Text>
+      </div>
+      <Metric name="Pending workload" previousLabel="Start" previous={sr.pending_at_period_start}
+        currentLabel="Now" current={sr.pending_now} />
+      <Metric name="SRs added" previousLabel="Previous" previous={sr.added_previous_7d}
+        currentLabel="Current" current={sr.added_current_7d} />
+      <Metric name="SRs closed" previousLabel="Previous" previous={sr.closed_previous_7d}
+        currentLabel="Current" current={sr.closed_current_7d} />
     </div>
   );
 }
@@ -138,14 +149,11 @@ function PendingTable({ data, loading, category, onNavigate }) {
     {
       title: (
         <ColHeader bold label="Pending Now"
-          formula="Now = Status is not Closed. Start = raised before the current 7-day period and not closed before that period. Change = Now minus Start. All rows use the current Pending With value." />
+          formula="Status is not Closed. Grouped by the current Pending With value." />
       ),
       dataIndex: 'pending_now',
-      width: 155,
-      render: (value, row) => (
-        <ComparisonValue current={value} previous={row.pending_at_period_start}
-          previousLabel="Start" tone="blue" changeMeaning="workload" />
-      ),
+      width: 120,
+      render: (value) => <Tag color="blue" style={{ fontWeight: 800 }}>{value}</Tag>,
     },
     {
       title: (
@@ -168,26 +176,20 @@ function PendingTable({ data, loading, category, onNavigate }) {
     {
       title: (
         <ColHeader label="Added (7d)"
-          formula="Current = Creation Date in the current 7-day period. Previous = Creation Date in the immediately preceding 7-day period. Created At is used only when Creation Date is blank. Grouped by current Pending With." />
+          formula="Creation Date is in the current 7-day period. Created At is used only when Creation Date is blank. Grouped by current Pending With." />
       ),
       dataIndex: 'added_current_7d',
-      width: 165,
-      render: (value, row) => (
-        <ComparisonValue current={value} previous={row.added_previous_7d}
-          previousLabel="Previous" tone="cyan" changeMeaning="activity" />
-      ),
+      width: 110,
+      render: (value) => value > 0 ? <Tag color="cyan">{value}</Tag> : <Text type="secondary">0</Text>,
     },
     {
       title: (
         <ColHeader label="Closed (7d)"
-          formula="Current = Status is Closed and Closed Date is in the current 7-day period. Previous uses the immediately preceding 7-day period. Grouped by current Pending With." />
+          formula="Status is Closed and Closed Date is in the current 7-day period. Grouped by current Pending With." />
       ),
       dataIndex: 'closed_current_7d',
-      width: 165,
-      render: (value, row) => (
-        <ComparisonValue current={value} previous={row.closed_previous_7d}
-          previousLabel="Previous" tone="green" changeMeaning="activity" />
-      ),
+      width: 110,
+      render: (value) => value > 0 ? <Tag color="green">{value}</Tag> : <Text type="secondary">0</Text>,
     },
     {
       title: (
@@ -235,8 +237,6 @@ export default function DashboardHome({ onNavigateToSR }) {
   if (error) return <Alert type="error" message={error} showIcon />;
 
   const { sr, periods } = data;
-  const pendingChange = (Number(sr.pending_now) || 0) - (Number(sr.pending_at_period_start) || 0);
-
   return (
     <div style={{ width: '100%' }}>
         <Reveal>
@@ -252,23 +252,23 @@ export default function DashboardHome({ onNavigateToSR }) {
             <StatCard title="Total SRs" value={sr.total} icon={<DatabaseOutlined />} color={PALETTE.total}
               formula="All non-deleted Service Requests, including open and closed records." />
             <StatCard title="Pending Now" value={sr.pending_now} icon={<ClockCircleFilled />} color={PALETTE.pending}
-              formula="Status is not Closed."
-              comparison={`Start: ${sr.pending_at_period_start ?? 0} | Change: ${pendingChange > 0 ? '+' : ''}${pendingChange}`} />
+              formula="Status is not Closed." />
             <StatCard title="Overdue Now" value={sr.overdue} icon={<WarningFilled />} color={PALETTE.overdue}
               formula="Status is not Closed and Expected Closure Date is before today." />
-            <StatCard title="Added (Current 7 Days)" value={sr.added_current_7d} icon={<PlusCircleFilled />} color={PALETTE.added}
-              formula="Creation Date is in the current 7-day period. Created At is used when Creation Date is blank."
-              comparison={`Previous 7 days: ${sr.added_previous_7d ?? 0}`} />
-            <StatCard title="Closed (Current 7 Days)" value={sr.closed_current_7d} icon={<CheckCircleFilled />} color={PALETTE.closedWeek}
-              formula="Status is Closed and Closed Date is in the current 7-day period."
-              comparison={`Previous 7 days: ${sr.closed_previous_7d ?? 0}`} />
+            <StatCard title="Added (7 Days)" value={sr.added_current_7d} icon={<PlusCircleFilled />} color={PALETTE.added}
+              formula="Creation Date is in the current 7-day period. Created At is used when Creation Date is blank." />
+            <StatCard title="Closed (7 Days)" value={sr.closed_current_7d} icon={<CheckCircleFilled />} color={PALETTE.closedWeek}
+              formula="Status is Closed and Closed Date is in the current 7-day period." />
           </div>
         </RevealGroup>
 
+        <Reveal delay={0.05}>
+          <ComparisonStrip periods={periods} sr={sr} />
+        </Reveal>
+
         <Reveal delay={0.1}>
-          <Card size="small" style={{ marginTop: 16 }}
-            title={<Space><TeamOutlined /><span>SR overview by current Pending With</span></Space>}>
-            <PeriodSummary periods={periods} />
+          <Card size="small" style={{ marginTop: 12 }}
+            title={<Space><TeamOutlined /><span>Current SR workload by Pending With</span></Space>}>
             <PendingTable data={sr.by_pending_with} loading={loading} category="SR" onNavigate={onNavigateToSR} />
           </Card>
         </Reveal>

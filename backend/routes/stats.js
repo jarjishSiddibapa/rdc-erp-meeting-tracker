@@ -77,30 +77,19 @@ router.get('/dashboard', async (req, res, next) => {
         SELECT
           COALESCE(NULLIF(TRIM(pending_with),''), '(Unassigned)') as name,
           COUNT(CASE WHEN status != 'Closed' THEN 1 END) as pending_now,
-          COUNT(CASE WHEN ${RAISED_DATE} < b.current_start
-                     AND ${STATUS_AT_PERIOD_START} != 'Closed'
-                     THEN 1 END) as pending_at_period_start,
           COUNT(CASE WHEN ${RAISED_DATE} >= b.current_start
                      AND ${RAISED_DATE} < b.next_week_start THEN 1 END) as added_current_7d,
-          COUNT(CASE WHEN ${RAISED_DATE} >= b.previous_start
-                     AND ${RAISED_DATE} < b.current_start THEN 1 END) as added_previous_7d,
           COUNT(CASE WHEN status = 'Closed'
                      AND s.closed_date >= b.current_start
                      AND s.closed_date < b.next_week_start THEN 1 END) as closed_current_7d,
-          COUNT(CASE WHEN status = 'Closed'
-                     AND s.closed_date >= b.previous_start
-                     AND s.closed_date < b.current_start THEN 1 END) as closed_previous_7d,
           COALESCE(SUM(CASE WHEN status = 'On Hold' THEN 1 ELSE 0 END), 0) as on_hold,
           COALESCE(SUM(CASE WHEN expected_closure_date < CURDATE() AND status != 'Closed' THEN 1 ELSE 0 END), 0) as overdue
         FROM srs s, ${WEEK_BOUNDS}
         WHERE s.category = ? AND s.is_deleted = 0
         GROUP BY name
         HAVING pending_now > 0
-          OR pending_at_period_start > 0
           OR added_current_7d > 0
-          OR added_previous_7d > 0
           OR closed_current_7d > 0
-          OR closed_previous_7d > 0
         ORDER BY pending_now DESC
       `, [category]);
       return rows;

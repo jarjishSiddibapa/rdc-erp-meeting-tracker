@@ -4,15 +4,15 @@
   "2": "useAuth",
   "3": "dependencies",
   "4": "migrate-sqlite-to-mysql.js",
-  "5": "DashboardHome.jsx",
+  "5": "react",
   "6": "dependencies",
   "7": "deloitte-import.js",
   "8": "routes/backup.js",
   "9": "frontend/package.json",
   "10": "Login.jsx",
-  "11": "users.js",
+  "11": "routes/auth.js",
   "12": "manageengine-import.js",
-  "13": "react",
+  "13": "api.js",
   "14": "UpdateTasks.jsx",
   "15": "srs.js",
   "16": "SRDetail.jsx",
@@ -29,5 +29,6 @@
   "27": "Q: Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible.",
   "28": "Q: Use company color #00B51A and the taste skill to improve fonts, colors, sizes, smoothness, and overall UI quality.",
   "29": "React + Vite",
-  "30": "SRForm.jsx"
+  "30": "users.js",
+  "31": "LoginScene.jsx"
 }
