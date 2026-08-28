@@ -2960,8 +2960,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_oxlintrc_plugins",
-      "community": 20,
-      "community_name": ".oxlintrc.json",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "plugins"
     },
     {
@@ -2971,7 +2971,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ref_react",
-      "community": 5,
+      "community": 31,
       "community_name": "react",
       "norm_label": "react"
     },
@@ -2982,8 +2982,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ref_oxc",
-      "community": 20,
-      "community_name": ".oxlintrc.json",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "oxc"
     },
     {
@@ -3422,8 +3422,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "frontend_package_dependencies_xlsx",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "xlsx"
     },
     {
@@ -3433,8 +3433,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "xlsx",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "xlsx"
     },
     {
@@ -3763,7 +3763,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_loginscene",
       "community": 31,
-      "community_name": "LoginScene.jsx",
+      "community_name": "react",
       "norm_label": "loginscene.jsx"
     },
     {
@@ -3775,7 +3775,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_floatingicosahedron",
       "community": 31,
-      "community_name": "LoginScene.jsx",
+      "community_name": "react",
       "norm_label": "floatingicosahedron()"
     },
     {
@@ -3787,7 +3787,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_particles",
       "community": 31,
-      "community_name": "LoginScene.jsx",
+      "community_name": "react",
       "norm_label": "particles()"
     },
     {
@@ -3799,7 +3799,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_loginscene",
       "community": 31,
-      "community_name": "LoginScene.jsx",
+      "community_name": "react",
       "norm_label": "loginscene()"
     },
     {
@@ -4051,8 +4051,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_ambientbackground",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "ambientbackground.jsx"
     },
     {
@@ -4075,7 +4075,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_animatedcounter",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "animatedcounter.jsx"
     },
     {
@@ -4087,7 +4087,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_animatedcounter_animatedcounter",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "animatedcounter()"
     },
     {
@@ -4097,8 +4097,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_brandbutton",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "brandbutton.jsx"
     },
     {
@@ -4109,8 +4109,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_brandbutton_brandbutton",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "brandbutton()"
     },
     {
@@ -4120,8 +4120,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "doodles.jsx"
     },
     {
@@ -4132,8 +4132,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_squiggle",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "squiggle()"
     },
     {
@@ -4144,8 +4144,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_sparkle",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "sparkle()"
     },
     {
@@ -4156,8 +4156,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_dashedcircle",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "dashedcircle()"
     },
     {
@@ -4168,8 +4168,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_arrow",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "arrow()"
     },
     {
@@ -4180,8 +4180,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_barchart",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "barchart()"
     },
     {
@@ -4192,8 +4192,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_checkscribble",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "checkscribble()"
     },
     {
@@ -4204,7 +4204,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "greenmonster.jsx"
     },
     {
@@ -4215,7 +4215,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_anchor",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "anchor"
     },
     {
@@ -4226,7 +4226,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_rest_face",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "rest_face"
     },
     {
@@ -4238,7 +4238,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_anglebetween",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "anglebetween()"
     },
     {
@@ -4250,7 +4250,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_anchortopage",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "anchortopage()"
     },
     {
@@ -4261,7 +4261,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_mirror_props",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "mirror_props"
     },
     {
@@ -4273,7 +4273,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_getmirror",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "getmirror()"
     },
     {
@@ -4285,7 +4285,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_caretrelativex",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "caretrelativex()"
     },
     {
@@ -4297,7 +4297,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_computefacemove",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "computefacemove()"
     },
     {
@@ -4309,7 +4309,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_greenmonster",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "greenmonster()"
     },
     {
@@ -4321,7 +4321,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_greenmonster_stylet",
       "community": 10,
-      "community_name": "Login.jsx",
+      "community_name": "GreenMonster.jsx",
       "norm_label": "stylet()"
     },
     {
@@ -4331,8 +4331,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_magneticbutton",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "magneticbutton.jsx"
     },
     {
@@ -4343,8 +4343,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_magneticbutton_magneticbutton",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "magneticbutton()"
     },
     {
@@ -4377,8 +4377,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "reveal.jsx"
     },
     {
@@ -4389,8 +4389,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal_reveal",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "reveal()"
     },
     {
@@ -4401,8 +4401,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal_revealgroup",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "revealgroup()"
     },
     {
@@ -4413,7 +4413,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_tiltcard",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "tiltcard.jsx"
     },
     {
@@ -4425,7 +4425,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_tiltcard_tiltcard",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "tiltcard()"
     },
     {
@@ -4492,8 +4492,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_backupsettings",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "backupsettings.jsx"
     },
     {
@@ -4504,8 +4504,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_backupsettings_formatbytes",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "formatbytes()"
     },
     {
@@ -4515,8 +4515,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "frontend_src_pages_backupsettings_status_tag",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "status_tag"
     },
     {
@@ -4527,8 +4527,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_backupsettings_backupsettings",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "backupsettings()"
     },
     {
@@ -4538,8 +4538,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_changepassword",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "changepassword.jsx"
     },
     {
@@ -4550,8 +4550,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_changepassword_changepassword",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "changepassword()"
     },
     {
@@ -4695,7 +4695,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "dashboardhome.jsx"
     },
     {
@@ -4706,7 +4706,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_months",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "months"
     },
     {
@@ -4717,7 +4717,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_palette",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "palette"
     },
     {
@@ -4729,7 +4729,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_statcard",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "statcard()"
     },
     {
@@ -4741,7 +4741,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_sectionheader",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "sectionheader()"
     },
     {
@@ -4753,7 +4753,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_colheader",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "colheader()"
     },
     {
@@ -4765,7 +4765,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_comparisonstrip",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "comparisonstrip()"
     },
     {
@@ -4777,7 +4777,7 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_pendingtable",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "pendingtable()"
     },
     {
@@ -4788,8 +4788,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_dashboardhome",
-      "community": 5,
-      "community_name": "react",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "dashboardhome()"
     },
     {
@@ -4822,8 +4822,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_login",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "login.jsx"
     },
     {
@@ -4833,8 +4833,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "frontend_src_pages_login_loginscene",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "loginscene"
     },
     {
@@ -4845,8 +4845,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_login_login",
-      "community": 10,
-      "community_name": "Login.jsx",
+      "community": 2,
+      "community_name": "useAuth",
       "norm_label": "login()"
     },
     {
@@ -5180,8 +5180,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_updatetasks_updatefrommanageengine",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "updatefrommanageengine()"
     },
     {
@@ -5237,8 +5237,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_bulkaddusersmodal",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "bulkaddusersmodal()"
     },
     {
@@ -5305,7 +5305,7 @@
       "_origin": "ast",
       "id": "frontend_src_services_api_statsapi",
       "community": 5,
-      "community_name": "react",
+      "community_name": "DashboardHome.jsx",
       "norm_label": "statsapi"
     },
     {
@@ -5326,8 +5326,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "frontend_src_services_api_deloitteimportapi",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "deloitteimportapi"
     },
     {
@@ -5337,8 +5337,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "frontend_src_services_api_csvimportapi",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "csvimportapi"
     },
     {
@@ -5370,8 +5370,8 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "frontend_src_services_api_backupapi",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 5,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "backupapi"
     },
     {
@@ -5381,8 +5381,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_utils_excelio",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "excelio.js"
     },
     {
@@ -5392,8 +5392,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_excel_epoch_utc",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "excel_epoch_utc"
     },
     {
@@ -5404,8 +5404,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_datestringtoexcelserial",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "datestringtoexcelserial()"
     },
     {
@@ -5416,8 +5416,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_excelserialtodatestring",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "excelserialtodatestring()"
     },
     {
@@ -5428,8 +5428,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_readworkbook",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "readworkbook()"
     },
     {
@@ -5440,8 +5440,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_buildsheet",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "buildsheet()"
     },
     {
@@ -5452,8 +5452,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_excelio_readsheetasfields",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "readsheetasfields()"
     },
     {
@@ -5463,8 +5463,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "exportexcel.js"
     },
     {
@@ -5475,8 +5475,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_fmtdate",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "fmtdate()"
     },
     {
@@ -5487,8 +5487,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_fmtdatetime",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "fmtdatetime()"
     },
     {
@@ -5498,8 +5498,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_digitization_columns",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "digitization_columns"
     },
     {
@@ -5509,8 +5509,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_sr_columns",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "sr_columns"
     },
     {
@@ -5521,8 +5521,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_exportexcel_exportsrstoexcel",
-      "community": 23,
-      "community_name": "excelIO.js",
+      "community": 6,
+      "community_name": "dependencies",
       "norm_label": "exportsrstoexcel()"
     },
     {
@@ -5556,8 +5556,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_pagination_compactpaginationconfig",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "compactpaginationconfig()"
     },
     {
@@ -5572,6 +5572,105 @@
       "norm_label": "vite.config.js"
     },
     {
+      "label": "pull_request_template.md",
+      "file_type": "document",
+      "source_file": ".github/pull_request_template.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "github_pull_request_template",
+      "community": 32,
+      "community_name": "pull_request_template.md",
+      "norm_label": "pull_request_template.md"
+    },
+    {
+      "label": "What changed?",
+      "file_type": "document",
+      "source_file": ".github/pull_request_template.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "github_pull_request_template_what_changed",
+      "community": 32,
+      "community_name": "pull_request_template.md",
+      "norm_label": "what changed?"
+    },
+    {
+      "label": "Verification",
+      "file_type": "document",
+      "source_file": ".github/pull_request_template.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "github_pull_request_template_verification",
+      "community": 32,
+      "community_name": "pull_request_template.md",
+      "norm_label": "verification"
+    },
+    {
+      "label": "Data and deployment impact",
+      "file_type": "document",
+      "source_file": ".github/pull_request_template.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "github_pull_request_template_data_and_deployment_impact",
+      "community": 32,
+      "community_name": "pull_request_template.md",
+      "norm_label": "data and deployment impact"
+    },
+    {
+      "label": "CONTRIBUTING.md",
+      "file_type": "document",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "contributing",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "contributing.md"
+    },
+    {
+      "label": "Contributing",
+      "file_type": "document",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "contributing_contributing",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "contributing"
+    },
+    {
+      "label": "Workflow",
+      "file_type": "document",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "contributing_workflow",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "workflow"
+    },
+    {
+      "label": "Required checks",
+      "file_type": "document",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "contributing_required_checks",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "required checks"
+    },
+    {
+      "label": "Commit guidance",
+      "file_type": "document",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "contributing_commit_guidance",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "commit guidance"
+    },
+    {
       "label": "PRODUCTION.md",
       "file_type": "document",
       "source_file": "PRODUCTION.md",
@@ -5579,7 +5678,7 @@
       "_origin": "ast",
       "id": "production",
       "community": 25,
-      "community_name": "Windows production deployment",
+      "community_name": "Troubleshooting",
       "norm_label": "production.md"
     },
     {
@@ -5590,40 +5689,40 @@
       "_origin": "ast",
       "id": "production_windows_production_deployment",
       "community": 25,
-      "community_name": "Windows production deployment",
+      "community_name": "Troubleshooting",
       "norm_label": "windows production deployment"
     },
     {
       "label": "First deployment after cloning",
       "file_type": "document",
       "source_file": "PRODUCTION.md",
-      "source_location": "L5",
+      "source_location": "L7",
       "_origin": "ast",
       "id": "production_first_deployment_after_cloning",
       "community": 25,
-      "community_name": "Windows production deployment",
+      "community_name": "Troubleshooting",
       "norm_label": "first deployment after cloning"
     },
     {
       "label": "Windows Task Scheduler",
       "file_type": "document",
       "source_file": "PRODUCTION.md",
-      "source_location": "L45",
+      "source_location": "L49",
       "_origin": "ast",
       "id": "production_windows_task_scheduler",
       "community": 25,
-      "community_name": "Windows production deployment",
+      "community_name": "Troubleshooting",
       "norm_label": "windows task scheduler"
     },
     {
       "label": "Installing future updates",
       "file_type": "document",
       "source_file": "PRODUCTION.md",
-      "source_location": "L62",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "production_installing_future_updates",
       "community": 25,
-      "community_name": "Windows production deployment",
+      "community_name": "Troubleshooting",
       "norm_label": "installing future updates"
     },
     {
@@ -5634,7 +5733,7 @@
       "_origin": "ast",
       "id": "readme",
       "community": 25,
-      "community_name": "Windows production deployment",
+      "community_name": "Troubleshooting",
       "norm_label": "readme.md"
     },
     {
@@ -5644,42 +5743,592 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "readme_rdc_erp_meeting_tracker",
-      "community": 25,
-      "community_name": "Windows production deployment",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
       "norm_label": "rdc erp meeting tracker"
+    },
+    {
+      "label": "What it does",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "readme_what_it_does",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
+      "norm_label": "what it does"
+    },
+    {
+      "label": "Screenshots",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "readme_screenshots",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
+      "norm_label": "screenshots"
+    },
+    {
+      "label": "Quick start",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "readme_quick_start",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
+      "norm_label": "quick start"
+    },
+    {
+      "label": "Requirements",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "readme_requirements",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
+      "norm_label": "requirements"
+    },
+    {
+      "label": "Run locally",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "readme_run_locally",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
+      "norm_label": "run locally"
+    },
+    {
+      "label": "Documentation",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "readme_documentation",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
+      "norm_label": "documentation"
     },
     {
       "label": "Technology",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L5",
+      "source_location": "L67",
       "_origin": "ast",
       "id": "readme_technology",
-      "community": 25,
-      "community_name": "Windows production deployment",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
       "norm_label": "technology"
     },
     {
-      "label": "Local setup",
+      "label": "Repository layout",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L11",
+      "source_location": "L74",
       "_origin": "ast",
-      "id": "readme_local_setup",
-      "community": 25,
-      "community_name": "Windows production deployment",
-      "norm_label": "local setup"
+      "id": "readme_repository_layout",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
+      "norm_label": "repository layout"
     },
     {
-      "label": "Useful commands",
+      "label": "Security and data boundaries",
       "file_type": "document",
       "source_file": "README.md",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "readme_security_and_data_boundaries",
+      "community": 29,
+      "community_name": "RDC ERP Meeting Tracker",
+      "norm_label": "security and data boundaries"
+    },
+    {
+      "label": "SECURITY.md",
+      "file_type": "document",
+      "source_file": "SECURITY.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "security",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "security.md"
+    },
+    {
+      "label": "Security policy",
+      "file_type": "document",
+      "source_file": "SECURITY.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "security_security_policy",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "security policy"
+    },
+    {
+      "label": "Scope",
+      "file_type": "document",
+      "source_file": "SECURITY.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "security_scope",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "scope"
+    },
+    {
+      "label": "Reporting a vulnerability",
+      "file_type": "document",
+      "source_file": "SECURITY.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "security_reporting_a_vulnerability",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "reporting a vulnerability"
+    },
+    {
+      "label": "Operational protections",
+      "file_type": "document",
+      "source_file": "SECURITY.md",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "security_operational_protections",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "operational protections"
+    },
+    {
+      "label": "backend/README.md",
+      "file_type": "document",
+      "source_file": "backend/README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "backend_readme",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "backend/readme.md"
+    },
+    {
+      "label": "Backend service",
+      "file_type": "document",
+      "source_file": "backend/README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "backend_readme_backend_service",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "backend service"
+    },
+    {
+      "label": "Commands",
+      "file_type": "document",
+      "source_file": "backend/README.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "backend_readme_commands",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "commands"
+    },
+    {
+      "label": "ARCHITECTURE.md",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_architecture",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "architecture.md"
+    },
+    {
+      "label": "Architecture",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_architecture_architecture",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "architecture"
+    },
+    {
+      "label": "Runtime topology",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "docs_architecture_runtime_topology",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "runtime topology"
+    },
+    {
+      "label": "Repository responsibilities",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "docs_architecture_repository_responsibilities",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "repository responsibilities"
+    },
+    {
+      "label": "Data model",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "docs_architecture_data_model",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "data model"
+    },
+    {
+      "label": "Authentication and authorization",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
       "source_location": "L42",
       "_origin": "ast",
-      "id": "readme_useful_commands",
+      "id": "docs_architecture_authentication_and_authorization",
       "community": 25,
-      "community_name": "Windows production deployment",
-      "norm_label": "useful commands"
+      "community_name": "Troubleshooting",
+      "norm_label": "authentication and authorization"
+    },
+    {
+      "label": "API map",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "docs_architecture_api_map",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "api map"
+    },
+    {
+      "label": "Performance and operational choices",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "docs_architecture_performance_and_operational_choices",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "performance and operational choices"
+    },
+    {
+      "label": "DEVELOPMENT.md",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_development",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "development.md"
+    },
+    {
+      "label": "Development guide",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_development_development_guide",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "development guide"
+    },
+    {
+      "label": "Prerequisites",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "docs_development_prerequisites",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "prerequisites"
+    },
+    {
+      "label": "Setup",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "docs_development_setup",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "setup"
+    },
+    {
+      "label": "Development workflows",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "docs_development_development_workflows",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "development workflows"
+    },
+    {
+      "label": "Production-style single port",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "docs_development_production_style_single_port",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "production-style single port"
+    },
+    {
+      "label": "Hot reload",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "docs_development_hot_reload",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "hot reload"
+    },
+    {
+      "label": "Validation before a pull request",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "docs_development_validation_before_a_pull_request",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "validation before a pull request"
+    },
+    {
+      "label": "Database and migrations",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "docs_development_database_and_migrations",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "database and migrations"
+    },
+    {
+      "label": "Frontend conventions",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "docs_development_frontend_conventions",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "frontend conventions"
+    },
+    {
+      "label": "Project map",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L68",
+      "_origin": "ast",
+      "id": "docs_development_project_map",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "project map"
+    },
+    {
+      "label": "TROUBLESHOOTING.md",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_troubleshooting",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "troubleshooting.md"
+    },
+    {
+      "label": "Troubleshooting",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_troubleshooting",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "troubleshooting"
+    },
+    {
+      "label": "A batch window opens and closes immediately",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_a_batch_window_opens_and_closes_immediately",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "a batch window opens and closes immediately"
+    },
+    {
+      "label": "The site opens but the old UI is still visible",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_the_site_opens_but_the_old_ui_is_still_visible",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "the site opens but the old ui is still visible"
+    },
+    {
+      "label": "Port 777 is already in use",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_port_777_is_already_in_use",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "port 777 is already in use"
+    },
+    {
+      "label": "MySQL connection or startup failure",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_mysql_connection_or_startup_failure",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "mysql connection or startup failure"
+    },
+    {
+      "label": "Login or password reset problems",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_login_or_password_reset_problems",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "login or password reset problems"
+    },
+    {
+      "label": "Backups fail",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_backups_fail",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "backups fail"
+    },
+    {
+      "label": "Production update refuses to run",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_production_update_refuses_to_run",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "production update refuses to run"
+    },
+    {
+      "label": "Health check",
+      "file_type": "document",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "docs_troubleshooting_health_check",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "health check"
+    },
+    {
+      "label": "USER_GUIDE.md",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_user_guide",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "user_guide.md"
+    },
+    {
+      "label": "User guide",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_user_guide_user_guide",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "user guide"
+    },
+    {
+      "label": "Dashboard",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "docs_user_guide_dashboard",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "dashboard"
+    },
+    {
+      "label": "Service Requests and Digitization Projects",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "docs_user_guide_service_requests_and_digitization_projects",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "service requests and digitization projects"
+    },
+    {
+      "label": "Roles and permissions",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "docs_user_guide_roles_and_permissions",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "roles and permissions"
+    },
+    {
+      "label": "Update Tasks",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "docs_user_guide_update_tasks",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "update tasks"
+    },
+    {
+      "label": "Reports and backups",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L58",
+      "_origin": "ast",
+      "id": "docs_user_guide_reports_and_backups",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "reports and backups"
     },
     {
       "label": "frontend/README.md",
@@ -5688,42 +6337,42 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_readme",
-      "community": 29,
-      "community_name": "React + Vite",
+      "community": 25,
+      "community_name": "Troubleshooting",
       "norm_label": "frontend/readme.md"
     },
     {
-      "label": "React + Vite",
+      "label": "Frontend",
       "file_type": "document",
       "source_file": "frontend/README.md",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "frontend_readme_react_vite",
-      "community": 29,
-      "community_name": "React + Vite",
-      "norm_label": "react + vite"
+      "id": "frontend_readme_frontend",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "frontend"
     },
     {
-      "label": "React Compiler",
+      "label": "Commands",
       "file_type": "document",
       "source_file": "frontend/README.md",
-      "source_location": "L10",
+      "source_location": "L5",
       "_origin": "ast",
-      "id": "frontend_readme_react_compiler",
-      "community": 29,
-      "community_name": "React + Vite",
-      "norm_label": "react compiler"
+      "id": "frontend_readme_commands",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "commands"
     },
     {
-      "label": "Expanding the Oxlint configuration",
+      "label": "Client structure",
       "file_type": "document",
       "source_file": "frontend/README.md",
-      "source_location": "L14",
+      "source_location": "L17",
       "_origin": "ast",
-      "id": "frontend_readme_expanding_the_oxlint_configuration",
-      "community": 29,
-      "community_name": "React + Vite",
-      "norm_label": "expanding the oxlint configuration"
+      "id": "frontend_readme_client_structure",
+      "community": 25,
+      "community_name": "Troubleshooting",
+      "norm_label": "client structure"
     },
     {
       "label": "query_20260825_095625_use_https___github_com_leonxlnx_taste_skill_to_imp.md",
@@ -15032,6 +15681,138 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": ".github/pull_request_template.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "github_pull_request_template",
+      "target": "github_pull_request_template_data_and_deployment_impact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".github/pull_request_template.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "github_pull_request_template",
+      "target": "github_pull_request_template_verification",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".github/pull_request_template.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "github_pull_request_template",
+      "target": "github_pull_request_template_what_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "contributing",
+      "target": "contributing_contributing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development",
+      "target": "contributing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "contributing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "contributing_contributing",
+      "target": "contributing_commit_guidance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "contributing_contributing",
+      "target": "contributing_required_checks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "contributing_contributing",
+      "target": "contributing_workflow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/README.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_readme",
+      "target": "production",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "PRODUCTION.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "production",
+      "target": "docs_troubleshooting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "PRODUCTION.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "production",
+      "target": "docs_user_guide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "PRODUCTION.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -15044,7 +15825,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L40",
+      "source_location": "L59",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -15055,7 +15836,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "PRODUCTION.md",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
       "source": "production_windows_production_deployment",
@@ -15066,7 +15847,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "PRODUCTION.md",
-      "source_location": "L62",
+      "source_location": "L66",
       "weight": 1.0,
       "_origin": "ast",
       "source": "production_windows_production_deployment",
@@ -15077,11 +15858,55 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "PRODUCTION.md",
-      "source_location": "L45",
+      "source_location": "L49",
       "weight": 1.0,
       "_origin": "ast",
       "source": "production_windows_production_deployment",
       "target": "production_windows_task_scheduler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "docs_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "docs_development",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "docs_troubleshooting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "docs_user_guide",
       "confidence_score": 1.0
     },
     {
@@ -15096,21 +15921,76 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "contains",
+      "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L11",
+      "source_location": "L64",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_local_setup",
+      "source": "readme",
+      "target": "security",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L5",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_rdc_erp_meeting_tracker",
+      "target": "readme_documentation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_rdc_erp_meeting_tracker",
+      "target": "readme_quick_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L74",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_rdc_erp_meeting_tracker",
+      "target": "readme_repository_layout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_rdc_erp_meeting_tracker",
+      "target": "readme_screenshots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_rdc_erp_meeting_tracker",
+      "target": "readme_security_and_data_boundaries",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L67",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_rdc_erp_meeting_tracker",
@@ -15121,11 +16001,495 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L42",
+      "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_useful_commands",
+      "target": "readme_what_it_does",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_quick_start",
+      "target": "readme_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_quick_start",
+      "target": "readme_run_locally",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "SECURITY.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "security",
+      "target": "security_security_policy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "SECURITY.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "security_security_policy",
+      "target": "security_operational_protections",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "SECURITY.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "security_security_policy",
+      "target": "security_reporting_a_vulnerability",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "SECURITY.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "security_security_policy",
+      "target": "security_scope",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_readme",
+      "target": "backend_readme_backend_service",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/README.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_readme",
+      "target": "docs_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/README.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_readme_backend_service",
+      "target": "backend_readme_commands",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture",
+      "target": "docs_architecture_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development",
+      "target": "docs_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/README.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_readme",
+      "target": "docs_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture_architecture",
+      "target": "docs_architecture_api_map",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture_architecture",
+      "target": "docs_architecture_authentication_and_authorization",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture_architecture",
+      "target": "docs_architecture_data_model",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture_architecture",
+      "target": "docs_architecture_performance_and_operational_choices",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture_architecture",
+      "target": "docs_architecture_repository_responsibilities",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture_architecture",
+      "target": "docs_architecture_runtime_topology",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development",
+      "target": "docs_development_development_guide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/README.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_readme",
+      "target": "docs_development",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_guide",
+      "target": "docs_development_database_and_migrations",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_guide",
+      "target": "docs_development_development_workflows",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_guide",
+      "target": "docs_development_frontend_conventions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_guide",
+      "target": "docs_development_prerequisites",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L68",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_guide",
+      "target": "docs_development_project_map",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_guide",
+      "target": "docs_development_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_guide",
+      "target": "docs_development_validation_before_a_pull_request",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_workflows",
+      "target": "docs_development_hot_reload",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_workflows",
+      "target": "docs_development_production_style_single_port",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting",
+      "target": "docs_troubleshooting_troubleshooting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting_troubleshooting",
+      "target": "docs_troubleshooting_a_batch_window_opens_and_closes_immediately",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting_troubleshooting",
+      "target": "docs_troubleshooting_backups_fail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting_troubleshooting",
+      "target": "docs_troubleshooting_health_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting_troubleshooting",
+      "target": "docs_troubleshooting_login_or_password_reset_problems",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting_troubleshooting",
+      "target": "docs_troubleshooting_mysql_connection_or_startup_failure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting_troubleshooting",
+      "target": "docs_troubleshooting_port_777_is_already_in_use",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting_troubleshooting",
+      "target": "docs_troubleshooting_production_update_refuses_to_run",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/TROUBLESHOOTING.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_troubleshooting_troubleshooting",
+      "target": "docs_troubleshooting_the_site_opens_but_the_old_ui_is_still_visible",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_user_guide",
+      "target": "docs_user_guide_user_guide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_user_guide_user_guide",
+      "target": "docs_user_guide_dashboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_user_guide_user_guide",
+      "target": "docs_user_guide_reports_and_backups",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_user_guide_user_guide",
+      "target": "docs_user_guide_roles_and_permissions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_user_guide_user_guide",
+      "target": "docs_user_guide_service_requests_and_digitization_projects",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_user_guide_user_guide",
+      "target": "docs_user_guide_update_tasks",
       "confidence_score": 1.0
     },
     {
@@ -15136,29 +16500,29 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_readme",
-      "target": "frontend_readme_react_vite",
+      "target": "frontend_readme_frontend",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/README.md",
-      "source_location": "L14",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "frontend_readme_react_vite",
-      "target": "frontend_readme_expanding_the_oxlint_configuration",
+      "source": "frontend_readme_frontend",
+      "target": "frontend_readme_client_structure",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/README.md",
-      "source_location": "L10",
+      "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "frontend_readme_react_vite",
-      "target": "frontend_readme_react_compiler",
+      "source": "frontend_readme_frontend",
+      "target": "frontend_readme_commands",
       "confidence_score": 1.0
     },
     {
@@ -15295,5 +16659,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "04219c8598ea3942a661f8bb38acf6ac7367a343"
+  "built_at_commit": "b65d1f481cd4d7eade55dc9ebc883e725c49133d"
 }

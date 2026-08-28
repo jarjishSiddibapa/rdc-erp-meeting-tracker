@@ -210,9 +210,9 @@
     "semantic_hash": "1b14e941ee104e55f0d2711f7346c774"
   },
   "frontend/README.md": {
-    "mtime": 1782710633.1960084,
-    "ast_hash": "75eb386f17caf77fd6fe3ce1d90968ee",
-    "semantic_hash": "75eb386f17caf77fd6fe3ce1d90968ee"
+    "mtime": 1787893772.7109787,
+    "ast_hash": "e99b9e9b419e9130b5aba0b2f8936599",
+    "semantic_hash": ""
   },
   "frontend/rdc-logo.png": {
     "mtime": 1698825350.0,
@@ -335,13 +335,73 @@
     "semantic_hash": "60e1d9f938e187f820a44c524bcf0687"
   },
   "README.md": {
-    "mtime": 1787717800.3704646,
-    "ast_hash": "c964c7010e67c2705dd70f6ba945dfdb",
+    "mtime": 1787893864.8470838,
+    "ast_hash": "828912a21292dffda94a089021c0fc2a",
     "semantic_hash": ""
   },
   "PRODUCTION.md": {
-    "mtime": 1787719671.9485004,
-    "ast_hash": "0b0d1421e01be17e3fff29f039268a47",
+    "mtime": 1787893781.3790724,
+    "ast_hash": "62d7e1f4c9411b5c479369eb93c09ba2",
+    "semantic_hash": ""
+  },
+  ".github/pull_request_template.md": {
+    "mtime": 1787893772.7266681,
+    "ast_hash": "60ad015488142b8b23dfe8ba7ae6820b",
+    "semantic_hash": ""
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1787893772.7266681,
+    "ast_hash": "1b40935541f0f433d0f41b5717c1cc3a",
+    "semantic_hash": ""
+  },
+  "CONTRIBUTING.md": {
+    "mtime": 1787893772.7246585,
+    "ast_hash": "bd04cb0866189c84be9b8041d7170afb",
+    "semantic_hash": ""
+  },
+  "SECURITY.md": {
+    "mtime": 1787893772.7246585,
+    "ast_hash": "e256216e143d1eb28c064a9332e512ad",
+    "semantic_hash": ""
+  },
+  "backend/README.md": {
+    "mtime": 1787893772.7167938,
+    "ast_hash": "a2fd8199404d9ab754df4ea0e9ab0356",
+    "semantic_hash": ""
+  },
+  "docs/ARCHITECTURE.md": {
+    "mtime": 1787893772.7206147,
+    "ast_hash": "bb9465cdb1e8fe3de7c9c337990de259",
+    "semantic_hash": ""
+  },
+  "docs/DEVELOPMENT.md": {
+    "mtime": 1787893772.7185214,
+    "ast_hash": "403b242edc08edbea724b2e561f957f3",
+    "semantic_hash": ""
+  },
+  "docs/TROUBLESHOOTING.md": {
+    "mtime": 1787893772.7226336,
+    "ast_hash": "0391b43315745d81e87beffb48581153",
+    "semantic_hash": ""
+  },
+  "docs/USER_GUIDE.md": {
+    "mtime": 1787893772.7182088,
+    "ast_hash": "7cc77237db2c52a27b4e918027d900df",
+    "semantic_hash": ""
+  },
+  "docs/images/dashboard-overview.png": {
+    "mtime": 1787892187.1699286,
+    "ast_hash": "d168b7dc4c02a75ecaff764a609b4a8d",
+    "semantic_hash": ""
+  },
+  "docs/images/login.png": {
+    "mtime": 1787892163.7221365,
+    "ast_hash": "22d66956c344a60685177e53b041d373",
+    "semantic_hash": ""
+  },
+  "docs/images/update-tasks.png": {
+    "mtime": 1787892202.587165,
+    "ast_hash": "bf839e6d674c7839c12d75b425686e10",
     "semantic_hash": ""
   }
 }

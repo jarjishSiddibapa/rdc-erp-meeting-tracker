@@ -1,5 +1,7 @@
 # Windows production deployment
 
+This runbook is the source of truth for installing and updating the Windows production machine. For application behavior and dashboard meanings, see the [user guide](docs/USER_GUIDE.md). For recovery from common failures, see [troubleshooting](docs/TROUBLESHOOTING.md).
+
 The production application uses one long-running process: the Node/Express backend on port `777`. Express serves both `/api/*` and the built React frontend from `frontend/dist`. Do not schedule the Vite development server.
 
 ## First deployment after cloning
@@ -40,6 +42,8 @@ After `build.bat` succeeds, test once interactively:
 
 Open `http://localhost:777/api/health` and confirm it returns `status: ok`. Stop the interactive process with `Ctrl+C` before enabling the scheduled task.
 
+Take a database backup before the first production deployment and before any change that affects schema or imported data. The application startup migrations are additive, but an operational backup is still the safest rollback point.
+
 For access from other LAN computers, allow inbound TCP port `777` in Windows Firewall and open `http://<production-machine-ip>:777`.
 
 ## Windows Task Scheduler
@@ -70,5 +74,15 @@ If a manual build or start fails, the window remains open and the scripts also r
 
 3. Start the scheduled task again.
 4. Verify `http://localhost:777/api/health`, then refresh the application in a browser.
+
+If a release must be rolled back, stop the scheduled task, identify the last known-good commit with `git log --oneline`, check out that commit, run `build.bat`, and start the task again. Return the checkout to `main` before the next normal update:
+
+```powershell
+git switch --detach <known-good-commit>
+.\build.bat
+# restart and verify the task
+git switch main
+git pull --ff-only origin main
+```
 
 The update script refuses to merge over tracked local changes, pulls `origin/main` using `--ff-only`, installs the exact dependency versions from both lockfiles with `npm ci`, and rebuilds `frontend/dist`. It does not replace `backend/.env`, the MySQL database, logs, or backup files because those are excluded from Git.

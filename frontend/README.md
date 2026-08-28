@@ -1,16 +1,25 @@
-# React + Vite
+# Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This directory contains the React/Vite client for RDC ERP Meeting Tracker. It is served by the Express backend from `frontend/dist` in production.
 
-Currently, two official plugins are available:
+## Commands
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```powershell
+npm install
+npm run dev       # Vite development server, normally http://localhost:5173
+npm run lint
+npm run build     # creates dist/ for the backend to serve
+npm run preview
+```
 
-## React Compiler
+The Vite development server proxies `/api` requests to the backend on port `777`. For a production-style verification, build the frontend and open `http://localhost:777` instead of the Vite URL.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Client structure
 
-## Expanding the Oxlint configuration
+- `src/App.jsx` — authentication gates and route shell.
+- `src/pages/` — dashboard, SR/Digitization lists, reports, imports, users, backups, and password screens.
+- `src/components/` — reusable SR forms, detail views, comments, and date controls.
+- `src/services/api.js` — the Axios API surface.
+- `src/utils/` — pagination and Excel import/export helpers.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+See the repository [development guide](../docs/DEVELOPMENT.md) and [architecture guide](../docs/ARCHITECTURE.md) for the complete system context.
