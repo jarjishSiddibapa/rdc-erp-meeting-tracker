@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Layout, Menu, Avatar, Dropdown, Typography, Space, Tag, theme, Tooltip, Spin, Grid } from 'antd';
+import { Layout, Menu, Avatar, Dropdown, Typography, Space, Tag, theme, Tooltip, Grid } from 'antd';
 import {
   DatabaseOutlined, TeamOutlined, LockOutlined, LogoutOutlined,
   UserOutlined, ProjectOutlined, CloudServerOutlined,
@@ -9,6 +9,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import AmbientBackground from '../components/ui/AmbientBackground';
+import { LoadingNotice } from '../components/ui/LoadingNotice';
 import DashboardHome from './DashboardHome';
 
 // Route-level code splitting: only the landing page (DashboardHome, above) loads eagerly;
@@ -248,7 +249,7 @@ export default function Dashboard() {
                 transition={{ duration: 0.2, ease: 'easeOut' }}
                 style={{ gridArea: '1 / 1', minWidth: 0 }}
               >
-                <Suspense fallback={<div style={{ textAlign: 'center', paddingTop: 80 }}><Spin size="large" /></div>}>
+                <Suspense fallback={<LoadingNotice />}>
                   {renderContent()}
                 </Suspense>
               </motion.div>

@@ -1,4 +1,20 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+
+const ENV_PATH = path.resolve(__dirname, '..', '.env');
+
+function upsertEnvValue(contents, name, value) {
+  const line = `${name}=${value}`;
+  const pattern = new RegExp(`^${name}=.*$`, 'm');
+  if (pattern.test(contents)) return contents.replace(pattern, () => line);
+  return `${contents.replace(/\s*$/, '')}\n${line}\n`;
+}
+
+function removeEnvValue(contents, name) {
+  const pattern = new RegExp(`^${name}=.*(?:\\r?\\n|$)`, 'm');
+  return contents.replace(pattern, '');
+}
 
 async function main() {
   const accountsUrl = String(process.env.MANAGEENGINE_ACCOUNTS_URL || 'https://accounts.zoho.com').replace(/\/+$/, '');
@@ -33,10 +49,14 @@ async function main() {
     throw new Error(`Token exchange failed: ${payload.error || `HTTP ${response.status}`}. Generate a new offline authorization code and try immediately.`);
   }
 
-  console.log('OAuth exchange succeeded. Copy these values into backend/.env:');
-  console.log(`MANAGEENGINE_REFRESH_TOKEN=${payload.refresh_token}`);
-  if (payload.api_domain) console.log(`MANAGEENGINE_API_DOMAIN=${payload.api_domain}`);
-  console.log('Then delete MANAGEENGINE_AUTH_CODE from backend/.env and restart the application.');
+  let envContents = fs.readFileSync(ENV_PATH, 'utf8');
+  envContents = upsertEnvValue(envContents, 'MANAGEENGINE_REFRESH_TOKEN', payload.refresh_token);
+  if (payload.api_domain) envContents = upsertEnvValue(envContents, 'MANAGEENGINE_API_DOMAIN', payload.api_domain);
+  envContents = removeEnvValue(envContents, 'MANAGEENGINE_AUTH_CODE');
+  fs.writeFileSync(ENV_PATH, envContents, 'utf8');
+
+  console.log('OAuth exchange succeeded. The refresh token was saved securely in backend/.env.');
+  console.log('Restart the application, then use Sync SRs from ManageEngine to test it.');
 }
 
 main().catch(error => {

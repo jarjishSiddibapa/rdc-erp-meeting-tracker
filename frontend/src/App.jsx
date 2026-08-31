@@ -1,7 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider, Spin } from 'antd';
+import { ConfigProvider } from 'antd';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import GlobalLoadingIndicator, { LoadingNotice } from './components/ui/LoadingNotice';
 
 // App.jsx is the root — anything imported here eagerly ends up in every route's initial
 // bundle, /login included. Login and Dashboard each pull in their own antd surface,
@@ -16,7 +17,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const BRAND = '#00B51A';
 
 function PageFallback() {
-  return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><Spin size="large" /></div>;
+  return <LoadingNotice fullPage />;
 }
 
 function ProtectedRoute({ children }) {
@@ -58,6 +59,7 @@ export default function App() {
         }
       }}
     >
+      <GlobalLoadingIndicator />
       <AuthProvider>
         <BrowserRouter>
           <AppRoutes />

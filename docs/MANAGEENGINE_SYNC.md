@@ -45,7 +45,7 @@ Then exchange it from the repository root:
 npm run manageengine:exchange-code --prefix backend
 ```
 
-Copy the printed refresh token into `backend/.env`, delete `MANAGEENGINE_AUTH_CODE`, and configure:
+The command stores the refresh token directly in the git-ignored `backend/.env`, removes the short-lived authorization code, and never prints the refresh token. Then configure:
 
 ```dotenv
 MANAGEENGINE_SYNC_ENABLED=true
@@ -59,7 +59,7 @@ MANAGEENGINE_TIME_ZONE=Asia/Kolkata
 
 `MANAGEENGINE_PORTAL` is needed only when the ServiceDesk URL contains `/app/<portal>/`; enter the `<portal>` segment shown in ESM Directory → Service Desk Instances. The token response normally supplies the correct API domain automatically. Set `MANAGEENGINE_API_DOMAIN` only when that needs an explicit override.
 
-Restart `start-all.bat` after changing `.env`. Open **Update Tasks → Update from ManageEngine** to see configuration status, the latest run, and the manual **Sync now** action.
+Restart `start-all.bat` after changing `.env`. Open **Update Tasks → Update from ManageEngine** to see configuration status and the latest run. Administrators can start the same guarded synchronization either with **Sync now** there or with **Sync SRs from ManageEngine** on the Service Requests page.
 
 ## Production checks
 

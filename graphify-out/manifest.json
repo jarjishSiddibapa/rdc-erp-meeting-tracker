@@ -95,9 +95,9 @@
     "semantic_hash": "098c38a8ca22b5f62459d74b15e2b2a9"
   },
   "frontend/src/App.jsx": {
-    "mtime": 1786163534.3667004,
-    "ast_hash": "3838feedcdbcf3a944a06ae176e0498d",
-    "semantic_hash": "3838feedcdbcf3a944a06ae176e0498d"
+    "mtime": 1788168646.518333,
+    "ast_hash": "be588aff145f0877f2bde846cb74f2ee",
+    "semantic_hash": ""
   },
   "frontend/src/main.jsx": {
     "mtime": 1782710865.6960855,
@@ -150,13 +150,13 @@
     "semantic_hash": "935f40fde404139fb3331f037d14cc66"
   },
   "frontend/src/pages/Dashboard.jsx": {
-    "mtime": 1786107671.1903148,
-    "ast_hash": "6cf5201dc9d2e045505717911a1db84a",
-    "semantic_hash": "6cf5201dc9d2e045505717911a1db84a"
+    "mtime": 1788168646.518333,
+    "ast_hash": "c1ee52a39106c1c8a93b31c4890f4e81",
+    "semantic_hash": ""
   },
   "frontend/src/pages/DashboardHome.jsx": {
-    "mtime": 1787736833.5434783,
-    "ast_hash": "23bf05858ea3d85c1d24f60a56247568",
+    "mtime": 1788168646.518333,
+    "ast_hash": "8695e089dcaf66f57e45dd864b560b31",
     "semantic_hash": ""
   },
   "frontend/src/pages/ForgotPassword.jsx": {
@@ -175,8 +175,8 @@
     "semantic_hash": "91f03f042e762a928d51cdac2b6bac88"
   },
   "frontend/src/pages/SRPage.jsx": {
-    "mtime": 1788153621.7458622,
-    "ast_hash": "769eafe587197e7e4f88f5d6fed76572",
+    "mtime": 1788168988.5150623,
+    "ast_hash": "b9cd4def1fa4a61a6a7bc57f7171aabc",
     "semantic_hash": ""
   },
   "frontend/src/pages/UpdateTasks.jsx": {
@@ -190,8 +190,8 @@
     "semantic_hash": "06852e197848fd01b52f149040d31c24"
   },
   "frontend/src/services/api.js": {
-    "mtime": 1788153621.7458622,
-    "ast_hash": "2720f96ca234cc7b0ed3ee24a4c42798",
+    "mtime": 1788168591.3972423,
+    "ast_hash": "63175a5bfdcdb601c6dfbffc1e7fef33",
     "semantic_hash": ""
   },
   "frontend/src/utils/excelIO.js": {
@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "docs/USER_GUIDE.md": {
-    "mtime": 1788153706.0236814,
-    "ast_hash": "99ff8571a9a830ac85b89119734e0924",
+    "mtime": 1788154352.792347,
+    "ast_hash": "ab8e225a567f8415cdcc830939d74df6",
     "semantic_hash": ""
   },
   "docs/images/dashboard-overview.png": {
@@ -405,8 +405,8 @@
     "semantic_hash": ""
   },
   "backend/scripts/exchange-manageengine-code.js": {
-    "mtime": 1788153705.9955041,
-    "ast_hash": "3da2a8760fef3436d33ad87a8bd00753",
+    "mtime": 1788168988.5140638,
+    "ast_hash": "0e9ce2d0b59882d1eaa4f6ff009aebc7",
     "semantic_hash": ""
   },
   "backend/services/manageengine-sync.js": {
@@ -420,8 +420,13 @@
     "semantic_hash": ""
   },
   "docs/MANAGEENGINE_SYNC.md": {
-    "mtime": 1788153705.9955041,
-    "ast_hash": "74a720995c056245e6e4fb46620ad32e",
+    "mtime": 1788168676.1324725,
+    "ast_hash": "9dafa9af129191e9ba7cbef4860db2b2",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ui/LoadingNotice.jsx": {
+    "mtime": 1788168591.3972423,
+    "ast_hash": "1fc7dd22cc2213424df13b70e52c4c74",
     "semantic_hash": ""
   }
 }

@@ -161,7 +161,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_db_pool",
-      "community": 18,
+      "community": 17,
       "community_name": "pool.js",
       "norm_label": "pool.js"
     },
@@ -172,7 +172,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_db_pool_mysql",
-      "community": 18,
+      "community": 17,
       "community_name": "pool.js",
       "norm_label": "mysql"
     },
@@ -183,7 +183,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "backend_db_pool_pool",
-      "community": 18,
+      "community": 17,
       "community_name": "pool.js",
       "norm_label": "pool"
     },
@@ -194,8 +194,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_middleware_auth",
-      "community": 19,
-      "community_name": "csv-import.js",
+      "community": 18,
+      "community_name": "middleware/auth.js",
       "norm_label": "middleware/auth.js"
     },
     {
@@ -205,8 +205,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_middleware_auth_jwt",
-      "community": 19,
-      "community_name": "csv-import.js",
+      "community": 18,
+      "community_name": "middleware/auth.js",
       "norm_label": "jwt"
     },
     {
@@ -217,8 +217,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_middleware_auth_authenticate",
-      "community": 19,
-      "community_name": "csv-import.js",
+      "community": 18,
+      "community_name": "middleware/auth.js",
       "norm_label": "authenticate()"
     },
     {
@@ -229,8 +229,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_middleware_auth_requirerole",
-      "community": 19,
-      "community_name": "csv-import.js",
+      "community": 18,
+      "community_name": "middleware/auth.js",
       "norm_label": "requirerole()"
     },
     {
@@ -769,7 +769,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "routes/auth.js"
     },
     {
@@ -780,7 +780,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_express",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "express"
     },
     {
@@ -791,7 +791,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_crypto",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "crypto"
     },
     {
@@ -802,7 +802,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_bcrypt",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "bcrypt"
     },
     {
@@ -813,7 +813,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_jwt",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "jwt"
     },
     {
@@ -824,7 +824,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_pool",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ pool }"
     },
     {
@@ -835,7 +835,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_authenticate",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ authenticate }"
     },
     {
@@ -846,7 +846,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_sendpasswordresetemail",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ sendpasswordresetemail }"
     },
     {
@@ -857,7 +857,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_email_regex",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ email_regex }"
     },
     {
@@ -868,7 +868,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_hashtoken_createresettoken",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "{ hashtoken, createresettoken }"
     },
     {
@@ -879,7 +879,7 @@
       "_origin": "ast",
       "id": "backend_routes_auth_router",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "router"
     },
     {
@@ -889,7 +889,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_routes_backup",
-      "community": 8,
+      "community": 45,
       "community_name": "routes/backup.js",
       "norm_label": "routes/backup.js"
     },
@@ -900,7 +900,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_routes_backup_express",
-      "community": 8,
+      "community": 45,
       "community_name": "routes/backup.js",
       "norm_label": "express"
     },
@@ -911,7 +911,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "backend_routes_backup_fs",
-      "community": 8,
+      "community": 45,
       "community_name": "routes/backup.js",
       "norm_label": "fs"
     },
@@ -922,7 +922,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "backend_routes_backup_path",
-      "community": 8,
+      "community": 45,
       "community_name": "routes/backup.js",
       "norm_label": "path"
     },
@@ -933,7 +933,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "backend_routes_backup_pool",
-      "community": 8,
+      "community": 45,
       "community_name": "routes/backup.js",
       "norm_label": "{ pool }"
     },
@@ -944,7 +944,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "backend_routes_backup_authenticate_requirerole",
-      "community": 8,
+      "community": 45,
       "community_name": "routes/backup.js",
       "norm_label": "{ authenticate, requirerole }"
     },
@@ -955,7 +955,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "backend_routes_backup_runbackup_getsettings_reschedulebackups_backup_dir",
-      "community": 8,
+      "community": 45,
       "community_name": "routes/backup.js",
       "norm_label": "{ runbackup, getsettings, reschedulebackups, backup_dir }"
     },
@@ -966,7 +966,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "backend_routes_backup_router",
-      "community": 8,
+      "community": 45,
       "community_name": "routes/backup.js",
       "norm_label": "router"
     },
@@ -1560,7 +1560,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "reports.js"
     },
     {
@@ -1571,7 +1571,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports_express",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "express"
     },
     {
@@ -1582,7 +1582,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports_pool",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "{ pool }"
     },
     {
@@ -1593,7 +1593,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports_authenticate",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "{ authenticate }"
     },
     {
@@ -1604,7 +1604,7 @@
       "_origin": "ast",
       "id": "backend_routes_reports_router",
       "community": 18,
-      "community_name": "pool.js",
+      "community_name": "middleware/auth.js",
       "norm_label": "router"
     },
     {
@@ -1774,7 +1774,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "stats.js"
     },
     {
@@ -1785,7 +1785,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_express",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "express"
     },
     {
@@ -1796,7 +1796,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_pool",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "{ pool }"
     },
     {
@@ -1807,7 +1807,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_authenticate",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "{ authenticate }"
     },
     {
@@ -1818,7 +1818,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_router",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "router"
     },
     {
@@ -1830,7 +1830,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_catstats",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "catstats()"
     },
     {
@@ -1842,7 +1842,7 @@
       "_origin": "ast",
       "id": "backend_routes_stats_pendingbyperson",
       "community": 17,
-      "community_name": "stats.js",
+      "community_name": "pool.js",
       "norm_label": "pendingbyperson()"
     },
     {
@@ -1852,7 +1852,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_routes_users",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "users.js"
     },
@@ -1863,7 +1863,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_routes_users_express",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "express"
     },
@@ -1874,7 +1874,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "backend_routes_users_bcrypt",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "bcrypt"
     },
@@ -1885,7 +1885,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "backend_routes_users_pool",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ pool }"
     },
@@ -1896,7 +1896,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "backend_routes_users_authenticate_requirerole",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ authenticate, requirerole }"
     },
@@ -1907,7 +1907,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "backend_routes_users_rdc_email_regex",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ rdc_email_regex }"
     },
@@ -1918,7 +1918,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "backend_routes_users_generaterandompassword",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ generaterandompassword }"
     },
@@ -1929,7 +1929,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "backend_routes_users_createresettoken",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ createresettoken }"
     },
@@ -1940,7 +1940,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "backend_routes_users_sendwelcomeemail",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "{ sendwelcomeemail }"
     },
@@ -1951,7 +1951,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "backend_routes_users_router",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "router"
     },
@@ -1962,7 +1962,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "backend_routes_users_valid_roles",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "valid_roles"
     },
@@ -1974,7 +1974,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_routes_users_provisionuser",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "provisionuser()"
     },
@@ -1990,10 +1990,67 @@
       "norm_label": "exchange-manageengine-code.js"
     },
     {
-      "label": "main()",
+      "label": "fs",
+      "file_type": "code",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "backend_scripts_exchange_manageengine_code_fs",
+      "community": 42,
+      "community_name": "exchange-manageengine-code.js",
+      "norm_label": "fs"
+    },
+    {
+      "label": "path",
       "file_type": "code",
       "source_file": "backend/scripts/exchange-manageengine-code.js",
       "source_location": "L3",
+      "_origin": "ast",
+      "id": "backend_scripts_exchange_manageengine_code_path",
+      "community": 42,
+      "community_name": "exchange-manageengine-code.js",
+      "norm_label": "path"
+    },
+    {
+      "label": "ENV_PATH",
+      "file_type": "code",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "backend_scripts_exchange_manageengine_code_env_path",
+      "community": 42,
+      "community_name": "exchange-manageengine-code.js",
+      "norm_label": "env_path"
+    },
+    {
+      "label": "upsertEnvValue()",
+      "file_type": "code",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L7",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "backend_scripts_exchange_manageengine_code_upsertenvvalue",
+      "community": 42,
+      "community_name": "exchange-manageengine-code.js",
+      "norm_label": "upsertenvvalue()"
+    },
+    {
+      "label": "removeEnvValue()",
+      "file_type": "code",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L14",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "backend_scripts_exchange_manageengine_code_removeenvvalue",
+      "community": 42,
+      "community_name": "exchange-manageengine-code.js",
+      "norm_label": "removeenvvalue()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L19",
       "_callable": true,
       "_origin": "ast",
       "id": "backend_scripts_exchange_manageengine_code_main",
@@ -2547,7 +2604,7 @@
       "_origin": "ast",
       "id": "backend_services_backup",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "services/backup.js"
     },
     {
@@ -2558,7 +2615,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_spawn",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "{ spawn }"
     },
     {
@@ -2569,7 +2626,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_fs",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "fs"
     },
     {
@@ -2580,7 +2637,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_path",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "path"
     },
     {
@@ -2591,7 +2648,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_cron",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "cron"
     },
     {
@@ -2602,7 +2659,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_pool_db_name",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "{ pool, db_name }"
     },
     {
@@ -2613,7 +2670,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_backup_dir",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "backup_dir"
     },
     {
@@ -2625,7 +2682,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_resolvemysqldump",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "resolvemysqldump()"
     },
     {
@@ -2637,7 +2694,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_timestamp",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "timestamp()"
     },
     {
@@ -2649,7 +2706,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_runbackup",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "runbackup()"
     },
     {
@@ -2661,7 +2718,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_getsettings",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "getsettings()"
     },
     {
@@ -2673,7 +2730,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_schedulefromsettings",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "schedulefromsettings()"
     },
     {
@@ -2685,7 +2742,7 @@
       "_origin": "ast",
       "id": "backend_services_backup_initscheduler",
       "community": 8,
-      "community_name": "routes/backup.js",
+      "community_name": "services/backup.js",
       "norm_label": "initscheduler()"
     },
     {
@@ -2835,7 +2892,7 @@
       "_origin": "ast",
       "id": "backend_services_mailer",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "mailer.js"
     },
     {
@@ -2846,7 +2903,7 @@
       "_origin": "ast",
       "id": "backend_services_mailer_nodemailer",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "nodemailer"
     },
     {
@@ -2857,7 +2914,7 @@
       "_origin": "ast",
       "id": "backend_services_mailer_transporter",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "transporter"
     },
     {
@@ -2881,7 +2938,7 @@
       "_origin": "ast",
       "id": "backend_services_mailer_sendpasswordresetemail",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "sendpasswordresetemail()"
     },
     {
@@ -2892,7 +2949,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_services_mailer_sendwelcomeemail",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "sendwelcomeemail()"
     },
@@ -3302,7 +3359,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_password",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "password.js"
     },
@@ -3313,7 +3370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_password_crypto",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "crypto"
     },
@@ -3325,7 +3382,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_utils_password_generaterandompassword",
-      "community": 30,
+      "community": 11,
       "community_name": "users.js",
       "norm_label": "generaterandompassword()"
     },
@@ -3336,8 +3393,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_resettoken",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "resettoken.js"
     },
     {
@@ -3347,8 +3404,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_resettoken_crypto",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "crypto"
     },
     {
@@ -3358,8 +3415,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "backend_utils_resettoken_pool",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "{ pool }"
     },
     {
@@ -3370,8 +3427,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_utils_resettoken_hashtoken",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "hashtoken()"
     },
     {
@@ -3382,8 +3439,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_utils_resettoken_createresettoken",
-      "community": 18,
-      "community_name": "pool.js",
+      "community": 11,
+      "community_name": "users.js",
       "norm_label": "createresettoken()"
     },
     {
@@ -3394,7 +3451,7 @@
       "_origin": "ast",
       "id": "backend_utils_validation",
       "community": 11,
-      "community_name": "routes/auth.js",
+      "community_name": "users.js",
       "norm_label": "validation.js"
     },
     {
@@ -3426,8 +3483,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "frontend_oxlintrc_plugins",
-      "community": 31,
-      "community_name": "react",
+      "community": 20,
+      "community_name": ".oxlintrc.json",
       "norm_label": "plugins"
     },
     {
@@ -3448,8 +3505,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ref_oxc",
-      "community": 31,
-      "community_name": "react",
+      "community": 20,
+      "community_name": ".oxlintrc.json",
       "norm_label": "oxc"
     },
     {
@@ -4031,75 +4088,75 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_app",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "app.jsx"
     },
     {
       "label": "Login",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L11",
+      "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_app_login",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "login"
     },
     {
       "label": "ForgotPassword",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "frontend_src_app_forgotpassword",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "forgotpassword"
     },
     {
       "label": "ResetPassword",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L13",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "frontend_src_app_resetpassword",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "resetpassword"
     },
     {
       "label": "Dashboard",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L14",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_app_dashboard",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "dashboard"
     },
     {
       "label": "PageFallback()",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_app_pagefallback",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "pagefallback()"
     },
     {
       "label": "ProtectedRoute()",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_app_protectedroute",
-      "community": 2,
+      "community": 46,
       "community_name": "useAuth",
       "norm_label": "protectedroute()"
     },
@@ -4107,11 +4164,11 @@
       "label": "PublicRoute()",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_app_publicroute",
-      "community": 2,
+      "community": 46,
       "community_name": "useAuth",
       "norm_label": "publicroute()"
     },
@@ -4119,24 +4176,24 @@
       "label": "AppRoutes()",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_app_approutes",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "approutes()"
     },
     {
       "label": "App()",
       "file_type": "code",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_app_app",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "app()"
     },
     {
@@ -4228,8 +4285,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_loginscene",
-      "community": 31,
-      "community_name": "react",
+      "community": 47,
+      "community_name": "LoginScene.jsx",
       "norm_label": "loginscene.jsx"
     },
     {
@@ -4240,8 +4297,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_floatingicosahedron",
-      "community": 31,
-      "community_name": "react",
+      "community": 47,
+      "community_name": "LoginScene.jsx",
       "norm_label": "floatingicosahedron()"
     },
     {
@@ -4252,8 +4309,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_particles",
-      "community": 31,
-      "community_name": "react",
+      "community": 47,
+      "community_name": "LoginScene.jsx",
       "norm_label": "particles()"
     },
     {
@@ -4264,8 +4321,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_loginscene_loginscene",
-      "community": 31,
-      "community_name": "react",
+      "community": 47,
+      "community_name": "LoginScene.jsx",
       "norm_label": "loginscene()"
     },
     {
@@ -4413,8 +4470,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_srform",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "srform.jsx"
     },
     {
@@ -4424,8 +4481,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "frontend_src_components_srform_base_statuses",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "base_statuses"
     },
     {
@@ -4435,8 +4492,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "frontend_src_components_srform_all_statuses",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "all_statuses"
     },
     {
@@ -4446,8 +4503,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "frontend_src_components_srform_sr_types",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "sr_types"
     },
     {
@@ -4458,8 +4515,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_dateval",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "dateval()"
     },
     {
@@ -4470,8 +4527,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_fmtdate",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "fmtdate()"
     },
     {
@@ -4482,8 +4539,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_usedistinctoptions",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "usedistinctoptions()"
     },
     {
@@ -4494,8 +4551,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_filteroption",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "filteroption()"
     },
     {
@@ -4506,8 +4563,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_srform_srform",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 44,
+      "community_name": "SRForm.jsx",
       "norm_label": "srform()"
     },
     {
@@ -4517,8 +4574,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_ambientbackground",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "ambientbackground.jsx"
     },
     {
@@ -4530,7 +4587,7 @@
       "_origin": "ast",
       "id": "frontend_src_components_ui_ambientbackground_ambientbackground",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "ambientbackground()"
     },
     {
@@ -4586,8 +4643,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "doodles.jsx"
     },
     {
@@ -4598,8 +4655,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_squiggle",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "squiggle()"
     },
     {
@@ -4610,8 +4667,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_sparkle",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "sparkle()"
     },
     {
@@ -4622,8 +4679,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_dashedcircle",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "dashedcircle()"
     },
     {
@@ -4634,8 +4691,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_arrow",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "arrow()"
     },
     {
@@ -4646,8 +4703,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_barchart",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "barchart()"
     },
     {
@@ -4658,8 +4715,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_doodles_checkscribble",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "checkscribble()"
     },
     {
@@ -4791,6 +4848,52 @@
       "norm_label": "stylet()"
     },
     {
+      "label": "LoadingNotice.jsx",
+      "file_type": "code",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "frontend_src_components_ui_loadingnotice",
+      "community": 30,
+      "community_name": "App.jsx",
+      "norm_label": "loadingnotice.jsx"
+    },
+    {
+      "label": "LOADING_MESSAGE",
+      "file_type": "code",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "frontend_src_components_ui_loadingnotice_loading_message",
+      "community": 30,
+      "community_name": "App.jsx",
+      "norm_label": "loading_message"
+    },
+    {
+      "label": "LoadingNotice()",
+      "file_type": "code",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L7",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_components_ui_loadingnotice_loadingnotice",
+      "community": 30,
+      "community_name": "App.jsx",
+      "norm_label": "loadingnotice()"
+    },
+    {
+      "label": "GlobalLoadingIndicator()",
+      "file_type": "code",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L21",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_components_ui_loadingnotice_globalloadingindicator",
+      "community": 30,
+      "community_name": "App.jsx",
+      "norm_label": "globalloadingindicator()"
+    },
+    {
       "label": "MagneticButton.jsx",
       "file_type": "code",
       "source_file": "frontend/src/components/ui/MagneticButton.jsx",
@@ -4843,8 +4946,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal",
-      "community": 5,
-      "community_name": "DashboardHome.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "reveal.jsx"
     },
     {
@@ -4855,8 +4958,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal_reveal",
-      "community": 5,
-      "community_name": "DashboardHome.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "reveal()"
     },
     {
@@ -4867,8 +4970,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal_revealgroup",
-      "community": 5,
-      "community_name": "DashboardHome.jsx",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "revealgroup()"
     },
     {
@@ -4901,8 +5004,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_context_authcontext",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "authcontext.jsx"
     },
     {
@@ -4912,8 +5015,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "frontend_src_context_authcontext_authcontext",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "authcontext"
     },
     {
@@ -4924,8 +5027,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_context_authcontext_authprovider",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "authprovider()"
     },
     {
@@ -4936,7 +5039,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_context_authcontext_useauth",
-      "community": 2,
+      "community": 46,
       "community_name": "useAuth",
       "norm_label": "useauth()"
     },
@@ -4947,8 +5050,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_main",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 30,
+      "community_name": "App.jsx",
       "norm_label": "main.jsx"
     },
     {
@@ -5016,8 +5119,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_changepassword_changepassword",
-      "community": 31,
-      "community_name": "react",
+      "community": 46,
+      "community_name": "useAuth",
       "norm_label": "changepassword()"
     },
     {
@@ -5028,129 +5131,129 @@
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "dashboard.jsx"
     },
     {
       "label": "SRPage",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_srpage",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "srpage"
     },
     {
       "label": "UserManagement",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L17",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_usermanagement",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "usermanagement"
     },
     {
       "label": "ChangePassword",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_changepassword",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "changepassword"
     },
     {
       "label": "UpdateTasks",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L19",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_updatetasks",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "updatetasks"
     },
     {
       "label": "BackupSettings",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_backupsettings",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "backupsettings"
     },
     {
       "label": "Reports",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_reports",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "reports"
     },
     {
       "label": "ROLE_COLORS",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_role_colors",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "role_colors"
     },
     {
       "label": "MENU_ITEMS",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_menu_items",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "menu_items"
     },
     {
       "label": "TITLES",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_titles",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "titles"
     },
     {
       "label": "ALL_KEYS",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L55",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_all_keys",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "all_keys"
     },
     {
       "label": "Dashboard()",
       "file_type": "code",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L57",
+      "source_location": "L58",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboard_dashboard",
       "community": 2,
-      "community_name": "useAuth",
+      "community_name": "Dashboard.jsx",
       "norm_label": "dashboard()"
     },
     {
@@ -5168,7 +5271,7 @@
       "label": "MONTHS",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_months",
       "community": 5,
@@ -5179,7 +5282,7 @@
       "label": "PALETTE",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_palette",
       "community": 5,
@@ -5190,7 +5293,7 @@
       "label": "StatCard()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_statcard",
@@ -5202,7 +5305,7 @@
       "label": "SectionHeader()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_sectionheader",
@@ -5214,7 +5317,7 @@
       "label": "ColHeader()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L62",
+      "source_location": "L63",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_colheader",
@@ -5226,7 +5329,7 @@
       "label": "ComparisonStrip()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L73",
+      "source_location": "L74",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_comparisonstrip",
@@ -5238,7 +5341,7 @@
       "label": "PendingTable()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L131",
+      "source_location": "L132",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_pendingtable",
@@ -5250,7 +5353,7 @@
       "label": "DashboardHome()",
       "file_type": "code",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L224",
+      "source_location": "L225",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_dashboardhome_dashboardhome",
@@ -5265,8 +5368,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_forgotpassword",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "forgotpassword.jsx"
     },
     {
@@ -5277,8 +5380,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_forgotpassword_forgotpassword",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "forgotpassword()"
     },
     {
@@ -5288,8 +5391,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_login",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "login.jsx"
     },
     {
@@ -5299,8 +5402,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "frontend_src_pages_login_loginscene",
-      "community": 2,
-      "community_name": "useAuth",
+      "community": 43,
+      "community_name": "Login.jsx",
       "norm_label": "loginscene"
     },
     {
@@ -5311,7 +5414,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_login_login",
-      "community": 2,
+      "community": 46,
       "community_name": "useAuth",
       "norm_label": "login()"
     },
@@ -5380,8 +5483,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_resetpassword",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "resetpassword.jsx"
     },
     {
@@ -5392,8 +5495,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_resetpassword_resetpassword",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "resetpassword()"
     },
     {
@@ -5411,7 +5514,7 @@
       "label": "STATUS_COLORS",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_status_colors",
       "community": 0,
@@ -5422,7 +5525,7 @@
       "label": "SCOPE_COLORS",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_scope_colors",
       "community": 0,
@@ -5433,7 +5536,7 @@
       "label": "STATUS_VALUES",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_status_values",
       "community": 0,
@@ -5444,7 +5547,7 @@
       "label": "STATUS_TILE_COLORS",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_status_tile_colors",
       "community": 0,
@@ -5455,7 +5558,7 @@
       "label": "STATUS_STAT_KEY",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L38",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_status_stat_key",
       "community": 0,
@@ -5466,7 +5569,7 @@
       "label": "fmt()",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L43",
+      "source_location": "L44",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_fmt",
@@ -5478,7 +5581,7 @@
       "label": "fmtCreated()",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_fmtcreated",
@@ -5490,7 +5593,7 @@
       "label": "PendingSinceCell()",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_pendingsincecell",
@@ -5502,7 +5605,7 @@
       "label": "buildColumns()",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L67",
+      "source_location": "L68",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_buildcolumns",
@@ -5514,7 +5617,7 @@
       "label": "SRPage()",
       "file_type": "code",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L170",
+      "source_location": "L171",
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_srpage",
@@ -5715,8 +5818,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_bulkaddusersmodal",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "bulkaddusersmodal()"
     },
     {
@@ -5754,21 +5857,92 @@
       "norm_label": "api"
     },
     {
+      "label": "loadingSubscribers",
+      "file_type": "code",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "frontend_src_services_api_loadingsubscribers",
+      "community": 13,
+      "community_name": "api.js",
+      "norm_label": "loadingsubscribers"
+    },
+    {
+      "label": "publishLoadingState()",
+      "file_type": "code",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L8",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_services_api_publishloadingstate",
+      "community": 13,
+      "community_name": "api.js",
+      "norm_label": "publishloadingstate()"
+    },
+    {
+      "label": "startTracking()",
+      "file_type": "code",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_services_api_starttracking",
+      "community": 13,
+      "community_name": "api.js",
+      "norm_label": "starttracking()"
+    },
+    {
+      "label": "stopTracking()",
+      "file_type": "code",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L18",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_services_api_stoptracking",
+      "community": 13,
+      "community_name": "api.js",
+      "norm_label": "stoptracking()"
+    },
+    {
+      "label": "subscribeToApiLoading()",
+      "file_type": "code",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L25",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_services_api_subscribetoapiloading",
+      "community": 30,
+      "community_name": "App.jsx",
+      "norm_label": "subscribetoapiloading()"
+    },
+    {
+      "label": "getApiLoadingSnapshot()",
+      "file_type": "code",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L30",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "frontend_src_services_api_getapiloadingsnapshot",
+      "community": 30,
+      "community_name": "App.jsx",
+      "norm_label": "getapiloadingsnapshot()"
+    },
+    {
       "label": "authAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L23",
+      "source_location": "L57",
       "_origin": "ast",
       "id": "frontend_src_services_api_authapi",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "authapi"
     },
     {
       "label": "srAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L31",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "frontend_src_services_api_srapi",
       "community": 24,
@@ -5779,7 +5953,7 @@
       "label": "statsAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L44",
+      "source_location": "L78",
       "_origin": "ast",
       "id": "frontend_src_services_api_statsapi",
       "community": 5,
@@ -5790,7 +5964,7 @@
       "label": "reportsAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L48",
+      "source_location": "L82",
       "_origin": "ast",
       "id": "frontend_src_services_api_reportsapi",
       "community": 24,
@@ -5801,7 +5975,7 @@
       "label": "deloitteImportAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L52",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "frontend_src_services_api_deloitteimportapi",
       "community": 13,
@@ -5812,7 +5986,7 @@
       "label": "csvImportAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L57",
+      "source_location": "L91",
       "_origin": "ast",
       "id": "frontend_src_services_api_csvimportapi",
       "community": 13,
@@ -5823,7 +5997,7 @@
       "label": "manageEngineImportAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L61",
+      "source_location": "L95",
       "_origin": "ast",
       "id": "frontend_src_services_api_manageengineimportapi",
       "community": 13,
@@ -5834,22 +6008,22 @@
       "label": "userAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L68",
+      "source_location": "L102",
       "_origin": "ast",
       "id": "frontend_src_services_api_userapi",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 22,
+      "community_name": "UserManagement.jsx",
       "norm_label": "userapi"
     },
     {
       "label": "backupAPI",
       "file_type": "code",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L75",
+      "source_location": "L109",
       "_origin": "ast",
       "id": "frontend_src_services_api_backupapi",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 13,
+      "community_name": "api.js",
       "norm_label": "backupapi"
     },
     {
@@ -6034,8 +6208,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_pagination_compactpaginationconfig",
-      "community": 22,
-      "community_name": "UserManagement.jsx",
+      "community": 14,
+      "community_name": "UpdateTasks.jsx",
       "norm_label": "compactpaginationconfig()"
     },
     {
@@ -10286,11 +10460,90 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/scripts/exchange-manageengine-code.js",
-      "source_location": "L3",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_scripts_exchange_manageengine_code",
+      "target": "backend_scripts_exchange_manageengine_code_env_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_scripts_exchange_manageengine_code",
+      "target": "backend_scripts_exchange_manageengine_code_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "backend_scripts_exchange_manageengine_code",
       "target": "backend_scripts_exchange_manageengine_code_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_scripts_exchange_manageengine_code",
+      "target": "backend_scripts_exchange_manageengine_code_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_scripts_exchange_manageengine_code",
+      "target": "backend_scripts_exchange_manageengine_code_removeenvvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_scripts_exchange_manageengine_code",
+      "target": "backend_scripts_exchange_manageengine_code_upsertenvvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_scripts_exchange_manageengine_code_main",
+      "target": "backend_scripts_exchange_manageengine_code_upsertenvvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/scripts/exchange-manageengine-code.js",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_scripts_exchange_manageengine_code_main",
+      "target": "backend_scripts_exchange_manageengine_code_removeenvvalue",
       "confidence_score": 1.0
     },
     {
@@ -12723,6 +12976,18 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice",
+      "target": "ref_react",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "frontend/src/components/ui/MagneticButton.jsx",
       "source_location": "L1",
       "weight": 1.0,
@@ -13484,7 +13749,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
@@ -13495,7 +13760,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
@@ -13506,7 +13771,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L14",
+      "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
@@ -13517,7 +13782,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
@@ -13528,7 +13793,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
@@ -13539,7 +13804,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
@@ -13550,7 +13815,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
@@ -13561,7 +13826,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
@@ -13572,11 +13837,47 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L13",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app",
       "target": "frontend_src_app_resetpassword",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/App.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_app",
+      "target": "frontend_src_components_ui_loadingnotice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/App.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_app",
+      "target": "frontend_src_components_ui_loadingnotice_globalloadingindicator",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/App.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_app",
+      "target": "frontend_src_components_ui_loadingnotice_loadingnotice",
       "confidence_score": 1.0
     },
     {
@@ -13632,7 +13933,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app_protectedroute",
@@ -13644,7 +13945,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/App.jsx",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_app_publicroute",
@@ -15096,6 +15397,147 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice",
+      "target": "frontend_src_components_ui_loadingnotice_globalloadingindicator",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice",
+      "target": "frontend_src_components_ui_loadingnotice_loading_message",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice",
+      "target": "frontend_src_components_ui_loadingnotice_loadingnotice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice",
+      "target": "frontend_src_services_api",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice",
+      "target": "frontend_src_services_api_getapiloadingsnapshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice",
+      "target": "frontend_src_services_api_subscribetoapiloading",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/pages/Dashboard.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_pages_dashboard",
+      "target": "frontend_src_components_ui_loadingnotice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_pages_dashboardhome",
+      "target": "frontend_src_components_ui_loadingnotice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/pages/Dashboard.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_pages_dashboard",
+      "target": "frontend_src_components_ui_loadingnotice_loadingnotice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/pages/DashboardHome.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_pages_dashboardhome",
+      "target": "frontend_src_components_ui_loadingnotice_loadingnotice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice_globalloadingindicator",
+      "target": "frontend_src_services_api_getapiloadingsnapshot"
+    },
+    {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "frontend/src/components/ui/LoadingNotice.jsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_components_ui_loadingnotice_globalloadingindicator",
+      "target": "frontend_src_services_api_subscribetoapiloading"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "frontend/src/components/ui/MagneticButton.jsx",
       "source_location": "L7",
       "weight": 1.0,
@@ -15181,7 +15623,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L464",
+      "source_location": "L505",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage_srpage",
@@ -15607,7 +16049,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L58",
+      "source_location": "L59",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard_dashboard",
@@ -15655,7 +16097,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L171",
+      "source_location": "L172",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage_srpage",
@@ -15829,7 +16271,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L55",
+      "source_location": "L56",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15840,7 +16282,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15851,7 +16293,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15862,7 +16304,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L57",
+      "source_location": "L58",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15873,7 +16315,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15884,7 +16326,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15895,7 +16337,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15906,7 +16348,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15917,7 +16359,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15928,7 +16370,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L19",
+      "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15939,7 +16381,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15951,7 +16393,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15963,7 +16405,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard",
@@ -15976,7 +16418,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/pages/Dashboard.jsx",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboard_dashboard",
@@ -15986,7 +16428,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L62",
+      "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -15997,7 +16439,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L73",
+      "source_location": "L74",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -16008,7 +16450,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L224",
+      "source_location": "L225",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -16019,7 +16461,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -16030,7 +16472,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -16041,7 +16483,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L131",
+      "source_location": "L132",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -16052,7 +16494,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -16063,7 +16505,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/DashboardHome.jsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_dashboardhome",
@@ -16318,7 +16760,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16329,7 +16771,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L43",
+      "source_location": "L44",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16340,7 +16782,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16351,7 +16793,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16362,7 +16804,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16373,7 +16815,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L170",
+      "source_location": "L171",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16384,7 +16826,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16395,7 +16837,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L38",
+      "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16406,7 +16848,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16417,7 +16859,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
@@ -16434,6 +16876,18 @@
       "_origin": "ast",
       "source": "frontend_src_pages_srpage",
       "target": "frontend_src_services_api",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/pages/SRPage.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_pages_srpage",
+      "target": "frontend_src_services_api_manageengineimportapi",
       "confidence_score": 1.0
     },
     {
@@ -16477,7 +16931,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L135",
+      "source_location": "L136",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage_buildcolumns",
@@ -16489,7 +16943,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L47",
+      "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage_fmtcreated",
@@ -16501,7 +16955,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L147",
+      "source_location": "L148",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage_buildcolumns",
@@ -16513,7 +16967,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L358",
+      "source_location": "L392",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage_srpage",
@@ -16526,7 +16980,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/pages/SRPage.jsx",
-      "source_location": "L490",
+      "source_location": "L531",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_pages_srpage_srpage",
@@ -16927,7 +17381,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L23",
+      "source_location": "L57",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
@@ -16938,7 +17392,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L75",
+      "source_location": "L109",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
@@ -16949,7 +17403,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L57",
+      "source_location": "L91",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
@@ -16960,7 +17414,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L52",
+      "source_location": "L86",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
@@ -16971,7 +17425,29 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L61",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_services_api",
+      "target": "frontend_src_services_api_getapiloadingsnapshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_services_api",
+      "target": "frontend_src_services_api_loadingsubscribers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L95",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
@@ -16982,7 +17458,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L48",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_services_api",
+      "target": "frontend_src_services_api_publishloadingstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L82",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
@@ -16993,7 +17480,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L31",
+      "source_location": "L65",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
@@ -17004,7 +17491,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L44",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_services_api",
+      "target": "frontend_src_services_api_starttracking",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L78",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
@@ -17015,11 +17513,57 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L68",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_services_api",
+      "target": "frontend_src_services_api_stoptracking",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_services_api",
+      "target": "frontend_src_services_api_subscribetoapiloading",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L102",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_src_services_api",
       "target": "frontend_src_services_api_userapi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_services_api_starttracking",
+      "target": "frontend_src_services_api_publishloadingstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_src_services_api_stoptracking",
+      "target": "frontend_src_services_api_publishloadingstate",
       "confidence_score": 1.0
     },
     {
@@ -18236,5 +18780,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f390f3d3daa16a35ef46848808126e4324e6ec19"
+  "built_at_commit": "13dadb727ad31537fde969bd0773dfd029ba2697"
 }

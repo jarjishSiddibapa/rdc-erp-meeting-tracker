@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Card, Table, Tag, Typography, Button,
-  Spin, Progress, Space, Alert, Tooltip
+  Progress, Space, Alert, Tooltip
 } from 'antd';
 import {
   CheckCircleFilled, ClockCircleFilled, PlusCircleFilled,
@@ -12,6 +12,7 @@ import { statsAPI } from '../services/api';
 import { Reveal, RevealGroup } from '../components/ui/Reveal';
 import TiltCard from '../components/ui/TiltCard';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
+import { LoadingNotice } from '../components/ui/LoadingNotice';
 
 const { Title, Text } = Typography;
 const BRAND = '#00B51A';
@@ -233,7 +234,7 @@ export default function DashboardHome({ onNavigateToSR }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div style={{ textAlign: 'center', paddingTop: 80 }}><Spin size="large" /></div>;
+  if (loading) return <LoadingNotice />;
   if (error) return <Alert type="error" message={error} showIcon />;
 
   const { sr, periods } = data;

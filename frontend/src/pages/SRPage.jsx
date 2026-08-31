@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
-  Table, Button, Tag, Space, Input,
+  Table, Button, Tag, Input,
   message, Typography, Row, Col, Card, Statistic
 } from 'antd';
-import { PlusOutlined, ReloadOutlined, FileExcelOutlined, ClearOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined, FileExcelOutlined, ClearOutlined, SyncOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { srAPI } from '../services/api';
+import { manageEngineImportAPI, srAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import SRForm from '../components/SRForm';
 import SRDetail from '../components/SRDetail';
@@ -17,6 +17,7 @@ import ResizableTitle from '../components/ui/ResizableTitle';
 import { paginationConfig } from '../utils/pagination';
 
 const BRAND = '#00B51A';
+const MANAGEENGINE_MESSAGE_KEY = 'manageengine-sr-sync';
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -191,6 +192,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
   const searchDebounceRef = useRef(null);
 
   const [exporting, setExporting] = useState(false);
+  const [syncingManageEngine, setSyncingManageEngine] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingSR, setEditingSR] = useState(null);
@@ -228,7 +230,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
     } finally {
       if (seq === fetchSeqRef.current) setLoading(false);
     }
-  }, [category, filters, pagination]);
+  }, [category, excludeClosed, filters, pagination]);
 
   // Tiles reflect the current search/scope/type/pendingWith selection (but not status —
   // that's what the tiles themselves set) so they "auto change" to match whatever the
@@ -249,15 +251,22 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
   useEffect(() => { fetchSRs(); fetchStats(); }, [fetchSRs, fetchStats]);
   useEffect(() => { setPagination(p => ({ ...p, page: 1 })); }, [category, filters]);
 
-  // Type and Pending With are free-form historical data (often imported from Excel), so
-  // their filter dropdowns list whatever values actually exist rather than a fixed set.
-  useEffect(() => {
+  // Type, Assigned To, and Pending With can change during a ManageEngine sync, so keep their
+  // server-derived filter choices behind one refresh function shared by initial load and the
+  // manual Sync action below.
+  const fetchFilterOptions = useCallback(async () => {
+    const requests = [];
     if (category !== 'Digitization') {
-      srAPI.distinctValues(category, 'type').then(res => setTypeOptions(res.data)).catch(() => {});
-      srAPI.distinctValues(category, 'assignedTo').then(res => setAssignedToOptions(res.data)).catch(() => {});
+      requests.push(
+        srAPI.distinctValues(category, 'type').then(res => setTypeOptions(res.data)),
+        srAPI.distinctValues(category, 'assignedTo').then(res => setAssignedToOptions(res.data)),
+      );
     }
-    srAPI.distinctValues(category, 'pendingWith').then(res => setPendingWithOptions(res.data)).catch(() => {});
+    requests.push(srAPI.distinctValues(category, 'pendingWith').then(res => setPendingWithOptions(res.data)));
+    await Promise.allSettled(requests);
   }, [category]);
+
+  useEffect(() => { fetchFilterOptions(); }, [fetchFilterOptions]);
 
   useEffect(() => () => clearTimeout(searchDebounceRef.current), []);
 
@@ -336,6 +345,31 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
       exportSRsToExcel(category, res.data.data);
     } catch { message.error('Failed to export'); }
     finally { setExporting(false); }
+  }
+
+  async function handleManageEngineSync() {
+    setSyncingManageEngine(true);
+    try {
+      const res = await manageEngineImportAPI.syncNow();
+      const summary = res.data;
+      const resultParts = [
+        `${summary.updated || 0} updated`,
+        `${summary.unchanged || 0} unchanged`,
+      ];
+      if (summary.missing) resultParts.push(`${summary.missing} not found`);
+      message.success({
+        key: MANAGEENGINE_MESSAGE_KEY,
+        content: `ManageEngine sync complete: ${resultParts.join(', ')}`,
+      });
+      await Promise.all([fetchSRs(), fetchStats(), fetchFilterOptions()]);
+    } catch (e) {
+      message.error({
+        key: MANAGEENGINE_MESSAGE_KEY,
+        content: e.response?.data?.message || 'ManageEngine sync failed. Check the API configuration and server log.',
+      });
+    } finally {
+      setSyncingManageEngine(false);
+    }
   }
 
   const openDetail = useCallback(async (row) => {
@@ -446,6 +480,13 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
               Export Excel
             </Button>
           </Col>
+          {isAdmin && !isDigitization && (
+            <Col>
+              <Button icon={<SyncOutlined />} loading={syncingManageEngine} onClick={handleManageEngineSync}>
+                Sync SRs from ManageEngine
+              </Button>
+            </Col>
+          )}
           {canEdit && (
             <Col>
               <BrandButton icon={<PlusOutlined />} onClick={() => { setEditingSR(null); setFormOpen(true); }}>

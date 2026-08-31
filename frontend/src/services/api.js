@@ -2,15 +2,49 @@ import axios from 'axios';
 
 const api = axios.create({ baseURL: '/api' });
 
+let activeRequestCount = 0;
+const loadingSubscribers = new Set();
+
+function publishLoadingState() {
+  loadingSubscribers.forEach(listener => listener());
+}
+
+function startTracking(config) {
+  config.__rdcTracksLoading = true;
+  activeRequestCount += 1;
+  publishLoadingState();
+}
+
+function stopTracking(config) {
+  if (!config?.__rdcTracksLoading) return;
+  config.__rdcTracksLoading = false;
+  activeRequestCount = Math.max(0, activeRequestCount - 1);
+  publishLoadingState();
+}
+
+export function subscribeToApiLoading(listener) {
+  loadingSubscribers.add(listener);
+  return () => loadingSubscribers.delete(listener);
+}
+
+export function getApiLoadingSnapshot() {
+  return activeRequestCount;
+}
+
 api.interceptors.request.use(config => {
   const token = sessionStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  startTracking(config);
   return config;
 });
 
 api.interceptors.response.use(
-  res => res,
+  res => {
+    stopTracking(res.config);
+    return res;
+  },
   err => {
+    stopTracking(err.config);
     if (err.response?.status === 401) {
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('user');
