@@ -1,6 +1,6 @@
 # ManageEngine API synchronization
 
-The application can refresh every existing Service Request from ManageEngine ServiceDesk Plus Cloud every 30 minutes. It never creates an SR from the API and never overwrites the local description.
+The application refreshes existing Service Requests from ManageEngine ServiceDesk Plus Cloud every 30 minutes. It also creates previously untracked requests whose category is exactly `Oracle ERP` and whose ManageEngine status is still active. Closed-family requests and new requests from other categories are not created. Local descriptions are never overwritten, and API-created SRs start with an empty description.
 
 ## Fields synchronized
 
@@ -19,6 +19,8 @@ The application can refresh every existing Service Request from ManageEngine Ser
 Pending Side uses ManageEngine's `unreplied_count`: a value greater than zero means the technician has requester replies awaiting a response. Zero means the technician replied last, so the next action is with the user. An explicit ManageEngine status such as `Pending with User` takes precedence. Closed tickets have no pending side.
 
 Every changed field receives an `sr_history` entry with a blank actor, identifying it as a system update. Unchanged SRs only receive a new `manageengine_last_synced_at` timestamp. Missing remote tickets are left unchanged; absence is never interpreted as closure.
+
+New Oracle ERP requests are deduplicated by their ManageEngine request identifiers. Soft-deleted local SRs also count as existing, so an automatic sync never recreates a record that an administrator deliberately deleted. The assigned technician name is stored exactly as ManageEngine returns it. `Deloitte ERP Support` is classified as External; every other technician is classified as Internal.
 
 ## OAuth setup
 
@@ -54,6 +56,7 @@ MANAGEENGINE_SYNC_RUN_ON_START=true
 MANAGEENGINE_REFRESH_TOKEN=your-refresh-token
 MANAGEENGINE_PORTAL=
 MANAGEENGINE_EXTERNAL_TECHNICIAN=Deloitte ERP Support
+MANAGEENGINE_AUTO_CREATE_CATEGORY=Oracle ERP
 MANAGEENGINE_TIME_ZONE=Asia/Kolkata
 ```
 
@@ -67,7 +70,7 @@ Restart `start-all.bat` after changing `.env`. Open **Update Tasks → Update fr
 2. Run `update-production.bat` or pull, run `build.bat`, and restart the scheduled task.
 3. Confirm `/api/health` is healthy.
 4. In **Update Tasks → Update from ManageEngine**, run one manual sync.
-5. Review matched, updated, unchanged, and not-found counts.
+5. Review matched, created, updated, unchanged, and not-found counts.
 6. Open a representative SR and confirm the ManageEngine status, timestamps, pending side, requester/technician, category, and scope.
 
 If the first run reports many not-found SRs, verify `MANAGEENGINE_PORTAL`, the Zoho data center, and whether local `sr_number` values match ManageEngine Request IDs. The job will not modify not-found records.

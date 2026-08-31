@@ -12,7 +12,7 @@ Internal operations application for RDC Concrete. The Meeting Tracker brings Ser
 - Show current workload, overdue items, seven-day activity, and pending ownership at a glance.
 - Import weekly Deloitte PDF status reports with a reviewable parse step before applying changes.
 - Download, edit, and re-upload a combined Excel workbook for controlled bulk updates.
-- Synchronize existing SRs from ManageEngine Cloud every 30 minutes, with a manual CSV fallback.
+- Synchronize existing SRs from ManageEngine Cloud every 30 minutes and automatically add new active Oracle ERP requests, with a manual CSV fallback.
 - Keep a field-level history and threaded comments for auditability.
 - Manage admin, editor, and viewer access with category-aware permissions.
 - Run scheduled MySQL backups from the application or Backup Settings screen.

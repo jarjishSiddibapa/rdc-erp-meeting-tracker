@@ -474,7 +474,7 @@ function UpdateFromManageEngine() {
     try {
       const res = await manageEngineImportAPI.syncNow();
       const summary = res.data;
-      message.success(`ManageEngine sync complete: ${summary.updated || 0} updated, ${summary.unchanged || 0} unchanged`);
+      message.success(`ManageEngine sync complete: ${summary.created || 0} created, ${summary.updated || 0} updated, ${summary.unchanged || 0} unchanged`);
       await refreshSyncStatus();
     } catch (e) {
       setError(e.response?.data?.message || 'ManageEngine API sync failed. Check the API configuration and server log.');
@@ -646,13 +646,14 @@ function UpdateFromManageEngine() {
               type={syncStatus.enabled ? 'success' : 'info'}
               showIcon
               message={syncStatus.enabled ? `Automatic sync runs every ${syncStatus.interval_minutes} minutes` : 'API is configured; automatic sync is currently disabled'}
-              description="Only existing Service Requests are updated. New ManageEngine tickets are not created here, and local descriptions are never overwritten."
+              description="Existing SRs are refreshed. New active Oracle ERP requests are created automatically; other new categories and already-closed tickets are ignored. Local descriptions are never overwritten."
             />
             {syncStatus.last_run && (
               <Row gutter={[12, 12]} style={{ marginTop: 14 }}>
                 {[
                   ['Last result', syncStatus.last_run.status],
                   ['Matched', syncStatus.last_run.matched],
+                  ['Created', syncStatus.last_run.created],
                   ['Updated', syncStatus.last_run.updated],
                   ['Unchanged', syncStatus.last_run.unchanged],
                   ['Not found', syncStatus.last_run.missing],

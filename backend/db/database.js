@@ -155,6 +155,7 @@ async function createTables() {
       remote_requests_scanned INT NOT NULL DEFAULT 0,
       matched INT NOT NULL DEFAULT 0,
       updated INT NOT NULL DEFAULT 0,
+      created INT NOT NULL DEFAULT 0,
       unchanged INT NOT NULL DEFAULT 0,
       missing INT NOT NULL DEFAULT 0,
       error_count INT NOT NULL DEFAULT 0,
@@ -225,6 +226,18 @@ async function migrateSRsTable() {
   }
 }
 
+async function migrateManageEngineSyncRuns() {
+  const [cols] = await pool.query(
+    `SELECT COLUMN_NAME FROM information_schema.columns
+     WHERE table_schema = ? AND table_name = 'manageengine_sync_runs'`,
+    [DB_NAME]
+  );
+  if (!cols.some(column => column.COLUMN_NAME === 'created')) {
+    await pool.query('ALTER TABLE manageengine_sync_runs ADD COLUMN created INT NOT NULL DEFAULT 0 AFTER updated');
+    console.log('Migrated: added manageengine_sync_runs.created column.');
+  }
+}
+
 // A viewer can normally only read — this flag lets an admin grant one specific viewer the
 // ability to edit Digitization Projects (not Service Requests) without promoting them to a
 // full editor. Same CREATE TABLE IF NOT EXISTS limitation as srs.assigned_to above.
@@ -265,6 +278,7 @@ async function initDb() {
   await migrateUsersTable();
   await migrateUsersCanEditDigitization();
   await migrateSRsTable();
+  await migrateManageEngineSyncRuns();
   await seedDefaults();
 }
 

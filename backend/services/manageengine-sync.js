@@ -36,6 +36,7 @@ function getConfig() {
     clientSecret: String(process.env.MANAGEENGINE_CLIENT_SECRET || '').trim(),
     refreshToken: String(process.env.MANAGEENGINE_REFRESH_TOKEN || '').trim(),
     externalTechnician: String(process.env.MANAGEENGINE_EXTERNAL_TECHNICIAN || 'Deloitte ERP Support').trim(),
+    autoCreateCategory: String(process.env.MANAGEENGINE_AUTO_CREATE_CATEGORY || 'Oracle ERP').trim(),
     timeZone: String(process.env.MANAGEENGINE_TIME_ZONE || 'Asia/Kolkata').trim(),
     maxPages: Math.max(1, Number.parseInt(process.env.MANAGEENGINE_SYNC_MAX_PAGES, 10) || 100),
   };
@@ -51,6 +52,12 @@ function missingConfig(config = getConfig()) {
 
 function normalizeStatusName(value) {
   return String(value || '').trim().toLowerCase().replace(/[\s_-]+/g, ' ');
+}
+
+function namesMatch(left, right) {
+  const first = String(left || '').trim();
+  const second = String(right || '').trim();
+  return !!first && !!second && first.localeCompare(second, undefined, { sensitivity: 'accent' }) === 0;
 }
 
 function isClosedFamily(value) {
@@ -110,7 +117,7 @@ function normalizeRequest(request, config = getConfig()) {
     manageengine_pending_party: pendingParty,
     pending_with: pendingParty === 'Technician' ? technician : pendingParty === 'User' ? requester : null,
     assigned_to: technician,
-    scope: technician && technician.localeCompare(config.externalTechnician, undefined, { sensitivity: 'accent' }) === 0
+    scope: namesMatch(technician, config.externalTechnician)
       ? 'External'
       : 'Internal',
     type: String(request?.category?.name || '').trim() || null,
@@ -120,6 +127,14 @@ function normalizeRequest(request, config = getConfig()) {
     manageengine_closed_at: status === 'Closed' ? closedAt : null,
     closed_date: status === 'Closed' && closedAt ? closedAt.slice(0, 10) : null,
   };
+}
+
+function isAutoCreateCandidate(request, config = getConfig()) {
+  const status = String(request?.status?.name || '').trim();
+  return requestLookupKeys(request).length > 0
+    && !!status
+    && !isClosedFamily(status)
+    && namesMatch(request?.category?.name, config.autoCreateCategory);
 }
 
 async function fetchWithRetry(url, options, attempts = 3) {
@@ -188,7 +203,7 @@ function assertApiSuccess(payload) {
   throw new Error(`ManageEngine API rejected the request: ${message}`);
 }
 
-async function fetchRequestPage(config, startIndex, forceTokenRefresh = false) {
+async function fetchRequestPage(config, startIndex, forceTokenRefresh = false, searchCriteria = null) {
   const token = await refreshAccessToken(config, forceTokenRefresh);
   const inputData = {
     list_info: {
@@ -203,6 +218,7 @@ async function fetchRequestPage(config, startIndex, forceTokenRefresh = false) {
       filter_by: { name: 'All_Requests' },
     },
   };
+  if (searchCriteria) inputData.list_info.search_criteria = searchCriteria;
   const url = new URL(requestsUrl(token.apiDomain, config.portal));
   url.searchParams.set('input_data', JSON.stringify(inputData));
   try {
@@ -216,7 +232,9 @@ async function fetchRequestPage(config, startIndex, forceTokenRefresh = false) {
     assertApiSuccess(payload);
     return payload;
   } catch (error) {
-    if (error.status === 401 && !forceTokenRefresh) return fetchRequestPage(config, startIndex, true);
+    if (error.status === 401 && !forceTokenRefresh) {
+      return fetchRequestPage(config, startIndex, true, searchCriteria);
+    }
     throw error;
   }
 }
@@ -230,17 +248,23 @@ function requestLookupKeys(request) {
 async function fetchMatchingRequests(config, localNumbers) {
   const wanted = new Set(localNumbers.map(value => String(value).trim()));
   const matches = new Map();
+  const autoCreateCandidates = new Map();
   let scanned = 0;
   let startIndex = 1;
   let pages = 0;
 
-  while (pages < config.maxPages && matches.size < wanted.size) {
+  // Always inspect at least the newest page. This provides a safe fallback for discovering
+  // newly-created Oracle ERP requests if a portal rejects the optional category-filtered scan.
+  while (pages < config.maxPages && (pages === 0 || matches.size < wanted.size)) {
     const payload = await fetchRequestPage(config, startIndex);
     const rows = Array.isArray(payload.requests) ? payload.requests : [];
     scanned += rows.length;
     pages++;
 
     for (const request of rows) {
+      if (isAutoCreateCandidate(request, config)) {
+        autoCreateCandidates.set(normalizeRequest(request, config).remoteId, request);
+      }
       for (const key of requestLookupKeys(request)) {
         if (wanted.has(key) && !matches.has(key)) matches.set(key, request);
       }
@@ -251,7 +275,37 @@ async function fetchMatchingRequests(config, localNumbers) {
     startIndex += rows.length;
   }
 
-  return { matches, scanned, pages };
+  return { matches, autoCreateCandidates, scanned, pages };
+}
+
+async function fetchAutoCreateRequests(config) {
+  const candidates = new Map();
+  let scanned = 0;
+  let startIndex = 1;
+  let pages = 0;
+  const categoryCriteria = {
+    field: 'category.name',
+    condition: 'is',
+    values: [config.autoCreateCategory],
+  };
+
+  while (pages < config.maxPages) {
+    const payload = await fetchRequestPage(config, startIndex, false, categoryCriteria);
+    const rows = Array.isArray(payload.requests) ? payload.requests : [];
+    scanned += rows.length;
+    pages++;
+
+    for (const request of rows) {
+      if (!isAutoCreateCandidate(request, config)) continue;
+      candidates.set(normalizeRequest(request, config).remoteId, request);
+    }
+
+    const hasMore = payload?.list_info?.has_more_rows === true || payload?.list_info?.has_more_rows === 'true';
+    if (!hasMore || rows.length === 0) break;
+    startIndex += rows.length;
+  }
+
+  return { candidates, scanned, pages };
 }
 
 function comparable(value) {
@@ -312,6 +366,34 @@ async function applyRequestUpdate(conn, local, remote, config) {
   return changes.length;
 }
 
+async function createAutoRequest(conn, remote, config) {
+  if (!isAutoCreateCandidate(remote, config)) return false;
+  const desired = normalizeRequest(remote, config);
+  const lookupKeys = [...new Set(requestLookupKeys(remote))];
+  const placeholders = lookupKeys.map(() => '?').join(', ');
+  const [existing] = await conn.query(
+    `SELECT id FROM srs WHERE category = 'SR' AND sr_number IN (${placeholders}) LIMIT 1`,
+    lookupKeys
+  );
+  // Includes soft-deleted SRs: an automatic sync must never resurrect something an admin deleted.
+  if (existing.length) return false;
+
+  const [result] = await conn.execute(`
+    INSERT INTO srs (
+      sr_number, category, scope, status, pending_with, assigned_to,
+      description, type, creation_date, created_by_name,
+      manageengine_status, manageengine_pending_party, manageengine_created_at,
+      manageengine_closed_at, manageengine_last_synced_at,
+      created_by, updated_by
+    ) VALUES (?, 'SR', ?, ?, ?, ?, '', ?, ?, ?, ?, ?, ?, NULL, NOW(), NULL, NULL)
+  `, [
+    desired.remoteId, desired.scope, desired.status, desired.pending_with, desired.assigned_to,
+    desired.type, desired.creation_date, desired.created_by_name, desired.manageengine_status,
+    desired.manageengine_pending_party, desired.manageengine_created_at,
+  ]);
+  return result.affectedRows === 1;
+}
+
 async function beginRun(triggeredBy) {
   const [result] = await pool.execute(
     "INSERT INTO manageengine_sync_runs (status, triggered_by) VALUES ('running', ?)",
@@ -324,10 +406,10 @@ async function finishRun(runId, status, counts, message = null) {
   await pool.execute(`
     UPDATE manageengine_sync_runs
     SET status = ?, local_srs = ?, remote_requests_scanned = ?, matched = ?, updated = ?,
-        unchanged = ?, missing = ?, error_count = ?, message = ?, finished_at = NOW()
+        created = ?, unchanged = ?, missing = ?, error_count = ?, message = ?, finished_at = NOW()
     WHERE id = ?
   `, [
-    status, counts.localSrs, counts.scanned, counts.matched, counts.updated,
+    status, counts.localSrs, counts.scanned, counts.matched, counts.updated, counts.created,
     counts.unchanged, counts.missing, counts.errorCount, message, runId,
   ]);
 }
@@ -341,7 +423,7 @@ async function executeSync(triggeredBy = 'schedule') {
   if (missing.length) throw new Error(`ManageEngine sync is not configured: missing ${missing.join(', ')}`);
 
   const runId = await beginRun(triggeredBy);
-  const counts = { localSrs: 0, scanned: 0, matched: 0, updated: 0, unchanged: 0, missing: 0, errorCount: 0 };
+  const counts = { localSrs: 0, scanned: 0, matched: 0, updated: 0, created: 0, unchanged: 0, missing: 0, errorCount: 0 };
   try {
     const [localRows] = await pool.query(`
       SELECT id, sr_number, status, scope, pending_with, assigned_to, type, creation_date,
@@ -351,15 +433,25 @@ async function executeSync(triggeredBy = 'schedule') {
       WHERE category = 'SR' AND is_deleted = 0
     `);
     counts.localSrs = localRows.length;
-    if (!localRows.length) {
-      await finishRun(runId, 'success', counts, 'No existing Service Requests to synchronize');
-      return { runId, status: 'success', ...counts };
-    }
 
     const remoteResult = await fetchMatchingRequests(config, localRows.map(row => row.sr_number));
     counts.scanned = remoteResult.scanned;
     counts.matched = localRows.filter(row => remoteResult.matches.has(String(row.sr_number).trim())).length;
     counts.missing = localRows.length - counts.matched;
+
+    // The filtered call keeps the scheduled job lightweight while still finding all active
+    // Oracle ERP requests, including a one-time backlog. Some older portals reject nested
+    // search fields, so retain candidates from the normal newest-first scan as a fallback.
+    const autoCreateCandidates = new Map(remoteResult.autoCreateCandidates);
+    try {
+      const createResult = await fetchAutoCreateRequests(config);
+      counts.scanned += createResult.scanned;
+      for (const [remoteId, request] of createResult.candidates) {
+        autoCreateCandidates.set(remoteId, request);
+      }
+    } catch (error) {
+      console.warn(`ManageEngine category-filtered discovery failed; using normal scan fallback: ${error.message}`);
+    }
 
     const conn = await pool.getConnection();
     try {
@@ -370,6 +462,9 @@ async function executeSync(triggeredBy = 'schedule') {
         const changedFields = await applyRequestUpdate(conn, local, remote, config);
         if (changedFields) counts.updated++;
         else counts.unchanged++;
+      }
+      for (const remote of autoCreateCandidates.values()) {
+        if (await createAutoRequest(conn, remote, config)) counts.created++;
       }
       await conn.commit();
     } catch (error) {
@@ -442,10 +537,12 @@ function initManageEngineScheduler() {
 }
 
 module.exports = {
+  createAutoRequest,
   getConfig,
   getSyncStatus,
   initManageEngineScheduler,
   isClosedFamily,
+  isAutoCreateCandidate,
   mapStatus,
   normalizeRequest,
   pendingPartyFor,

@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "backend/db/database.js": {
-    "mtime": 1788153463.3403006,
-    "ast_hash": "17e99acf9fa8adfe0fa0295ffa6ad70c",
+    "mtime": 1788169643.9485404,
+    "ast_hash": "21a156e6120e318989406c6d71482c57",
     "semantic_hash": ""
   },
   "backend/db/pool.js": {
@@ -175,13 +175,13 @@
     "semantic_hash": "91f03f042e762a928d51cdac2b6bac88"
   },
   "frontend/src/pages/SRPage.jsx": {
-    "mtime": 1788168988.5150623,
-    "ast_hash": "b9cd4def1fa4a61a6a7bc57f7171aabc",
+    "mtime": 1788169643.9637089,
+    "ast_hash": "64efa43c3f5ee521c85ed2cc4dcf139a",
     "semantic_hash": ""
   },
   "frontend/src/pages/UpdateTasks.jsx": {
-    "mtime": 1788153621.7634735,
-    "ast_hash": "5ba7030d94879c8bb08521032fbc77dd",
+    "mtime": 1788169643.9637089,
+    "ast_hash": "5fcdcb3899cd17dd4b21e21862c4801e",
     "semantic_hash": ""
   },
   "frontend/src/pages/UserManagement.jsx": {
@@ -335,8 +335,8 @@
     "semantic_hash": "60e1d9f938e187f820a44c524bcf0687"
   },
   "README.md": {
-    "mtime": 1788153705.9955041,
-    "ast_hash": "5e5998efcfea4c94075a962e4814e1e6",
+    "mtime": 1788169643.9637089,
+    "ast_hash": "cabced2f68958bd9dd416669198a5dc8",
     "semantic_hash": ""
   },
   "PRODUCTION.md": {
@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "docs/USER_GUIDE.md": {
-    "mtime": 1788154352.792347,
-    "ast_hash": "ab8e225a567f8415cdcc830939d74df6",
+    "mtime": 1788169643.9637089,
+    "ast_hash": "ecb5b85984c21b63cfb0680cd9447c40",
     "semantic_hash": ""
   },
   "docs/images/dashboard-overview.png": {
@@ -410,18 +410,18 @@
     "semantic_hash": ""
   },
   "backend/services/manageengine-sync.js": {
-    "mtime": 1788154104.3582647,
-    "ast_hash": "632a3dbc7976f8cc61417dedb2ee4a05",
+    "mtime": 1788169887.408248,
+    "ast_hash": "d5a3a881403ac5638fc98210f02644a4",
     "semantic_hash": ""
   },
   "backend/test/manageengine-sync.test.js": {
-    "mtime": 1788154007.8359237,
-    "ast_hash": "b988b3d9159acae04266256e28515712",
+    "mtime": 1788169887.4242258,
+    "ast_hash": "59427cc9d1cd75f7b93c10a6b2457414",
     "semantic_hash": ""
   },
   "docs/MANAGEENGINE_SYNC.md": {
-    "mtime": 1788168676.1324725,
-    "ast_hash": "9dafa9af129191e9ba7cbef4860db2b2",
+    "mtime": 1788169643.9637089,
+    "ast_hash": "380014d89b192f76148c2167f035a1a4",
     "semantic_hash": ""
   },
   "frontend/src/components/ui/LoadingNotice.jsx": {

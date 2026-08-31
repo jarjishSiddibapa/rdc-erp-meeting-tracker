@@ -353,6 +353,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
       const res = await manageEngineImportAPI.syncNow();
       const summary = res.data;
       const resultParts = [
+        `${summary.created || 0} created`,
         `${summary.updated || 0} updated`,
         `${summary.unchanged || 0} unchanged`,
       ];
