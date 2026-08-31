@@ -440,6 +440,8 @@ function UploadDeloittePdf() {
 // ManageEngine tickets that were never tracked here are never picked up at all - they stay
 // untracked, on purpose (we only move forward, never backfill closed history we never had).
 function UpdateFromManageEngine() {
+  const [syncStatus, setSyncStatus] = useState(null);
+  const [syncLoading, setSyncLoading] = useState(false);
   const [technicianOptions, setTechnicianOptions] = useState([]);
   const [assignedTo, setAssignedTo] = useState('');
   const [parsing, setParsing] = useState(false);
@@ -454,9 +456,33 @@ function UpdateFromManageEngine() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [closingId, setClosingId] = useState(null);
 
+  async function refreshSyncStatus() {
+    try {
+      const res = await manageEngineImportAPI.syncStatus();
+      setSyncStatus(res.data);
+    } catch { /* The manual CSV fallback remains usable if status lookup fails. */ }
+  }
+
   useEffect(() => {
     srAPI.distinctValues('SR', 'assignedTo').then(res => setTechnicianOptions(res.data)).catch(() => {});
+    refreshSyncStatus();
   }, []);
+
+  async function handleSyncNow() {
+    setSyncLoading(true);
+    setError('');
+    try {
+      const res = await manageEngineImportAPI.syncNow();
+      const summary = res.data;
+      message.success(`ManageEngine sync complete: ${summary.updated || 0} updated, ${summary.unchanged || 0} unchanged`);
+      await refreshSyncStatus();
+    } catch (e) {
+      setError(e.response?.data?.message || 'ManageEngine API sync failed. Check the API configuration and server log.');
+      await refreshSyncStatus();
+    } finally {
+      setSyncLoading(false);
+    }
+  }
 
   // Ambiguous rows (tracked as open here, absent from the export) need a way to actually
   // resolve them right here instead of just being told about them - either open the full SR
@@ -601,6 +627,49 @@ function UpdateFromManageEngine() {
 
   return (
     <div>
+      <Card
+        size="small"
+        title={<Space><SyncOutlined style={{ color: BRAND }} />Automatic API sync</Space>}
+        extra={<Button icon={<SyncOutlined />} loading={syncLoading || syncStatus?.running} disabled={!syncStatus?.configured} onClick={handleSyncNow}>Sync now</Button>}
+        style={{ marginBottom: 20 }}
+      >
+        {!syncStatus?.configured ? (
+          <Alert
+            type="warning"
+            showIcon
+            message="ManageEngine API credentials are not configured"
+            description={`Add the missing values to backend/.env${syncStatus?.missing_configuration?.length ? `: ${syncStatus.missing_configuration.join(', ')}` : ''}, then restart the server.`}
+          />
+        ) : (
+          <>
+            <Alert
+              type={syncStatus.enabled ? 'success' : 'info'}
+              showIcon
+              message={syncStatus.enabled ? `Automatic sync runs every ${syncStatus.interval_minutes} minutes` : 'API is configured; automatic sync is currently disabled'}
+              description="Only existing Service Requests are updated. New ManageEngine tickets are not created here, and local descriptions are never overwritten."
+            />
+            {syncStatus.last_run && (
+              <Row gutter={[12, 12]} style={{ marginTop: 14 }}>
+                {[
+                  ['Last result', syncStatus.last_run.status],
+                  ['Matched', syncStatus.last_run.matched],
+                  ['Updated', syncStatus.last_run.updated],
+                  ['Unchanged', syncStatus.last_run.unchanged],
+                  ['Not found', syncStatus.last_run.missing],
+                  ['Finished', syncStatus.last_run.finished_at ? dayjs(syncStatus.last_run.finished_at).format('DD-MMM-YYYY hh:mm A') : 'Running'],
+                ].map(([label, value]) => (
+                  <Col xs={12} sm={8} md={4} key={label}>
+                    <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>{label}</Text>
+                    <Text strong>{value ?? 0}</Text>
+                  </Col>
+                ))}
+              </Row>
+            )}
+          </>
+        )}
+      </Card>
+
+      <Title level={5} style={{ marginBottom: 6 }}>Manual CSV fallback</Title>
       <Paragraph type="secondary" style={{ marginBottom: 20 }}>
         Reconcile this app against a ManageEngine export for one technician. Pick who the export
         belongs to (Assigned To), then upload it. Tickets open in ManageEngine but not yet tracked

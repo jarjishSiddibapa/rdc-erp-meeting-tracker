@@ -41,6 +41,11 @@ const STATUS_STAT_KEY = {
 };
 
 function fmt(date) { return date ? dayjs(date).format('DD-MMM-YYYY') : '—'; }
+function fmtCreated(row) {
+  return row.manageengine_created_at
+    ? dayjs(row.manageengine_created_at).format('DD-MMM-YYYY hh:mm A')
+    : fmt(row.creation_date);
+}
 
 function PendingSinceCell({ days, isClosed }) {
   if (days === null || days === undefined) return <Text type="secondary">—</Text>;
@@ -139,7 +144,7 @@ function buildColumns({ category, onView, filters, typeOptions, pendingWithOptio
   return [
     srNoCol,
     sortable({ title: 'Description', dataIndex: 'description', width: 200, render: v => <div style={cellStyle}>{v || '—'}</div> }),
-    sortable({ title: 'Creation Date', dataIndex: 'creation_date', width: 100, render: v => fmt(v) }),
+    sortable({ title: 'Created', dataIndex: 'creation_date', width: 145, render: (_, row) => fmtCreated(row) }),
     lastCommentCol,
     sortable({ title: 'Exp. Closure', dataIndex: 'expected_closure_date', width: 100, render: (v, row) => <ClosureDateCell srId={row.id} field="expected_closure_date" value={v} warnOverdue status={row.status} /> }),
     pendingSinceCol,

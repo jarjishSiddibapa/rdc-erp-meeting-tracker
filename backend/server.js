@@ -20,6 +20,7 @@ const manageEngineImportRoutes = require('./routes/manageengine-import');
 const { initDb, pool } = require('./db/database');
 const { verifyMailer } = require('./services/mailer');
 const { initScheduler } = require('./services/backup');
+const { initManageEngineScheduler } = require('./services/manageengine-sync');
 const { startHeartbeat, logShutdown, logCrash } = require('./services/heartbeat');
 
 const REQUIRED_ENV = ['JWT_SECRET', 'DB_HOST', 'DB_USER', 'DB_NAME'];
@@ -127,6 +128,7 @@ async function start() {
   await initDb();
   await verifyMailer();
   await initScheduler();
+  initManageEngineScheduler();
   const server = app.listen(PORT, () => {
     console.log(`ERP Meeting Tracker API running on http://localhost:${PORT}`);
     startHeartbeat();

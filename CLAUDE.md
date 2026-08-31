@@ -201,6 +201,14 @@ running app:
 
 Chronological, most-recent-relevant-first, for context on *why* rather than just *what*:
 
+- **Automatic ManageEngine Cloud synchronization** — `services/manageengine-sync.js` refreshes
+  OAuth access tokens and updates existing SRs every 30 minutes (plus an optional startup run).
+  It matches local `sr_number` against ManageEngine `display_id`, never creates missing SRs,
+  never overwrites descriptions, and leaves not-found records unchanged. Pending side comes
+  from the official `unreplied_count` field (>0 = Technician, 0 = User), with explicit pending
+  statuses taking precedence. Exact source timestamps and the raw source status are stored in
+  `manageengine_*` columns; real field changes are written to `sr_history` with a null system
+  actor. Credentials and the offline refresh token live only in `backend/.env`.
 - **Proper dashboarding stat tiles + Overdue** — `SRPage.jsx`'s stat-tile row was replaced from
   a partial 4-tile set (Total/Open/On Hold/Closed) to a full 8-tile breakdown covering every
   status (Open, In Progress, Pending, Pending with User, On Hold, Closed) plus Total and

@@ -53,7 +53,7 @@ The **Update Task Data** tab provides a controlled round trip:
 
 Comments are appended rather than replacing earlier comments. An unchanged re-upload reports zero updated rows.
 
-The **Upload Deloitte PDF** tab parses the weekly report first. Review the page and row classifications before applying the changes. The **Update from ManageEngine** tab follows the same parse-then-apply pattern for CSV exports.
+The **Upload Deloitte PDF** tab parses the weekly report first. Review the page and row classifications before applying the changes. The **Update from ManageEngine** tab shows the automatic API sync state and its latest counts; administrators can also run it immediately. The CSV parse-and-apply workflow remains available as a manual fallback.
 
 ## Reports and backups
 

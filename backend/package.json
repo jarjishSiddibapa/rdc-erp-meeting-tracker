@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "migrate:mysql": "node scripts/migrate-sqlite-to-mysql.js"
+    "migrate:mysql": "node scripts/migrate-sqlite-to-mysql.js",
+    "manageengine:exchange-code": "node scripts/exchange-manageengine-code.js",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",

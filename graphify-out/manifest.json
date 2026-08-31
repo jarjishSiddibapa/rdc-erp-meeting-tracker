@@ -1,18 +1,18 @@
 {
   "backend/package.json": {
-    "mtime": 1786100345.5648365,
-    "ast_hash": "e4ede96bd9df13d955fb62c322bbd123",
-    "semantic_hash": "e4ede96bd9df13d955fb62c322bbd123"
+    "mtime": 1788153705.9955041,
+    "ast_hash": "a906857b7bc1cd25da2a2d2a50e52eec",
+    "semantic_hash": ""
   },
   "backend/server.js": {
-    "mtime": 1787228567.6911085,
-    "ast_hash": "63deeab1370e1ddb4ff999c9da075840",
-    "semantic_hash": "63deeab1370e1ddb4ff999c9da075840"
+    "mtime": 1788153577.208481,
+    "ast_hash": "0677fabba572c5f65b13d45f25965fc2",
+    "semantic_hash": ""
   },
   "backend/db/database.js": {
-    "mtime": 1787717109.2691138,
-    "ast_hash": "92dc5547eaf9b7ddf00c5a7cb220d70e",
-    "semantic_hash": "92dc5547eaf9b7ddf00c5a7cb220d70e"
+    "mtime": 1788153463.3403006,
+    "ast_hash": "17e99acf9fa8adfe0fa0295ffa6ad70c",
+    "semantic_hash": ""
   },
   "backend/db/pool.js": {
     "mtime": 1785559994.0614185,
@@ -110,9 +110,9 @@
     "semantic_hash": "3551c1dea6a020cd9a408d44a932d66a"
   },
   "frontend/src/components/SRDetail.jsx": {
-    "mtime": 1787654090.1903691,
-    "ast_hash": "4a72ad9e1421a5eb0ba61d000209f00e",
-    "semantic_hash": "4a72ad9e1421a5eb0ba61d000209f00e"
+    "mtime": 1788153621.7620666,
+    "ast_hash": "610399775427804d8603ff66f0f387f0",
+    "semantic_hash": ""
   },
   "frontend/src/components/SRForm.jsx": {
     "mtime": 1787654090.190786,
@@ -175,14 +175,14 @@
     "semantic_hash": "91f03f042e762a928d51cdac2b6bac88"
   },
   "frontend/src/pages/SRPage.jsx": {
-    "mtime": 1787222981.291301,
-    "ast_hash": "06c8ba45444e67138d0852198785fa3e",
-    "semantic_hash": "06c8ba45444e67138d0852198785fa3e"
+    "mtime": 1788153621.7458622,
+    "ast_hash": "769eafe587197e7e4f88f5d6fed76572",
+    "semantic_hash": ""
   },
   "frontend/src/pages/UpdateTasks.jsx": {
-    "mtime": 1787654083.6467257,
-    "ast_hash": "0d100bcfd4acf650fc28e643b07466a6",
-    "semantic_hash": "0d100bcfd4acf650fc28e643b07466a6"
+    "mtime": 1788153621.7634735,
+    "ast_hash": "5ba7030d94879c8bb08521032fbc77dd",
+    "semantic_hash": ""
   },
   "frontend/src/pages/UserManagement.jsx": {
     "mtime": 1787654090.190786,
@@ -190,9 +190,9 @@
     "semantic_hash": "06852e197848fd01b52f149040d31c24"
   },
   "frontend/src/services/api.js": {
-    "mtime": 1787228572.6834059,
-    "ast_hash": "db728e01645ca6102c545b0b550697e5",
-    "semantic_hash": "db728e01645ca6102c545b0b550697e5"
+    "mtime": 1788153621.7458622,
+    "ast_hash": "2720f96ca234cc7b0ed3ee24a4c42798",
+    "semantic_hash": ""
   },
   "frontend/src/utils/excelIO.js": {
     "mtime": 1787651492.8004863,
@@ -285,9 +285,9 @@
     "semantic_hash": "d659b1d219873a464b3f1a2bc848c1df"
   },
   "backend/routes/manageengine-import.js": {
-    "mtime": 1787228552.5355823,
-    "ast_hash": "38e7968408fc3b82215054ce0b1f1ebe",
-    "semantic_hash": "38e7968408fc3b82215054ce0b1f1ebe"
+    "mtime": 1788153577.208481,
+    "ast_hash": "6af8d6bf85b51897123ce2d4af0e51f4",
+    "semantic_hash": ""
   },
   "graphify-out/memory/query_20260825_095625_use_https___github_com_leonxlnx_taste_skill_to_imp.md": {
     "mtime": 1787651785.9380767,
@@ -335,13 +335,13 @@
     "semantic_hash": "60e1d9f938e187f820a44c524bcf0687"
   },
   "README.md": {
-    "mtime": 1787893864.8470838,
-    "ast_hash": "828912a21292dffda94a089021c0fc2a",
+    "mtime": 1788153705.9955041,
+    "ast_hash": "5e5998efcfea4c94075a962e4814e1e6",
     "semantic_hash": ""
   },
   "PRODUCTION.md": {
-    "mtime": 1787893781.3790724,
-    "ast_hash": "62d7e1f4c9411b5c479369eb93c09ba2",
+    "mtime": 1788153706.0236814,
+    "ast_hash": "108f728f2738ce5c1e67e349be926ab2",
     "semantic_hash": ""
   },
   ".github/pull_request_template.md": {
@@ -350,8 +350,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1787893772.7266681,
-    "ast_hash": "1b40935541f0f433d0f41b5717c1cc3a",
+    "mtime": 1788154117.1698766,
+    "ast_hash": "0d195581c628ed9b42c703a854258cd8",
     "semantic_hash": ""
   },
   "CONTRIBUTING.md": {
@@ -370,13 +370,13 @@
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
-    "mtime": 1787893772.7206147,
-    "ast_hash": "bb9465cdb1e8fe3de7c9c337990de259",
+    "mtime": 1788153706.0236814,
+    "ast_hash": "238222766ac96999bc58c2a9249b4ec9",
     "semantic_hash": ""
   },
   "docs/DEVELOPMENT.md": {
-    "mtime": 1787893772.7185214,
-    "ast_hash": "403b242edc08edbea724b2e561f957f3",
+    "mtime": 1788154128.8807852,
+    "ast_hash": "b0cff09c9fe2f913a958903afd8023ad",
     "semantic_hash": ""
   },
   "docs/TROUBLESHOOTING.md": {
@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "docs/USER_GUIDE.md": {
-    "mtime": 1787893772.7182088,
-    "ast_hash": "7cc77237db2c52a27b4e918027d900df",
+    "mtime": 1788153706.0236814,
+    "ast_hash": "99ff8571a9a830ac85b89119734e0924",
     "semantic_hash": ""
   },
   "docs/images/dashboard-overview.png": {
@@ -402,6 +402,26 @@
   "docs/images/update-tasks.png": {
     "mtime": 1787892202.587165,
     "ast_hash": "bf839e6d674c7839c12d75b425686e10",
+    "semantic_hash": ""
+  },
+  "backend/scripts/exchange-manageengine-code.js": {
+    "mtime": 1788153705.9955041,
+    "ast_hash": "3da2a8760fef3436d33ad87a8bd00753",
+    "semantic_hash": ""
+  },
+  "backend/services/manageengine-sync.js": {
+    "mtime": 1788154104.3582647,
+    "ast_hash": "632a3dbc7976f8cc61417dedb2ee4a05",
+    "semantic_hash": ""
+  },
+  "backend/test/manageengine-sync.test.js": {
+    "mtime": 1788154007.8359237,
+    "ast_hash": "b988b3d9159acae04266256e28515712",
+    "semantic_hash": ""
+  },
+  "docs/MANAGEENGINE_SYNC.md": {
+    "mtime": 1788153705.9955041,
+    "ast_hash": "74a720995c056245e6e4fb46620ad32e",
     "semantic_hash": ""
   }
 }

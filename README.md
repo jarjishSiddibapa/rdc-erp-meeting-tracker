@@ -12,7 +12,7 @@ Internal operations application for RDC Concrete. The Meeting Tracker brings Ser
 - Show current workload, overdue items, seven-day activity, and pending ownership at a glance.
 - Import weekly Deloitte PDF status reports with a reviewable parse step before applying changes.
 - Download, edit, and re-upload a combined Excel workbook for controlled bulk updates.
-- Import and apply ManageEngine CSV updates.
+- Synchronize existing SRs from ManageEngine Cloud every 30 minutes, with a manual CSV fallback.
 - Keep a field-level history and threaded comments for auditability.
 - Manage admin, editor, and viewer access with category-aware permissions.
 - Run scheduled MySQL backups from the application or Backup Settings screen.
@@ -61,6 +61,7 @@ For a hot-reload development session, use `start-backend.bat` and `start-fronten
 | [Development guide](docs/DEVELOPMENT.md) | Local setup, commands, migrations, verification, and contribution flow |
 | [Architecture](docs/ARCHITECTURE.md) | Runtime topology, data model, API map, and design decisions |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | Batch files, port 777, MySQL, stale builds, email, and backups |
+| [ManageEngine sync](docs/MANAGEENGINE_SYNC.md) | OAuth setup, synchronized fields, pending-side logic, and production checks |
 | [Security policy](SECURITY.md) | Secret handling and private vulnerability reporting |
 | [Contributing](CONTRIBUTING.md) | Branch, review, and validation expectations |
 

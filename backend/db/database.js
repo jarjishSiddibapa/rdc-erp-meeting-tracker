@@ -64,6 +64,12 @@ async function createTables() {
       created_by_name VARCHAR(255),
       expected_closure_date DATE,
 
+      manageengine_status VARCHAR(255),
+      manageengine_pending_party VARCHAR(20),
+      manageengine_created_at DATETIME,
+      manageengine_closed_at DATETIME,
+      manageengine_last_synced_at DATETIME,
+
       project_name VARCHAR(255),
       process_owner VARCHAR(255),
       target_date DATE,
@@ -139,6 +145,25 @@ async function createTables() {
       finished_at DATETIME NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS manageengine_sync_runs (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      status VARCHAR(20) NOT NULL,
+      triggered_by VARCHAR(20) NOT NULL DEFAULT 'schedule',
+      local_srs INT NOT NULL DEFAULT 0,
+      remote_requests_scanned INT NOT NULL DEFAULT 0,
+      matched INT NOT NULL DEFAULT 0,
+      updated INT NOT NULL DEFAULT 0,
+      unchanged INT NOT NULL DEFAULT 0,
+      missing INT NOT NULL DEFAULT 0,
+      error_count INT NOT NULL DEFAULT 0,
+      message TEXT NULL,
+      started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      finished_at DATETIME NULL,
+      INDEX idx_manageengine_sync_runs_started (started_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
 }
 
 // The users table already existed with the old constraints (username required, email
@@ -176,13 +201,27 @@ async function migrateUsersTable() {
 async function migrateSRsTable() {
   const [cols] = await pool.query(
     `SELECT COLUMN_NAME FROM information_schema.columns
-     WHERE table_schema = ? AND table_name = 'srs' AND COLUMN_NAME = 'assigned_to'`,
+     WHERE table_schema = ? AND table_name = 'srs'`,
     [DB_NAME]
   );
-  if (cols.length === 0) {
+  const existing = new Set(cols.map(c => c.COLUMN_NAME));
+  if (!existing.has('assigned_to')) {
     await pool.query('ALTER TABLE srs ADD COLUMN assigned_to VARCHAR(255) NULL AFTER pending_with');
     await pool.query('ALTER TABLE srs ADD INDEX idx_srs_assigned_to (assigned_to)');
     console.log('Migrated: added srs.assigned_to column.');
+  }
+
+  const manageEngineColumns = [
+    ['manageengine_status', 'VARCHAR(255) NULL AFTER expected_closure_date'],
+    ['manageengine_pending_party', 'VARCHAR(20) NULL AFTER manageengine_status'],
+    ['manageengine_created_at', 'DATETIME NULL AFTER manageengine_pending_party'],
+    ['manageengine_closed_at', 'DATETIME NULL AFTER manageengine_created_at'],
+    ['manageengine_last_synced_at', 'DATETIME NULL AFTER manageengine_closed_at'],
+  ];
+  for (const [name, definition] of manageEngineColumns) {
+    if (existing.has(name)) continue;
+    await pool.query(`ALTER TABLE srs ADD COLUMN ${name} ${definition}`);
+    console.log(`Migrated: added srs.${name} column.`);
   }
 }
 

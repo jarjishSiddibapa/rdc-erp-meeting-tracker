@@ -279,9 +279,19 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
               <Descriptions.Item label="Type">{sr.type || '-'}</Descriptions.Item>
               <Descriptions.Item label="Created By">{sr.created_by_name || '-'}</Descriptions.Item>
               <Descriptions.Item label="Assigned To">{sr.assigned_to || '-'}</Descriptions.Item>
-              <Descriptions.Item label="Creation Date">{fmt(sr.creation_date)}</Descriptions.Item>
+              <Descriptions.Item label="Pending Side">
+                {sr.manageengine_pending_party ? <Tag>{sr.manageengine_pending_party}</Tag> : '-'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Created">{fmtDT(sr.manageengine_created_at || sr.creation_date)}</Descriptions.Item>
               <Descriptions.Item label="Expected Closure">{fmt(sr.expected_closure_date)}</Descriptions.Item>
-              {sr.closed_date && <Descriptions.Item label="Closed On" span={2}>{fmt(sr.closed_date)}</Descriptions.Item>}
+              {(sr.manageengine_closed_at || sr.closed_date) && (
+                <Descriptions.Item label="Closed On">{fmtDT(sr.manageengine_closed_at || sr.closed_date)}</Descriptions.Item>
+              )}
+              {sr.manageengine_status && (
+                <Descriptions.Item label="ManageEngine">
+                  <Space size={6}><Tag color="cyan">{sr.manageengine_status}</Tag><Text type="secondary">Synced {fmtDT(sr.manageengine_last_synced_at)}</Text></Space>
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label="Description" span={2}>
                 <Paragraph style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{sr.description || '-'}</Paragraph>
               </Descriptions.Item>

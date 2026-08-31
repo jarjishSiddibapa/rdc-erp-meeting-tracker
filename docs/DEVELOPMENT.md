@@ -45,11 +45,12 @@ Open the Vite URL shown by the frontend process, normally `http://localhost:5173
 ```powershell
 npm run lint --prefix frontend
 npm run build --prefix frontend
+npm test --prefix backend
 node --check backend/server.js
 node --check backend/routes/stats.js
 ```
 
-Then exercise the real built app at `http://localhost:777`: sign in with a disposable test user, verify the changed screen and relevant API flow, and remove the test data. There is no separate mock test suite; verification intentionally follows the production-serving path.
+Then exercise the real built app at `http://localhost:777`: sign in with a disposable test user, verify the changed screen and relevant API flow, and remove the test data. Focused backend unit tests cover deterministic mappings such as the ManageEngine sync, but real production-serving verification remains required.
 
 ## Database and migrations
 

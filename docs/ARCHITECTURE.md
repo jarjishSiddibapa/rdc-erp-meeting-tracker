@@ -27,7 +27,8 @@ The backend is the production entrypoint. It serves the API and the built SPA fr
 | `backend/routes/stats.js` | Dashboard totals, rolling seven-day metrics, pending-by-person aggregation |
 | `backend/routes/csv-import.js` | Excel parse/apply and diffed field updates |
 | `backend/routes/deloitte-import.js` | Deloitte PDF parse/apply workflow |
-| `backend/routes/manageengine-import.js` | ManageEngine CSV parse/apply workflow |
+| `backend/routes/manageengine-import.js` | ManageEngine API sync status/manual run and CSV fallback workflow |
+| `backend/services/manageengine-sync.js` | OAuth token refresh, 30-minute schedule, field mapping, audit-safe updates |
 | `backend/services/backup.js` | Scheduled and manual `mysqldump` backups |
 | `frontend/src/App.jsx` | Public/protected routes and application shell |
 | `frontend/src/pages/` | Feature screens |
@@ -53,7 +54,7 @@ All protected routes require `Authorization: Bearer <token>` unless noted.
 | Records | `/api/srs`, `/api/srs/:id`, `/comments`, `/close`, `/reopen`, `/stats/summary` | SR and Digitization operations |
 | Dashboard | `/api/stats/dashboard` | Current and comparison metrics |
 | Users | `/api/users` and `/bulk` | Admin user management |
-| Imports | `/api/csv-import/execute`, `/api/deloitte-import/{parse,apply}`, `/api/manageengine-import/{parse,apply}` | Bulk update pipelines |
+| Imports | `/api/csv-import/execute`, `/api/deloitte-import/{parse,apply}`, `/api/manageengine-import/{parse,apply,sync-status,sync-now}` | Bulk update and synchronization pipelines |
 | Reporting | `/api/reports/assigned-to-ecd` | Deloitte assignment/ECD history |
 | Backups | `/api/backup/settings`, `/run-now`, `/history`, `/download/:filename` | Backup administration |
 | Health | `/api/health` | Unauthenticated process check |

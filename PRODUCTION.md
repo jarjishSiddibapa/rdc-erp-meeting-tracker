@@ -31,6 +31,7 @@ Configure `backend/.env` before running the build:
 - Configure the initial administrator values. They are used only when the database has no users and by the one-time SQLite migration.
 - Configure SMTP values for password-reset and account emails.
 - Set `MYSQLDUMP_PATH` if `mysqldump.exe` is not available on the Task Scheduler account's `PATH`.
+- Configure the optional ManageEngine refresh-token values when automatic SR synchronization is required; see [ManageEngine sync](docs/MANAGEENGINE_SYNC.md). Never copy the short-lived authorization code into Git.
 
 If this clone replaces an older production folder, copy its existing `backend/.env` into the new checkout instead of generating new credentials. The active MySQL database is not stored in Git. Preserve any existing `backend/db-backup` files separately if their history is required.
 

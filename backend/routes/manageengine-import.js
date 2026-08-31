@@ -2,12 +2,23 @@ const express = require('express');
 const multer = require('multer');
 const { pool } = require('../db/pool');
 const { authenticate, requireRole } = require('../middleware/auth');
+const { getSyncStatus, runManageEngineSync } = require('../services/manageengine-sync');
 
 const router = express.Router();
 router.use(authenticate);
 router.use(requireRole('admin'));
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
+
+// The API sync only updates SRs that already exist locally. These endpoints let an admin
+// see the scheduler's most recent outcome and trigger the exact same guarded job on demand.
+router.get('/sync-status', async (_req, res, next) => {
+  try { res.json(await getSyncStatus()); } catch (error) { next(error); }
+});
+
+router.post('/sync-now', async (_req, res, next) => {
+  try { res.json(await runManageEngineSync('manual')); } catch (error) { next(error); }
+});
 
 // Minimal RFC4180-ish CSV parser: handles quoted fields, embedded commas, and doubled
 // double-quotes ("" -> ") inside a quoted field — good enough for a ManageEngine export,
