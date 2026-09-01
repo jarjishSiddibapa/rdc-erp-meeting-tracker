@@ -158,6 +158,11 @@ graphify-out/                — knowledge graph of this codebase (see AGENTS.md
   Deloitte `pdf-parse` module is intentionally required inside the parse action, not at server
   startup. Production static caching/log filtering depends on `NODE_ENV=production`, which
   `start-all.bat` sets explicitly.
+- **Documentation screenshots are always fictional**: capture the real production build against
+  a temporary/disposable database, then remove that database immediately. Never publish real SRs,
+  user names, operational counts, credentials, logs, or backup contents. The current portfolio
+  screenshots live in `docs/images/`; keep README, `docs/FEATURES.md`, and `docs/USER_GUIDE.md`
+  aligned when a visible feature changes.
 
 ## How changes get verified
 
@@ -191,6 +196,10 @@ Focused backend tests exist, but verification also means exercising the real run
 
 Chronological, most-recent-relevant-first, for context on *why* rather than just *what*:
 
+- **Portfolio-quality documentation** — README now presents the product, architecture,
+  integration flows, engineering outcomes, quality gates, and a sanitized product tour.
+  `docs/FEATURES.md` inventories the complete feature set and `docs/API_REFERENCE.md` documents
+  route groups/authorization. All current screenshots use a temporary fictional database.
 - **Low-overhead responsiveness pass** — removed the Three.js/Framer/Axios runtime, kept the
   existing Ant Design visual language, made counters and page switches deterministic, warmed
   route chunks during idle time, cancelled stale SR requests, batched filter metadata, added

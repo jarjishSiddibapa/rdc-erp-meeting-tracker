@@ -2914,8 +2914,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_services_mailer",
-      "community": 43,
-      "community_name": "mailer.js",
+      "community": 11,
+      "community_name": "routes/auth.js",
       "norm_label": "mailer.js"
     },
     {
@@ -2925,8 +2925,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_services_mailer_nodemailer",
-      "community": 43,
-      "community_name": "mailer.js",
+      "community": 11,
+      "community_name": "routes/auth.js",
       "norm_label": "nodemailer"
     },
     {
@@ -2936,8 +2936,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "backend_services_mailer_transporter",
-      "community": 43,
-      "community_name": "mailer.js",
+      "community": 11,
+      "community_name": "routes/auth.js",
       "norm_label": "transporter"
     },
     {
@@ -2948,8 +2948,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_services_mailer_verifymailer",
-      "community": 43,
-      "community_name": "mailer.js",
+      "community": 1,
+      "community_name": "server.js",
       "norm_label": "verifymailer()"
     },
     {
@@ -2960,8 +2960,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_services_mailer_sendpasswordresetemail",
-      "community": 43,
-      "community_name": "mailer.js",
+      "community": 11,
+      "community_name": "routes/auth.js",
       "norm_label": "sendpasswordresetemail()"
     },
     {
@@ -3464,8 +3464,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_resettoken",
-      "community": 11,
-      "community_name": "routes/auth.js",
+      "community": 43,
+      "community_name": "resetToken.js",
       "norm_label": "resettoken.js"
     },
     {
@@ -3475,8 +3475,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "backend_utils_resettoken_crypto",
-      "community": 11,
-      "community_name": "routes/auth.js",
+      "community": 43,
+      "community_name": "resetToken.js",
       "norm_label": "crypto"
     },
     {
@@ -3486,8 +3486,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "backend_utils_resettoken_pool",
-      "community": 11,
-      "community_name": "routes/auth.js",
+      "community": 43,
+      "community_name": "resetToken.js",
       "norm_label": "{ pool }"
     },
     {
@@ -3498,8 +3498,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_utils_resettoken_hashtoken",
-      "community": 11,
-      "community_name": "routes/auth.js",
+      "community": 43,
+      "community_name": "resetToken.js",
       "norm_label": "hashtoken()"
     },
     {
@@ -3510,8 +3510,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "backend_utils_resettoken_createresettoken",
-      "community": 11,
-      "community_name": "routes/auth.js",
+      "community": 43,
+      "community_name": "resetToken.js",
       "norm_label": "createresettoken()"
     },
     {
@@ -4708,8 +4708,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_components_ui_resizabletitle",
-      "community": 24,
-      "community_name": "Reports.jsx",
+      "community": 0,
+      "community_name": "SRPage.jsx",
       "norm_label": "resizabletitle.jsx"
     },
     {
@@ -4720,8 +4720,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_resizabletitle_resizabletitle",
-      "community": 24,
-      "community_name": "Reports.jsx",
+      "community": 0,
+      "community_name": "SRPage.jsx",
       "norm_label": "resizabletitle()"
     },
     {
@@ -4755,8 +4755,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_components_ui_reveal_revealgroup",
-      "community": 30,
-      "community_name": "DashboardHome.jsx",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "revealgroup()"
     },
     {
@@ -4824,8 +4824,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_context_authcontext_useauth",
-      "community": 31,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "useauth()"
     },
     {
@@ -4904,8 +4904,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_changepassword_changepassword",
-      "community": 31,
-      "community_name": "react",
+      "community": 30,
+      "community_name": "DashboardHome.jsx",
       "norm_label": "changepassword()"
     },
     {
@@ -5176,8 +5176,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_forgotpassword",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "forgotpassword.jsx"
     },
     {
@@ -5188,8 +5188,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_forgotpassword_forgotpassword",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "forgotpassword()"
     },
     {
@@ -5280,8 +5280,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_resetpassword",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "resetpassword.jsx"
     },
     {
@@ -5292,8 +5292,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_resetpassword_resetpassword",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "resetpassword()"
     },
     {
@@ -5418,8 +5418,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_srpage_srpage",
-      "community": 31,
-      "community_name": "react",
+      "community": 0,
+      "community_name": "SRPage.jsx",
       "norm_label": "srpage()"
     },
     {
@@ -5558,8 +5558,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_updatetasks_updatefrommanageengine",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "updatefrommanageengine()"
     },
     {
@@ -5581,8 +5581,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement",
-      "community": 31,
-      "community_name": "react",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "usermanagement.jsx"
     },
     {
@@ -5592,8 +5592,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_role_colors",
-      "community": 31,
-      "community_name": "react",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "role_colors"
     },
     {
@@ -5603,8 +5603,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_bulk_user_fields",
-      "community": 31,
-      "community_name": "react",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "bulk_user_fields"
     },
     {
@@ -5615,8 +5615,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_bulkaddusersmodal",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "bulkaddusersmodal()"
     },
     {
@@ -5627,8 +5627,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_pages_usermanagement_usermanagement",
-      "community": 31,
-      "community_name": "react",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "usermanagement()"
     },
     {
@@ -5825,8 +5825,8 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "frontend_src_services_api_authapi",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "authapi"
     },
     {
@@ -5902,8 +5902,8 @@
       "source_location": "L172",
       "_origin": "ast",
       "id": "frontend_src_services_api_userapi",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "userapi"
     },
     {
@@ -5913,8 +5913,8 @@
       "source_location": "L179",
       "_origin": "ast",
       "id": "frontend_src_services_api_backupapi",
-      "community": 13,
-      "community_name": "api.js",
+      "community": 31,
+      "community_name": "react",
       "norm_label": "backupapi"
     },
     {
@@ -6075,8 +6075,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_src_utils_pagination",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "pagination.js"
     },
     {
@@ -6087,8 +6087,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_pagination_paginationconfig",
-      "community": 31,
-      "community_name": "react",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "paginationconfig()"
     },
     {
@@ -6099,8 +6099,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "frontend_src_utils_pagination_compactpaginationconfig",
-      "community": 14,
-      "community_name": "UpdateTasks.jsx",
+      "community": 38,
+      "community_name": "UserManagement.jsx",
       "norm_label": "compactpaginationconfig()"
     },
     {
@@ -6206,7 +6206,7 @@
       "label": "Commit guidance",
       "file_type": "document",
       "source_file": "CONTRIBUTING.md",
-      "source_location": "L23",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "contributing_commit_guidance",
       "community": 37,
@@ -6220,8 +6220,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "production",
-      "community": 38,
-      "community_name": "README.md",
+      "community": 40,
+      "community_name": "PRODUCTION.md",
       "norm_label": "production.md"
     },
     {
@@ -6231,8 +6231,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "production_windows_production_deployment",
-      "community": 41,
-      "community_name": "Windows production deployment",
+      "community": 40,
+      "community_name": "PRODUCTION.md",
       "norm_label": "windows production deployment"
     },
     {
@@ -6242,8 +6242,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "production_first_deployment_after_cloning",
-      "community": 41,
-      "community_name": "Windows production deployment",
+      "community": 40,
+      "community_name": "PRODUCTION.md",
       "norm_label": "first deployment after cloning"
     },
     {
@@ -6253,8 +6253,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "production_windows_task_scheduler",
-      "community": 41,
-      "community_name": "Windows production deployment",
+      "community": 40,
+      "community_name": "PRODUCTION.md",
       "norm_label": "windows task scheduler"
     },
     {
@@ -6264,8 +6264,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "production_installing_future_updates",
-      "community": 41,
-      "community_name": "Windows production deployment",
+      "community": 40,
+      "community_name": "PRODUCTION.md",
       "norm_label": "installing future updates"
     },
     {
@@ -6275,119 +6275,240 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "readme",
-      "community": 38,
+      "community": 29,
       "community_name": "README.md",
       "norm_label": "readme.md"
     },
     {
-      "label": "RDC ERP Meeting Tracker",
+      "label": "Why this project exists",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L1",
+      "source_location": "L26",
       "_origin": "ast",
-      "id": "readme_rdc_erp_meeting_tracker",
+      "id": "readme_why_this_project_exists",
       "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
-      "norm_label": "rdc erp meeting tracker"
+      "community_name": "README.md",
+      "norm_label": "why this project exists"
     },
     {
-      "label": "What it does",
+      "label": "Product capabilities",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L9",
+      "source_location": "L38",
       "_origin": "ast",
-      "id": "readme_what_it_does",
+      "id": "readme_product_capabilities",
       "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
-      "norm_label": "what it does"
+      "community_name": "README.md",
+      "norm_label": "product capabilities"
     },
     {
-      "label": "Screenshots",
+      "label": "Product tour",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L21",
+      "source_location": "L53",
       "_origin": "ast",
-      "id": "readme_screenshots",
+      "id": "readme_product_tour",
+      "community": 44,
+      "community_name": "Product tour",
+      "norm_label": "product tour"
+    },
+    {
+      "label": "Work management",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "readme_work_management",
+      "community": 44,
+      "community_name": "Product tour",
+      "norm_label": "work management"
+    },
+    {
+      "label": "Controlled updates and delivery reporting",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "readme_controlled_updates_and_delivery_reporting",
+      "community": 44,
+      "community_name": "Product tour",
+      "norm_label": "controlled updates and delivery reporting"
+    },
+    {
+      "label": "Administration and resilience",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L74",
+      "_origin": "ast",
+      "id": "readme_administration_and_resilience",
+      "community": 44,
+      "community_name": "Product tour",
+      "norm_label": "administration and resilience"
+    },
+    {
+      "label": "Architecture",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L90",
+      "_origin": "ast",
+      "id": "readme_architecture",
       "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
-      "norm_label": "screenshots"
+      "community_name": "README.md",
+      "norm_label": "architecture"
+    },
+    {
+      "label": "Integration flow",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "readme_integration_flow",
+      "community": 29,
+      "community_name": "README.md",
+      "norm_label": "integration flow"
+    },
+    {
+      "label": "Engineering highlights",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L130",
+      "_origin": "ast",
+      "id": "readme_engineering_highlights",
+      "community": 45,
+      "community_name": "Engineering highlights",
+      "norm_label": "engineering highlights"
+    },
+    {
+      "label": "Correctness and trust",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L132",
+      "_origin": "ast",
+      "id": "readme_correctness_and_trust",
+      "community": 45,
+      "community_name": "Engineering highlights",
+      "norm_label": "correctness and trust"
+    },
+    {
+      "label": "Performance on a shared server",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L141",
+      "_origin": "ast",
+      "id": "readme_performance_on_a_shared_server",
+      "community": 45,
+      "community_name": "Engineering highlights",
+      "norm_label": "performance on a shared server"
+    },
+    {
+      "label": "Security and operations",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L156",
+      "_origin": "ast",
+      "id": "readme_security_and_operations",
+      "community": 45,
+      "community_name": "Engineering highlights",
+      "norm_label": "security and operations"
+    },
+    {
+      "label": "Technology",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L166",
+      "_origin": "ast",
+      "id": "readme_technology",
+      "community": 29,
+      "community_name": "README.md",
+      "norm_label": "technology"
     },
     {
       "label": "Quick start",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L29",
+      "source_location": "L176",
       "_origin": "ast",
       "id": "readme_quick_start",
-      "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
+      "community": 47,
+      "community_name": "Quick start",
       "norm_label": "quick start"
     },
     {
       "label": "Requirements",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L31",
+      "source_location": "L178",
       "_origin": "ast",
       "id": "readme_requirements",
-      "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
+      "community": 47,
+      "community_name": "Quick start",
       "norm_label": "requirements"
     },
     {
-      "label": "Run locally",
+      "label": "Local production-style run",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L38",
+      "source_location": "L185",
       "_origin": "ast",
-      "id": "readme_run_locally",
+      "id": "readme_local_production_style_run",
+      "community": 47,
+      "community_name": "Quick start",
+      "norm_label": "local production-style run"
+    },
+    {
+      "label": "Configuration",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L204",
+      "_origin": "ast",
+      "id": "readme_configuration",
       "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
-      "norm_label": "run locally"
+      "community_name": "README.md",
+      "norm_label": "configuration"
+    },
+    {
+      "label": "Quality gates",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L218",
+      "_origin": "ast",
+      "id": "readme_quality_gates",
+      "community": 29,
+      "community_name": "README.md",
+      "norm_label": "quality gates"
     },
     {
       "label": "Documentation",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L55",
+      "source_location": "L230",
       "_origin": "ast",
       "id": "readme_documentation",
       "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
+      "community_name": "README.md",
       "norm_label": "documentation"
     },
     {
-      "label": "Technology",
+      "label": "Repository map",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L68",
+      "source_location": "L245",
       "_origin": "ast",
-      "id": "readme_technology",
+      "id": "readme_repository_map",
       "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
-      "norm_label": "technology"
+      "community_name": "README.md",
+      "norm_label": "repository map"
     },
     {
-      "label": "Repository layout",
+      "label": "License and data boundary",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L81",
+      "source_location": "L258",
       "_origin": "ast",
-      "id": "readme_repository_layout",
+      "id": "readme_license_and_data_boundary",
       "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
-      "norm_label": "repository layout"
-    },
-    {
-      "label": "Security and data boundaries",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L93",
-      "_origin": "ast",
-      "id": "readme_security_and_data_boundaries",
-      "community": 29,
-      "community_name": "RDC ERP Meeting Tracker",
-      "norm_label": "security and data boundaries"
+      "community_name": "README.md",
+      "norm_label": "license and data boundary"
     },
     {
       "label": "SECURITY.md",
@@ -6445,6 +6566,17 @@
       "norm_label": "operational protections"
     },
     {
+      "label": "Application controls",
+      "file_type": "document",
+      "source_file": "SECURITY.md",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "security_application_controls",
+      "community": 39,
+      "community_name": "Security policy",
+      "norm_label": "application controls"
+    },
+    {
       "label": "backend/README.md",
       "file_type": "document",
       "source_file": "backend/README.md",
@@ -6452,7 +6584,7 @@
       "_origin": "ast",
       "id": "backend_readme",
       "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community_name": "DEVELOPMENT.md",
       "norm_label": "backend/readme.md"
     },
     {
@@ -6463,7 +6595,7 @@
       "_origin": "ast",
       "id": "backend_readme_backend_service",
       "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community_name": "DEVELOPMENT.md",
       "norm_label": "backend service"
     },
     {
@@ -6474,8 +6606,118 @@
       "_origin": "ast",
       "id": "backend_readme_commands",
       "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community_name": "DEVELOPMENT.md",
       "norm_label": "commands"
+    },
+    {
+      "label": "API_REFERENCE.md",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_api_reference",
+      "community": 25,
+      "community_name": "DEVELOPMENT.md",
+      "norm_label": "api_reference.md"
+    },
+    {
+      "label": "API reference",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_api_reference_api_reference",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "api reference"
+    },
+    {
+      "label": "Authentication",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "docs_api_reference_authentication",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "authentication"
+    },
+    {
+      "label": "Service Requests and Digitization Projects",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "docs_api_reference_service_requests_and_digitization_projects",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "service requests and digitization projects"
+    },
+    {
+      "label": "Dashboard and reports",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L57",
+      "_origin": "ast",
+      "id": "docs_api_reference_dashboard_and_reports",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "dashboard and reports"
+    },
+    {
+      "label": "Users",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "docs_api_reference_users",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "users"
+    },
+    {
+      "label": "Imports and synchronization",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L75",
+      "_origin": "ast",
+      "id": "docs_api_reference_imports_and_synchronization",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "imports and synchronization"
+    },
+    {
+      "label": "Backups",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L90",
+      "_origin": "ast",
+      "id": "docs_api_reference_backups",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "backups"
+    },
+    {
+      "label": "Health",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L101",
+      "_origin": "ast",
+      "id": "docs_api_reference_health",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "health"
+    },
+    {
+      "label": "Authorization summary",
+      "file_type": "document",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L109",
+      "_origin": "ast",
+      "id": "docs_api_reference_authorization_summary",
+      "community": 41,
+      "community_name": "API reference",
+      "norm_label": "authorization summary"
     },
     {
       "label": "ARCHITECTURE.md",
@@ -6485,7 +6727,7 @@
       "_origin": "ast",
       "id": "docs_architecture",
       "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community_name": "DEVELOPMENT.md",
       "norm_label": "architecture.md"
     },
     {
@@ -6525,7 +6767,7 @@
       "label": "Data model",
       "file_type": "document",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L37",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "docs_architecture_data_model",
       "community": 35,
@@ -6536,7 +6778,7 @@
       "label": "Authentication and authorization",
       "file_type": "document",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L43",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "docs_architecture_authentication_and_authorization",
       "community": 35,
@@ -6547,7 +6789,7 @@
       "label": "API map",
       "file_type": "document",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L47",
+      "source_location": "L49",
       "_origin": "ast",
       "id": "docs_architecture_api_map",
       "community": 35,
@@ -6558,7 +6800,7 @@
       "label": "Performance and operational choices",
       "file_type": "document",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L62",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "docs_architecture_performance_and_operational_choices",
       "community": 35,
@@ -6569,12 +6811,23 @@
       "label": "Why Express remains the backend",
       "file_type": "document",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L80",
+      "source_location": "L82",
       "_origin": "ast",
       "id": "docs_architecture_why_express_remains_the_backend",
       "community": 35,
       "community_name": "Architecture",
       "norm_label": "why express remains the backend"
+    },
+    {
+      "label": "Key design decisions",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L90",
+      "_origin": "ast",
+      "id": "docs_architecture_key_design_decisions",
+      "community": 35,
+      "community_name": "Architecture",
+      "norm_label": "key design decisions"
     },
     {
       "label": "DEVELOPMENT.md",
@@ -6584,7 +6837,7 @@
       "_origin": "ast",
       "id": "docs_development",
       "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community_name": "DEVELOPMENT.md",
       "norm_label": "development.md"
     },
     {
@@ -6698,14 +6951,190 @@
       "norm_label": "project map"
     },
     {
+      "label": "Documentation and screenshots",
+      "file_type": "document",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "docs_development_documentation_and_screenshots",
+      "community": 23,
+      "community_name": "Development guide",
+      "norm_label": "documentation and screenshots"
+    },
+    {
+      "label": "FEATURES.md",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_features",
+      "community": 25,
+      "community_name": "DEVELOPMENT.md",
+      "norm_label": "features.md"
+    },
+    {
+      "label": "Feature reference",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_features_feature_reference",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "feature reference"
+    },
+    {
+      "label": "Dashboard and operational visibility",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "docs_features_dashboard_and_operational_visibility",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "dashboard and operational visibility"
+    },
+    {
+      "label": "Service Requests",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "docs_features_service_requests",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "service requests"
+    },
+    {
+      "label": "Digitization Projects",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "docs_features_digitization_projects",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "digitization projects"
+    },
+    {
+      "label": "ManageEngine ServiceDesk Plus Cloud",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "docs_features_manageengine_servicedesk_plus_cloud",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "manageengine servicedesk plus cloud"
+    },
+    {
+      "label": "Update Tasks",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "docs_features_update_tasks",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "update tasks"
+    },
+    {
+      "label": "Excel round trip",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L58",
+      "_origin": "ast",
+      "id": "docs_features_excel_round_trip",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "excel round trip"
+    },
+    {
+      "label": "Deloitte weekly PDF",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L67",
+      "_origin": "ast",
+      "id": "docs_features_deloitte_weekly_pdf",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "deloitte weekly pdf"
+    },
+    {
+      "label": "ManageEngine administration",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L75",
+      "_origin": "ast",
+      "id": "docs_features_manageengine_administration",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "manageengine administration"
+    },
+    {
+      "label": "Reports",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L81",
+      "_origin": "ast",
+      "id": "docs_features_reports",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "reports"
+    },
+    {
+      "label": "Users, authentication, and permissions",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L90",
+      "_origin": "ast",
+      "id": "docs_features_users_authentication_and_permissions",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "users, authentication, and permissions"
+    },
+    {
+      "label": "Backup and production operations",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L102",
+      "_origin": "ast",
+      "id": "docs_features_backup_and_production_operations",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "backup and production operations"
+    },
+    {
+      "label": "Data integrity and audit behavior",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L113",
+      "_origin": "ast",
+      "id": "docs_features_data_integrity_and_audit_behavior",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "data integrity and audit behavior"
+    },
+    {
+      "label": "Performance and UX",
+      "file_type": "document",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L122",
+      "_origin": "ast",
+      "id": "docs_features_performance_and_ux",
+      "community": 22,
+      "community_name": "Feature reference",
+      "norm_label": "performance and ux"
+    },
+    {
       "label": "MANAGEENGINE_SYNC.md",
       "file_type": "document",
       "source_file": "docs/MANAGEENGINE_SYNC.md",
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_manageengine_sync",
-      "community": 38,
-      "community_name": "README.md",
+      "community": 40,
+      "community_name": "PRODUCTION.md",
       "norm_label": "manageengine_sync.md"
     },
     {
@@ -6716,7 +7145,7 @@
       "_origin": "ast",
       "id": "docs_manageengine_sync_manageengine_api_synchronization",
       "community": 40,
-      "community_name": "ManageEngine API synchronization",
+      "community_name": "PRODUCTION.md",
       "norm_label": "manageengine api synchronization"
     },
     {
@@ -6727,7 +7156,7 @@
       "_origin": "ast",
       "id": "docs_manageengine_sync_fields_synchronized",
       "community": 40,
-      "community_name": "ManageEngine API synchronization",
+      "community_name": "PRODUCTION.md",
       "norm_label": "fields synchronized"
     },
     {
@@ -6738,7 +7167,7 @@
       "_origin": "ast",
       "id": "docs_manageengine_sync_oauth_setup",
       "community": 40,
-      "community_name": "ManageEngine API synchronization",
+      "community_name": "PRODUCTION.md",
       "norm_label": "oauth setup"
     },
     {
@@ -6749,7 +7178,7 @@
       "_origin": "ast",
       "id": "docs_manageengine_sync_production_checks",
       "community": 40,
-      "community_name": "ManageEngine API synchronization",
+      "community_name": "PRODUCTION.md",
       "norm_label": "production checks"
     },
     {
@@ -6759,8 +7188,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_troubleshooting",
-      "community": 38,
-      "community_name": "README.md",
+      "community": 40,
+      "community_name": "PRODUCTION.md",
       "norm_label": "troubleshooting.md"
     },
     {
@@ -6869,8 +7298,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_user_guide",
-      "community": 38,
-      "community_name": "README.md",
+      "community": 25,
+      "community_name": "DEVELOPMENT.md",
       "norm_label": "user_guide.md"
     },
     {
@@ -6885,10 +7314,21 @@
       "norm_label": "user guide"
     },
     {
+      "label": "Recommended daily workflow",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "docs_user_guide_recommended_daily_workflow",
+      "community": 36,
+      "community_name": "User guide",
+      "norm_label": "recommended daily workflow"
+    },
+    {
       "label": "Dashboard",
       "file_type": "document",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L5",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "docs_user_guide_dashboard",
       "community": 36,
@@ -6899,7 +7339,7 @@
       "label": "Service Requests and Digitization Projects",
       "file_type": "document",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L25",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "docs_user_guide_service_requests_and_digitization_projects",
       "community": 36,
@@ -6910,7 +7350,7 @@
       "label": "Roles and permissions",
       "file_type": "document",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L34",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "docs_user_guide_roles_and_permissions",
       "community": 36,
@@ -6921,7 +7361,7 @@
       "label": "Update Tasks",
       "file_type": "document",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L44",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "docs_user_guide_update_tasks",
       "community": 36,
@@ -6932,12 +7372,23 @@
       "label": "Reports and backups",
       "file_type": "document",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L58",
+      "source_location": "L79",
       "_origin": "ast",
       "id": "docs_user_guide_reports_and_backups",
       "community": 36,
       "community_name": "User guide",
       "norm_label": "reports and backups"
+    },
+    {
+      "label": "Loading and refresh behavior",
+      "file_type": "document",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L91",
+      "_origin": "ast",
+      "id": "docs_user_guide_loading_and_refresh_behavior",
+      "community": 36,
+      "community_name": "User guide",
+      "norm_label": "loading and refresh behavior"
     },
     {
       "label": "frontend/README.md",
@@ -6947,7 +7398,7 @@
       "_origin": "ast",
       "id": "frontend_readme",
       "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community_name": "DEVELOPMENT.md",
       "norm_label": "frontend/readme.md"
     },
     {
@@ -6957,8 +7408,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "frontend_readme_frontend",
-      "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community": 46,
+      "community_name": "Frontend",
       "norm_label": "frontend"
     },
     {
@@ -6968,8 +7419,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "frontend_readme_commands",
-      "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community": 46,
+      "community_name": "Frontend",
       "norm_label": "commands"
     },
     {
@@ -6979,8 +7430,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "frontend_readme_client_structure",
-      "community": 25,
-      "community_name": "ARCHITECTURE.md",
+      "community": 46,
+      "community_name": "Frontend",
       "norm_label": "client structure"
     },
     {
@@ -17674,7 +18125,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L66",
+      "source_location": "L243",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -17685,7 +18136,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CONTRIBUTING.md",
-      "source_location": "L23",
+      "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
       "source": "contributing_contributing",
@@ -17718,7 +18169,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/README.md",
-      "source_location": "L15",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "backend_readme",
@@ -17773,7 +18224,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L59",
+      "source_location": "L239",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -17817,7 +18268,18 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L62",
+      "source_location": "L127",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "docs_api_reference",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L127",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -17828,7 +18290,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L61",
+      "source_location": "L240",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -17839,7 +18301,18 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L64",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "docs_features",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L216",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -17850,7 +18323,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L63",
+      "source_location": "L241",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -17861,7 +18334,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L60",
+      "source_location": "L235",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -17872,18 +18345,139 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L1",
+      "source_location": "L90",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
-      "target": "readme_rdc_erp_meeting_tracker",
+      "target": "readme_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L204",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_configuration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L230",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_documentation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L130",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_engineering_highlights",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L258",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_license_and_data_boundary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_product_capabilities",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_product_tour",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L218",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_quality_gates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L176",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_quick_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L245",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_repository_map",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L166",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_technology",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_why_this_project_exists",
       "confidence_score": 1.0
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L65",
+      "source_location": "L242",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
@@ -17894,99 +18488,99 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
+      "source_location": "L74",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_product_tour",
+      "target": "readme_administration_and_resilience",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_product_tour",
+      "target": "readme_controlled_updates_and_delivery_reporting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
       "source_location": "L55",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_documentation",
+      "source": "readme_product_tour",
+      "target": "readme_work_management",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L29",
+      "source_location": "L110",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_quick_start",
+      "source": "readme_architecture",
+      "target": "readme_integration_flow",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L81",
+      "source_location": "L132",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_repository_layout",
+      "source": "readme_engineering_highlights",
+      "target": "readme_correctness_and_trust",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L21",
+      "source_location": "L141",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_screenshots",
+      "source": "readme_engineering_highlights",
+      "target": "readme_performance_on_a_shared_server",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L93",
+      "source_location": "L156",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_security_and_data_boundaries",
+      "source": "readme_engineering_highlights",
+      "target": "readme_security_and_operations",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L68",
+      "source_location": "L185",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_technology",
+      "source": "readme_quick_start",
+      "target": "readme_local_production_style_run",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "readme_rdc_erp_meeting_tracker",
-      "target": "readme_what_it_does",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L31",
+      "source_location": "L178",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_quick_start",
       "target": "readme_requirements",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L38",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "readme_quick_start",
-      "target": "readme_run_locally",
       "confidence_score": 1.0
     },
     {
@@ -17998,6 +18592,17 @@
       "_origin": "ast",
       "source": "security",
       "target": "security_security_policy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "SECURITY.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "security_security_policy",
+      "target": "security_application_controls",
       "confidence_score": 1.0
     },
     {
@@ -18048,7 +18653,18 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/README.md",
-      "source_location": "L15",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "backend_readme",
+      "target": "docs_api_reference",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/README.md",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "backend_readme",
@@ -18064,6 +18680,127 @@
       "_origin": "ast",
       "source": "backend_readme_backend_service",
       "target": "backend_readme_commands",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference",
+      "target": "docs_api_reference_api_reference",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture",
+      "target": "docs_api_reference",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development",
+      "target": "docs_api_reference",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference_api_reference",
+      "target": "docs_api_reference_authentication",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L109",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference_api_reference",
+      "target": "docs_api_reference_authorization_summary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference_api_reference",
+      "target": "docs_api_reference_backups",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference_api_reference",
+      "target": "docs_api_reference_dashboard_and_reports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L101",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference_api_reference",
+      "target": "docs_api_reference_health",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L75",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference_api_reference",
+      "target": "docs_api_reference_imports_and_synchronization",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference_api_reference",
+      "target": "docs_api_reference_service_requests_and_digitization_projects",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/API_REFERENCE.md",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_api_reference_api_reference",
+      "target": "docs_api_reference_users",
       "confidence_score": 1.0
     },
     {
@@ -18091,8 +18828,19 @@
     {
       "relation": "references",
       "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features",
+      "target": "docs_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
       "source_file": "frontend/README.md",
-      "source_location": "L25",
+      "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_readme",
@@ -18103,7 +18851,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_architecture_architecture",
@@ -18114,7 +18862,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L43",
+      "source_location": "L45",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_architecture_architecture",
@@ -18125,7 +18873,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L37",
+      "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_architecture_architecture",
@@ -18136,7 +18884,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L62",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_architecture_architecture",
+      "target": "docs_architecture_key_design_decisions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "L64",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_architecture_architecture",
@@ -18169,7 +18928,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/ARCHITECTURE.md",
-      "source_location": "L80",
+      "source_location": "L82",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_architecture_performance_and_operational_choices",
@@ -18190,8 +18949,30 @@
     {
       "relation": "references",
       "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development",
+      "target": "docs_features",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development",
+      "target": "docs_user_guide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
       "source_file": "frontend/README.md",
-      "source_location": "L25",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "frontend_readme",
@@ -18218,6 +18999,17 @@
       "_origin": "ast",
       "source": "docs_development_development_guide",
       "target": "docs_development_development_workflows",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/DEVELOPMENT.md",
+      "source_location": "L79",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_development_development_guide",
+      "target": "docs_development_documentation_and_screenshots",
       "confidence_score": 1.0
     },
     {
@@ -18295,6 +19087,182 @@
       "_origin": "ast",
       "source": "docs_development_development_workflows",
       "target": "docs_development_production_style_single_port",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features",
+      "target": "docs_features_feature_reference",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features",
+      "target": "docs_user_guide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "frontend/README.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "frontend_readme",
+      "target": "docs_features",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L102",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_backup_and_production_operations",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_dashboard_and_operational_visibility",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L113",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_data_integrity_and_audit_behavior",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_digitization_projects",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_manageengine_servicedesk_plus_cloud",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L122",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_performance_and_ux",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_reports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_service_requests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_update_tasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_feature_reference",
+      "target": "docs_features_users_authentication_and_permissions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_update_tasks",
+      "target": "docs_features_deloitte_weekly_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_update_tasks",
+      "target": "docs_features_excel_round_trip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/FEATURES.md",
+      "source_location": "L75",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_features_update_tasks",
+      "target": "docs_features_manageengine_administration",
       "confidence_score": 1.0
     },
     {
@@ -18455,7 +19423,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L5",
+      "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_user_guide_user_guide",
@@ -18466,7 +19434,29 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L58",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_user_guide_user_guide",
+      "target": "docs_user_guide_loading_and_refresh_behavior",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_user_guide_user_guide",
+      "target": "docs_user_guide_recommended_daily_workflow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/USER_GUIDE.md",
+      "source_location": "L79",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_user_guide_user_guide",
@@ -18477,7 +19467,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L34",
+      "source_location": "L53",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_user_guide_user_guide",
@@ -18488,7 +19478,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L25",
+      "source_location": "L38",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_user_guide_user_guide",
@@ -18499,7 +19489,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/USER_GUIDE.md",
-      "source_location": "L44",
+      "source_location": "L65",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_user_guide_user_guide",
@@ -18673,5 +19663,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "2a9fcc194a5977abb16966319e5bc94e8fb32f5d"
+  "built_at_commit": "5c294180bbd7706cc456d671ab0008e7d3fd0790"
 }

@@ -34,6 +34,8 @@ The backend is the production entrypoint. It serves the API and the built SPA fr
 | `frontend/src/pages/` | Feature screens |
 | `frontend/src/services/api.js` | Client API wrappers |
 
+The detailed route catalogue is maintained in [API reference](API_REFERENCE.md).
+
 ## Data model
 
 The primary `srs` table stores both categories using `category = 'SR'` or `category = 'Digitization'`. Related tables record users, field-level history, and comments. Records are soft-deleted with `is_deleted`; normal application flows never hard-delete SRs or users.
@@ -84,3 +86,16 @@ FastAPI would add migration and dual-stack operational risk without removing dat
 network latency. The single Node process also serves the built frontend, scheduled work, and
 API from one small deployment. Targeted request, bundle, pool, and lazy-loading improvements
 therefore provide a better performance-to-risk result than changing backend languages.
+
+## Key design decisions
+
+| Decision | Reason | Trade-off |
+| --- | --- | --- |
+| One `srs` table for both categories | Shared history, comments, imports, and authorization paths | Every query must remain category-aware |
+| Single-port Node deployment | One service to operate on the Windows host | Backend restart is required after frontend builds |
+| JWT permissions in session storage | Simple LAN session model; closing the tab signs out | Role changes require a new login |
+| Preview then apply for imports | Users can inspect parser/match quality before mutation | Two-step workflow is intentionally slower than blind import |
+| Diff-only field writes | Accurate history and meaningful update counts | Mapping code must compare normalized values carefully |
+| Soft deletion | Preserves audit intent and prevents remote recreation | Storage is retained until an explicit maintenance decision |
+| Native Fetch plus focused caching | Smaller client runtime and fewer duplicate reads | Cache windows stay deliberately short |
+| Express rather than a FastAPI rewrite | Workload is DB/API bound and the current stack is operationally compact | Node remains the backend language |

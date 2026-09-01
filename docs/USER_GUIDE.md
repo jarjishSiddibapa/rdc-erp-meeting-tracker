@@ -1,8 +1,21 @@
 # User guide
 
-This guide explains the screens and the figures shown in the RDC ERP Meeting Tracker.
+This guide explains the screens, figures, and daily workflows in RDC Digitization Review.
+For the exhaustive capability inventory, see the [feature reference](FEATURES.md).
+
+All screenshots use fictional demo records captured from the current production build.
+
+## Recommended daily workflow
+
+1. Open **Dashboard** and review Pending Now, Overdue Now, and workload share.
+2. Select an owner or `(Unassigned)` to open the matching Service Requests.
+3. Use the status tiles and filters to focus the list; open an SR number for history/comments.
+4. Run **Sync SRs from ManageEngine** when an immediate refresh is needed between scheduled runs.
+5. Use **Reports** for Deloitte Expected Closure Date movement and **Update Tasks** for controlled bulk work.
 
 ## Dashboard
+
+![Dashboard overview](images/dashboard-overview.png)
 
 The dashboard is designed for a quick current-state read:
 
@@ -24,14 +37,22 @@ The table is the current workload by **Pending With**. It shows one current numb
 
 ## Service Requests and Digitization Projects
 
+| Service Requests | Digitization Projects |
+| --- | --- |
+| ![Service Requests](images/service-requests.png) | ![Digitization Projects](images/digitization-projects.png) |
+
 Use the left navigation to switch between the two record categories. Both use the same underlying `srs` table, but Digitization Projects have their own category-specific fields and permissions.
 
 - Filter by status, owner, assignment, dates, and other available metadata.
 - Select a row to view details, field history, and comments.
+- Select a status tile to use it as a filter. The Overdue tile uses the correct category date.
+- Use **Export Excel** for a filtered/current data export.
 - Editors can create and update records they are allowed to edit.
 - Closing, reopening, and deleting are administrator actions. Deletes are soft deletes.
 
 ## Roles and permissions
+
+![User management](images/user-management.png)
 
 | Role | Access |
 | --- | --- |
@@ -57,6 +78,19 @@ The **Upload Deloitte PDF** tab parses the weekly report first. Review the page 
 
 ## Reports and backups
 
-- **Reports** provides the Assigned-to-Deloitte/ECD-history view.
-- **Backup Settings** shows the backup schedule and history, allows an administrator to run a backup, and provides controlled download/delete actions.
+| Delivery reporting | Backup operations |
+| --- | --- |
+| ![Assigned-to-Deloitte report](images/reports.png) | ![Backup settings](images/backup-settings.png) |
+
+- **Reports** provides the Assigned-to-Deloitte/ECD-history view. Each ECD column is one real
+  date the SR held; Changes counts revisions after the initial value.
+- **Backup Settings** shows the backup schedule and history, allows an administrator to run a
+  backup, and provides controlled download/delete actions.
 - Password reset emails require the SMTP settings in `backend/.env`.
+
+## Loading and refresh behavior
+
+Fast cached interactions do not flash a loading screen. When a request takes long enough to be
+noticeable, the application shows the shared loading indicator. Searching after five characters
+is debounced, and changing a filter cancels obsolete table requests so older data cannot replace
+the latest result.

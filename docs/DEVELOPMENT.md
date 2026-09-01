@@ -75,3 +75,13 @@ The `migrate:mysql` script is only for the one-time historical SQLite migration.
 ## Project map
 
 See [Architecture](ARCHITECTURE.md) for the runtime and API map, and [Contributing](../CONTRIBUTING.md) for branch and review expectations.
+
+## Documentation and screenshots
+
+- Update [Feature reference](FEATURES.md), [User guide](USER_GUIDE.md), or
+  [API reference](API_REFERENCE.md) whenever the corresponding behavior changes.
+- Link to the authoritative guide instead of duplicating long procedures across documents.
+- Capture product screenshots from the real built application, not a mockup.
+- Use a temporary/disposable database with fictional records and remove it immediately after
+  capture. Never publish production SRs, users, counts, credentials, or logs.
+- Keep screenshots in `docs/images/` with descriptive lowercase filenames and useful alt text.

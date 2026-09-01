@@ -15,10 +15,14 @@ This is an internal RDC application. Contributions should preserve the existing 
 ```powershell
 npm run lint --prefix frontend
 npm run build --prefix frontend
+npm test --prefix backend
 node --check backend/server.js
 ```
 
 For database or import changes, also verify the real endpoint against a disposable record and remove the test data afterward. Never use production credentials or commit `.env` files.
+
+For user-visible changes, update the relevant guide and screenshot. Repository screenshots must
+come from fictional/disposable data; never capture the operational database for documentation.
 
 ## Commit guidance
 

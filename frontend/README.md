@@ -19,7 +19,14 @@ The Vite development server proxies `/api` requests to the backend on port `777`
 - `src/App.jsx` — authentication gates and route shell.
 - `src/pages/` — dashboard, SR/Digitization lists, reports, imports, users, backups, and password screens.
 - `src/components/` — reusable SR forms, detail views, comments, and date controls.
-- `src/services/api.js` — the Axios API surface.
+- `src/services/api.js` — native Fetch wrappers, loading tracking, safe read coalescing,
+  short-lived metadata caching, and mutation invalidation.
 - `src/utils/` — pagination and Excel import/export helpers.
 
-See the repository [development guide](../docs/DEVELOPMENT.md) and [architecture guide](../docs/ARCHITECTURE.md) for the complete system context.
+Routes are lazy-loaded and warmed during browser idle time/menu hover. Excel support remains a
+click-time dynamic import. Live table reads accept `AbortSignal` so outdated filter/search
+requests cannot compete with the current view.
+
+See the repository [development guide](../docs/DEVELOPMENT.md),
+[feature reference](../docs/FEATURES.md), and [architecture guide](../docs/ARCHITECTURE.md) for
+the complete system context.
