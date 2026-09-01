@@ -1,6 +1,5 @@
 const express = require('express');
 const multer = require('multer');
-const { PDFParse } = require('pdf-parse');
 const { pool } = require('../db/pool');
 const { authenticate, requireRole } = require('../middleware/auth');
 
@@ -151,6 +150,9 @@ function parsePendingRow(chunk) {
 // lets the preview show "here's every page and what we did with it" instead of asking for
 // blind trust that nothing was silently skipped.
 async function extractRows(buffer) {
+  // pdf-parse adds roughly 20-25 MB of resident memory. Most server runs never parse a PDF,
+  // so load it only for the admin action that actually needs it instead of on every startup.
+  const { PDFParse } = require('pdf-parse');
   const parser = new PDFParse({ data: buffer });
   let pages;
   try {

@@ -61,7 +61,26 @@ All protected routes require `Authorization: Bearer <token>` unless noted.
 
 ## Performance and operational choices
 
-- The MySQL pool batches work and avoids per-row queries in bulk paths.
-- Frontend routes are lazy-loaded and Excel support is dynamically imported.
+- The MySQL pool defaults to five connections with three idle connections, and can be tuned
+  with `DB_POOL_SIZE`, `DB_POOL_IDLE`, and `DB_POOL_IDLE_TIMEOUT_MS` for a shared host.
+- Frontend routes are lazy-loaded, warmed during browser idle time, and warmed on menu hover.
+  Excel support remains a click-time dynamic import.
+- The native Fetch client coalesces identical safe reads, briefly caches stable metadata, and
+  cancels obsolete SR table requests when filters or pages change.
+- SR filter choices come from one batched endpoint instead of three independent requests.
+- The Deloitte PDF parser is required on demand, avoiding its substantial memory cost during
+  normal dashboard and SR usage.
+- Hashed frontend assets receive immutable caching. Public brand assets receive a shorter
+  revalidation cache, while `index.html` remains uncached so deployments appear promptly.
+- Production logging skips static assets and repeated health checks; SMTP verification runs
+  after the HTTP listener starts.
 - Compression, Helmet, CORS restrictions, and auth rate limits are enabled in Express.
 - The scale target is tens to low hundreds of records and a handful of concurrent users, so maintainability and clear audit behavior take priority over distributed-system complexity.
+
+### Why Express remains the backend
+
+The application is primarily MySQL and third-party-API bound. Rewriting the same routes in
+FastAPI would add migration and dual-stack operational risk without removing database or
+network latency. The single Node process also serves the built frontend, scheduled work, and
+API from one small deployment. Targeted request, bundle, pool, and lazy-loading improvements
+therefore provide a better performance-to-risk result than changing backend languages.

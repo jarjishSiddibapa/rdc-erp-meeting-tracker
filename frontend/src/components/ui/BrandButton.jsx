@@ -1,19 +1,15 @@
 import { Button } from 'antd';
-import MagneticButton from './MagneticButton';
 
 const BRAND = '#00B51A';
-const BRAND_DEEP = '#048a17';
 
-// A pill-shaped, gradient CTA button with a soft colored glow — ported from the
-// portfolio site's Hero buttons — wrapping antd's Button so all its usual props
-// (htmlType, loading, icon, disabled, block...) keep working.
+// A focused Ant Design button using the company color. Keeping it native avoids wrapper
+// transforms around popovers/forms and gives immediate keyboard, pointer and loading states.
 export default function BrandButton({ variant = 'primary', style, block, ...props }) {
   const shared = {
-    borderRadius: 999,
-    height: 44,
-    paddingInline: 26,
+    borderRadius: 8,
+    height: 40,
+    paddingInline: 20,
     fontWeight: 600,
-    border: 'none',
     display: block ? 'flex' : 'inline-flex',
     width: block ? '100%' : undefined,
     justifyContent: 'center',
@@ -22,9 +18,10 @@ export default function BrandButton({ variant = 'primary', style, block, ...prop
   const variants = {
     primary: {
       ...shared,
-      background: `linear-gradient(100deg, ${BRAND_DEEP}, ${BRAND})`,
+      background: BRAND,
+      borderColor: BRAND,
       color: '#fff',
-      boxShadow: '0 8px 20px rgba(0,181,26,0.32)',
+      boxShadow: '0 4px 12px rgba(0,181,26,0.18)',
     },
     ghost: {
       ...shared,
@@ -35,9 +32,5 @@ export default function BrandButton({ variant = 'primary', style, block, ...prop
     },
   };
 
-  return (
-    <MagneticButton style={{ display: block ? 'block' : 'inline-block' }}>
-      <Button type={variant === 'primary' ? 'primary' : 'default'} block={block} style={{ ...variants[variant], ...style }} {...props} />
-    </MagneticButton>
-  );
+  return <Button type={variant === 'primary' ? 'primary' : 'default'} block={block} style={{ ...variants[variant], ...style }} {...props} />;
 }

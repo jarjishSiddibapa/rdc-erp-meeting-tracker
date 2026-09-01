@@ -6,17 +6,17 @@ importing Deloitte's status-report PDF and keeping SRs synced against it. Small-
 scale (tens–low hundreds of records, a handful of concurrent users), not internet-scale —
 weigh any performance/architecture decision against that reality, not hypothetical scale.
 
-This is not a git repository. There is no automated test suite — all verification in this
-project happens by exercising the real running app (see "How changes get verified" below).
+This is a Git repository with focused backend unit tests. Final verification still exercises
+the real production-style build (see "How changes get verified" below).
 
 ## Stack
 
 - **Backend**: Node.js + Express 5, MySQL via `mysql2/promise` (connection pool, no ORM).
   JWT auth (`jsonwebtoken`), `bcryptjs` for passwords, `multer` for uploads, `node-cron` for
   scheduled backups, `nodemailer` for email, `pdf-parse` v2.x for the Deloitte PDF importer.
-- **Frontend**: React 19 + Vite 8 + antd v6. `axios` for API calls, `dayjs` for dates,
-  `framer-motion` + `three`/`@react-three/fiber` for the login page's animated mascot scene,
-  `xlsx` for Excel import/export (dynamically imported at click-time, not bundled eagerly).
+- **Frontend**: React 19 + Vite 8 + antd v6. Native `fetch` for API calls, `dayjs` for dates,
+  lightweight CSS transitions plus the SVG/CSS `GreenMonster` login mascot, and `xlsx` for
+  Excel import/export (dynamically imported at click-time, not bundled eagerly).
 - **Hosting**: single-port. The backend (port 777) serves the built frontend
   (`frontend/dist`, via `express.static`) AND the API from the same origin — there is no
   separate frontend server in production. `frontend/dist` must be rebuilt
@@ -52,9 +52,9 @@ frontend/src/
   pages/                    — one file per route/screen (SRPage, Dashboard, DashboardHome,
                                 Reports, UpdateTasks, UserManagement, BackupSettings, etc.)
   components/               — SRDetail.jsx (view/edit modal), SRForm.jsx (add/edit form),
-                                CommentCell.jsx, ClosureDateCell.jsx, LoginScene.jsx (3D mascot)
+                                CommentCell.jsx, ClosureDateCell.jsx
   components/ui/            — small reusable UI primitives (BrandButton, Reveal, TiltCard, ...)
-  services/api.js           — axios wrapper, one *API object per route group
+  services/api.js           — native Fetch wrapper, request tracking/cache, one API object per route group
   utils/pagination.js        — shared antd Table pagination config (see gotcha below)
   utils/excelIO.js, exportExcel.js — xlsx read/write helpers, dynamically imported
 
@@ -129,10 +129,11 @@ graphify-out/                — knowledge graph of this codebase (see AGENTS.md
   per-row `needsReview` flag (set when the Track-token — DBA/P2P/O2C/Finance/PTM — that splits
   Subject from Comment couldn't be located) so the admin can visually verify parser coverage
   rather than trusting it blindly. Surfaced in `UpdateTasks.jsx`'s "Upload Deloitte PDF" tab.
-- **Bundle size**: `App.jsx` lazy-loads `Login`/`ForgotPassword`/`ResetPassword`/`Dashboard`;
-  `xlsx` (421KB) is dynamic-imported inside click handlers (export/import), never at module
-  load. Keep new heavy dependencies behind the same pattern unless there's a specific reason
-  not to.
+- **Bundle and interaction performance**: routes are lazy-loaded and prewarmed on idle/hover;
+  `xlsx` stays dynamically imported at click time. `services/api.js` coalesces/cache safe reads,
+  while live SR list requests pass `AbortSignal` and deliberately bypass coalescing. Keep heavy
+  dependencies behind dynamic imports and do not reintroduce WebGL or page-exit animation for
+  the data-heavy shell.
 - **Table re-render cost**: antd/rc-table treats a new `columns` array reference as "changed"
   and re-renders every visible row. `SRPage.jsx` and `Reports.jsx` memoize their column
   builders (`useMemo`)/callbacks (`useCallback`) for this reason — don't reintroduce an inline
@@ -152,26 +153,15 @@ graphify-out/                — knowledge graph of this codebase (see AGENTS.md
   `target_date` for Digitization. Both `routes/srs.js` (`GET /` via `?overdue=true`, and
   `GET /stats/summary`) and `routes/stats.js` (`catStats`, SR-only) compute this server-side;
   never derive "overdue" client-side against the wrong field for Digitization rows.
-- **This dev sandbox's Browser pane stalls `requestAnimationFrame` when not actively
-  displayed/composited** — confirmed by a direct rAF-callback probe timing out with "The
-  Browser pane is currently hidden." Two concrete symptoms this causes, neither a real app bug:
-  (1) `AnimatedCounter.jsx` (used only on `DashboardHome.jsx`'s StatCards) gets stuck showing
-  `0` forever instead of animating up to the real value, because its count-up loop is
-  rAF-driven; (2) `Dashboard.jsx`'s `AnimatePresence` page-transition exit animation never
-  completes, so the previous page's DOM can stay stacked underneath the newly-mounted page
-  indefinitely (framer-motion's exit-complete detection also depends on animation-frame
-  timing) — `get_page_text`/`read_page` can then return **both** pages' content concatenated,
-  and a naive text-based element query can click a stale/disconnected element from the old
-  page. When verifying UI changes in this environment: trust a direct API fetch (via
-  `javascript_tool`) and non-animated DOM state over anything`AnimatedCounter`-rendered or
-  anything read immediately after a page-switching click; if a `find`/query match seems to do
-  nothing, scope the query narrowly (e.g. to a `.ant-row` containing text unique to the target
-  page) rather than assuming the app is broken.
+- **Shared-host runtime budget**: the MySQL pool defaults to five connections and three idle
+  connections; tune with `DB_POOL_SIZE`, `DB_POOL_IDLE`, and `DB_POOL_IDLE_TIMEOUT_MS`. The
+  Deloitte `pdf-parse` module is intentionally required inside the parse action, not at server
+  startup. Production static caching/log filtering depends on `NODE_ENV=production`, which
+  `start-all.bat` sets explicitly.
 
 ## How changes get verified
 
-There is no automated test suite. Verification in this project means exercising the real
-running app:
+Focused backend tests exist, but verification also means exercising the real running app:
 
 1. **Backend**: start via `cd backend && node server.js` (or the launch config). Verify port
    777 is actually listening (`netstat -ano | grep ':777'`) before assuming it's up — in this
@@ -201,6 +191,11 @@ running app:
 
 Chronological, most-recent-relevant-first, for context on *why* rather than just *what*:
 
+- **Low-overhead responsiveness pass** — removed the Three.js/Framer/Axios runtime, kept the
+  existing Ant Design visual language, made counters and page switches deterministic, warmed
+  route chunks during idle time, cancelled stale SR requests, batched filter metadata, added
+  conservative client read caching, deferred the PDF parser, reduced the DB pool, improved
+  production asset caching/logging, and added a complete RDC favicon set.
 - **Automatic ManageEngine Cloud synchronization** — `services/manageengine-sync.js` refreshes
   OAuth access tokens and updates existing SRs every 30 minutes (plus an optional startup run).
   It matches local `sr_number` against ManageEngine `display_id`, and also auto-creates

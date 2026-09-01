@@ -4,19 +4,21 @@
   -webkit-font-smoothing: antialiased;
   color-scheme: light;
 
-  /* Brand — fixed company green, same in both themes */
+  /* Fixed RDC brand green and quiet enterprise neutrals. */
   --brand: #00b51a;
   --brand-deep: #048a17;
-  --doodle-warm: #c2760c;
-  --doodle-accent2: #0e9f6e;
-  --doodle-grid: rgba(11, 13, 18, 0.06);
   --shadow-rgb: 20, 30, 60;
   --shadow-strength: 1;
 }
 
 html, body { height: 100%; width: 100%; }
-body { margin: 0; transition: background-color 0.2s ease; overflow-x: hidden; }
-#root { min-height: 100vh; width: 100%; }
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: #f5f7f5;
+  font-family: Aptos, "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+}
+#root { min-height: 100dvh; width: 100%; }
 
 .loading-notice {
   display: flex;
@@ -69,6 +71,31 @@ body { margin: 0; transition: background-color 0.2s ease; overflow-x: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .global-loading-indicator { animation: none; }
 }
+
+/* Immediate, low-cost tactile feedback. Only compositor-friendly transforms animate. */
+.sidebar-toggle,
+.ant-btn,
+.ant-menu-item,
+.ant-table-row {
+  transition-property: background-color, border-color, color, box-shadow, transform;
+  transition-duration: 120ms;
+  transition-timing-function: ease-out;
+}
+
+.sidebar-toggle:hover { background: rgba(0, 181, 26, 0.08) !important; }
+.sidebar-toggle:active,
+.ant-btn:active:not(:disabled) { transform: translateY(1px); }
+
+.interactive-surface {
+  transition: border-color 140ms ease-out, box-shadow 140ms ease-out, transform 140ms ease-out;
+}
+.interactive-surface:hover {
+  border-color: rgba(0, 181, 26, 0.24) !important;
+  box-shadow: 0 8px 24px rgba(20, 72, 35, 0.09);
+  transform: translateY(-1px);
+}
+
+.login-panel { isolation: isolate; }
 
 /* Dim closed SR rows */
 .row-closed td { opacity: 0.6; }
@@ -126,49 +153,11 @@ body { margin: 0; transition: background-color 0.2s ease; overflow-x: hidden; }
 
 * { scrollbar-width: thin; scrollbar-color: rgba(0, 181, 26, 0.35) transparent; }
 
-/* ── Doodle / ambient-background motion (ported from the portfolio site) ── */
-@keyframes doodle-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-14px); }
-}
-@keyframes doodle-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-.doodle-float { animation: doodle-float 6s ease-in-out infinite; }
-.doodle-glow { animation: doodle-glow 3s ease-in-out infinite; }
-
-.noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  opacity: 0.025;
-  mix-blend-mode: multiply;
-}
-
-/* ── Glass / soft-shadow / gradient-text utilities (ported from the portfolio site) ── */
-.glass-panel {
-  background: color-mix(in oklab, var(--panel-bg, #fff) 88%, transparent);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid color-mix(in oklab, currentColor 8%, transparent);
-  box-shadow:
-    0px 1px 3px rgba(var(--shadow-rgb), calc(0.03 * var(--shadow-strength))),
-    0px 4px 8px rgba(var(--shadow-rgb), calc(0.04 * var(--shadow-strength))),
-    0px 12px 20px -4px rgba(var(--shadow-rgb), calc(0.06 * var(--shadow-strength))),
-    0px 24px 40px -8px rgba(var(--shadow-rgb), calc(0.08 * var(--shadow-strength)));
-}
-
 .shadow-soft {
   box-shadow:
     0px 1px 3px rgba(var(--shadow-rgb), calc(0.03 * var(--shadow-strength))),
     0px 4px 8px rgba(var(--shadow-rgb), calc(0.04 * var(--shadow-strength))),
     0px 12px 20px -4px rgba(var(--shadow-rgb), calc(0.06 * var(--shadow-strength)));
-}
-
-.text-gradient-brand {
-  background: linear-gradient(100deg, var(--brand-deep) 15%, var(--brand) 55%, var(--doodle-accent2) 90%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {

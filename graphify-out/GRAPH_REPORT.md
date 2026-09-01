@@ -1,16 +1,16 @@
-# Graph Report - anesh-sir-erp-meeting-tracker-application  (2026-08-31)
+# Graph Report - anesh-sir-erp-meeting-tracker-application  (2026-09-01)
 
 ## Corpus Check
-- 75 files · ~132,865 words
+- 71 files · ~89,772 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 646 nodes · 1026 edges · 46 communities
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 37 edges (avg confidence: 0.53)
+- 632 nodes · 1003 edges · 43 communities
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 39 edges (avg confidence: 0.53)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c29cab50`
+- Built from commit: `2a9fcc19`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,12 +20,12 @@
 - users.js
 - dependencies
 - migrate-sqlite-to-mysql.js
-- DashboardHome.jsx
+- SRForm.jsx
 - dependencies
 - deloitte-import.js
 - routes/backup.js
 - frontend/package.json
-- Login.jsx
+- GreenMonster.jsx
 - routes/auth.js
 - manageengine-import.js
 - api.js
@@ -36,7 +36,6 @@
 - pool.js
 - csv-import.js
 - .oxlintrc.json
-- BackupSettings.jsx
 - Development guide
 - Reports.jsx
 - ARCHITECTURE.md
@@ -44,7 +43,7 @@
 - Q: Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible.
 - Q: Use company color #00B51A and the taste skill to improve fonts, colors, sizes, smoothness, and overall UI quality.
 - RDC ERP Meeting Tracker
-- Dashboard.jsx
+- DashboardHome.jsx
 - react
 - pull_request_template.md
 - manageengine-sync.js
@@ -57,10 +56,9 @@
 - Windows production deployment
 - exchange-manageengine-code.js
 - mailer.js
-- ClosureDateCell.jsx
 
 ## God Nodes (most connected - your core abstractions)
-1. `react` - 24 edges
+1. `react` - 20 edges
 2. `useAuth()` - 18 edges
 3. `pool` - 14 edges
 4. `main()` - 11 edges
@@ -72,25 +70,25 @@
 10. `Troubleshooting` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `AssignedToEcdReport()` --indirect_call--> `ResizableTitle()`  [INFERRED]
-  frontend/src/pages/Reports.jsx → frontend/src/components/ui/ResizableTitle.jsx
+- `ProtectedRoute()` --calls--> `useAuth()`  [EXTRACTED]
+  frontend/src/App.jsx → frontend/src/context/AuthContext.jsx
+- `PublicRoute()` --calls--> `useAuth()`  [EXTRACTED]
+  frontend/src/App.jsx → frontend/src/context/AuthContext.jsx
+- `SRPage()` --indirect_call--> `ResizableTitle()`  [INFERRED]
+  frontend/src/pages/SRPage.jsx → frontend/src/components/ui/ResizableTitle.jsx
 - `start()` --calls--> `initDb()`  [EXTRACTED]
   backend/server.js → backend/db/database.js
-- `provisionUser()` --calls--> `createResetToken()`  [EXTRACTED]
-  backend/routes/users.js → backend/utils/resetToken.js
-- `start()` --calls--> `initScheduler()`  [EXTRACTED]
-  backend/server.js → backend/services/backup.js
-- `start()` --calls--> `verifyMailer()`  [EXTRACTED]
-  backend/server.js → backend/services/mailer.js
+- `extractRows()` --references--> `pdf-parse`  [EXTRACTED]
+  backend/routes/deloitte-import.js → backend/package.json
 
 ## Import Cycles
 - None detected.
 
-## Communities (46 total, 0 thin omitted)
+## Communities (43 total, 0 thin omitted)
 
 ### Community 0 - "SRPage.jsx"
-Cohesion: 0.21
-Nodes (11): ResizableTitle(), buildColumns(), fmt(), fmtCreated(), SCOPE_COLORS, SRPage(), STATUS_COLORS, STATUS_STAT_KEY (+3 more)
+Cohesion: 0.19
+Nodes (12): ClosureDateCell(), fmt(), fmtDT(), buildColumns(), fmt(), fmtCreated(), SCOPE_COLORS, STATUS_COLORS (+4 more)
 
 ### Community 1 - "server.js"
 Cohesion: 0.06
@@ -108,17 +106,17 @@ Nodes (47): author, dependencies, bcryptjs, better-sqlite3, compression, cors, c
 Cohesion: 0.14
 Nodes (30): assertDefaultAdminConfigured(), bcrypt, createTables(), DEFAULT_ADMIN, ensureDatabaseExists(), initDb(), migrateManageEngineSyncRuns(), migrateSRsTable() (+22 more)
 
-### Community 5 - "DashboardHome.jsx"
-Cohesion: 0.19
-Nodes (5): AnimatedCounter(), Reveal(), RevealGroup(), MONTHS, PALETTE
+### Community 5 - "SRForm.jsx"
+Cohesion: 0.28
+Nodes (6): ALL_STATUSES, BASE_STATUSES, dateVal(), SR_TYPES, SRForm(), useDistinctOptions()
 
 ### Community 6 - "dependencies"
-Cohesion: 0.05
-Nodes (36): @ant-design/icons, antd, axios, dayjs, framer-motion, dependencies, @ant-design/icons, antd (+28 more)
+Cohesion: 0.07
+Nodes (26): @ant-design/icons, antd, dayjs, dependencies, @ant-design/icons, antd, dayjs, react (+18 more)
 
 ### Community 7 - "deloitte-import.js"
-Cohesion: 0.11
-Nodes (22): { authenticate, requireRole }, DELOITTE_FIELDS, ensureAssignedToDeloitte(), ensureFieldValue(), ensurePendingWithDeloitte(), ETA_RE, express, extractRows() (+14 more)
+Cohesion: 0.12
+Nodes (21): { authenticate, requireRole }, DELOITTE_FIELDS, ensureAssignedToDeloitte(), ensureFieldValue(), ensurePendingWithDeloitte(), ETA_RE, express, extractRows() (+13 more)
 
 ### Community 8 - "routes/backup.js"
 Cohesion: 0.13
@@ -128,21 +126,21 @@ Nodes (19): { authenticate, requireRole }, express, fs, path, { pool }, router, 
 Cohesion: 0.10
 Nodes (20): devDependencies, oxlint, @types/react, @types/react-dom, vite, @vitejs/plugin-react, name, private (+12 more)
 
-### Community 10 - "Login.jsx"
-Cohesion: 0.18
-Nodes (17): Arrow(), BarChart(), CheckScribble(), DashedCircle(), Sparkle(), Squiggle(), ANCHOR, anchorToPage() (+9 more)
+### Community 10 - "GreenMonster.jsx"
+Cohesion: 0.27
+Nodes (10): ANCHOR, anchorToPage(), angleBetween(), caretRelativeX(), computeFaceMove(), getMirror(), GreenMonster(), MIRROR_PROPS (+2 more)
 
 ### Community 11 - "routes/auth.js"
-Cohesion: 0.15
-Nodes (12): { authenticate }, bcrypt, crypto, { EMAIL_REGEX }, express, { hashToken, createResetToken }, jwt, { pool } (+4 more)
+Cohesion: 0.14
+Nodes (14): { authenticate }, bcrypt, crypto, { EMAIL_REGEX }, express, { hashToken, createResetToken }, jwt, { pool } (+6 more)
 
 ### Community 12 - "manageengine-import.js"
 Cohesion: 0.14
 Nodes (15): { authenticate, requireRole }, CLOSED_STATUSES, crossReference(), express, { getSyncStatus, runManageEngineSync }, isClosedFamily(), loadRows(), mapOpenStatus() (+7 more)
 
 ### Community 13 - "api.js"
-Cohesion: 0.32
-Nodes (7): api, loadingSubscribers, publishLoadingState(), startTracking(), statsAPI, stopTracking(), userAPI
+Cohesion: 0.16
+Nodes (16): api, authAPI, backupAPI, clearReadCache(), executeRequest(), get(), httpError(), inFlightGets (+8 more)
 
 ### Community 14 - "UpdateTasks.jsx"
 Cohesion: 0.14
@@ -162,7 +160,7 @@ Nodes (4): { authenticate }, express, { pool }, router
 
 ### Community 18 - "pool.js"
 Cohesion: 0.22
-Nodes (8): mysql, pool, { authenticate }, express, { pool }, router, crypto, { pool }
+Nodes (8): CONNECTION_LIMIT, MAX_IDLE, mysql, pool, { authenticate }, express, { pool }, router
 
 ### Community 19 - "csv-import.js"
 Cohesion: 0.18
@@ -172,17 +170,13 @@ Nodes (8): authenticate(), jwt, requireRole(), { authenticate, requireRole }, ex
 Cohesion: 0.25
 Nodes (7): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema, oxc, warn
 
-### Community 22 - "BackupSettings.jsx"
-Cohesion: 0.29
-Nodes (7): TiltCard(), BackupSettings(), formatBytes(), STATUS_TAG, UserManagement(), backupAPI, paginationConfig()
-
 ### Community 23 - "Development guide"
 Cohesion: 0.20
 Nodes (10): Database and migrations, Development guide, Development workflows, Frontend conventions, Hot reload, Prerequisites, Production-style single port, Project map (+2 more)
 
 ### Community 24 - "Reports.jsx"
-Cohesion: 0.29
-Nodes (7): CommentCell(), fmtDT(), AssignedToEcdReport(), fmt(), STATUS_COLORS, reportsAPI, srAPI
+Cohesion: 0.26
+Nodes (8): CommentCell(), fmtDT(), ResizableTitle(), AssignedToEcdReport(), fmt(), STATUS_COLORS, reportsAPI, srAPI
 
 ### Community 25 - "ARCHITECTURE.md"
 Cohesion: 0.25
@@ -204,13 +198,13 @@ Nodes (4): Answer, Outcome, Q: Use company color #00B51A and the taste skill to 
 Cohesion: 0.20
 Nodes (10): Documentation, Quick start, RDC ERP Meeting Tracker, Repository layout, Requirements, Run locally, Screenshots, Security and data boundaries (+2 more)
 
-### Community 30 - "Dashboard.jsx"
-Cohesion: 0.06
-Nodes (35): App(), Dashboard, ForgotPassword, Login, ProtectedRoute(), PublicRoute(), ResetPassword, ALL_STATUSES (+27 more)
+### Community 30 - "DashboardHome.jsx"
+Cohesion: 0.05
+Nodes (33): App(), Dashboard, ForgotPassword, Login, ProtectedRoute(), PublicRoute(), ResetPassword, AnimatedCounter() (+25 more)
 
 ### Community 31 - "react"
-Cohesion: 0.21
-Nodes (7): BrandButton(), MagneticButton(), AuthContext, BULK_USER_FIELDS, ROLE_COLORS, authAPI, react
+Cohesion: 0.20
+Nodes (15): BrandButton(), Reveal(), AuthContext, useAuth(), BackupSettings(), formatBytes(), STATUS_TAG, ChangePassword() (+7 more)
 
 ### Community 32 - "pull_request_template.md"
 Cohesion: 0.50
@@ -225,8 +219,8 @@ Cohesion: 0.22
 Nodes (9): A batch window opens and closes immediately, Backups fail, Health check, Login or password reset problems, MySQL connection or startup failure, Port 777 is already in use, Production update refuses to run, The site opens but the old UI is still visible (+1 more)
 
 ### Community 35 - "Architecture"
-Cohesion: 0.29
-Nodes (7): API map, Architecture, Authentication and authorization, Data model, Performance and operational choices, Repository responsibilities, Runtime topology
+Cohesion: 0.25
+Nodes (8): API map, Architecture, Authentication and authorization, Data model, Performance and operational choices, Repository responsibilities, Runtime topology, Why Express remains the backend
 
 ### Community 36 - "User guide"
 Cohesion: 0.33
@@ -256,28 +250,24 @@ Nodes (6): ENV_PATH, fs, main(), path, removeEnvValue(), upsertEnvValue()
 Cohesion: 0.40
 Nodes (4): nodemailer, sendPasswordResetEmail(), transporter, verifyMailer()
 
-### Community 44 - "ClosureDateCell.jsx"
-Cohesion: 0.83
-Nodes (3): ClosureDateCell(), fmt(), fmtDT()
-
 ## Knowledge Gaps
-- **300 isolated node(s):** `mysql`, `bcrypt`, `{ pool, DB_NAME }`, `mysql`, `jwt` (+295 more)
+- **298 isolated node(s):** `mysql`, `bcrypt`, `{ pool, DB_NAME }`, `mysql`, `CONNECTION_LIMIT` (+293 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `SRPage.jsx`, `DashboardHome.jsx`, `Login.jsx`, `ClosureDateCell.jsx`, `UpdateTasks.jsx`, `LoginScene.jsx`, `SRDetail.jsx`, `.oxlintrc.json`, `BackupSettings.jsx`, `Reports.jsx`, `Dashboard.jsx`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Why does `pool` connect `pool.js` to `manageengine-sync.js`, `users.js`, `migrate-sqlite-to-mysql.js`, `deloitte-import.js`, `routes/backup.js`, `routes/auth.js`, `manageengine-import.js`, `srs.js`, `stats.js`, `csv-import.js`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `dependencies` to `frontend/package.json`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `extractRows()` connect `deloitte-import.js` to `dependencies`?**
+  _High betweenness centrality (0.062) - this node is a cross-community bridge._
+- **Why does `pdf-parse` connect `dependencies` to `deloitte-import.js`?**
+  _High betweenness centrality (0.061) - this node is a cross-community bridge._
 - **What connects `mysql`, `bcrypt`, `{ pool, DB_NAME }` to the rest of the system?**
-  _300 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _298 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `server.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0627177700348432 - nodes in this community are weakly interconnected._
 - **Should `dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.041666666666666664 - nodes in this community are weakly interconnected._
 - **Should `migrate-sqlite-to-mysql.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1350806451612903 - nodes in this community are weakly interconnected._
+- **Should `dependencies` be split into smaller, more focused modules?**
+  _Cohesion score 0.07126436781609195 - nodes in this community are weakly interconnected._

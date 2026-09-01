@@ -35,6 +35,7 @@ cd /d "%PROJECT_ROOT%backend"
 echo Starting RDC ERP Meeting Tracker on port 777...
 >> "%STARTUP_LOG%" echo [%date% %time%] Starting application.
 
+set "NODE_ENV=production"
 node server.js
 set "APP_EXIT_CODE=%ERRORLEVEL%"
 

@@ -67,10 +67,16 @@ For a hot-reload development session, use `start-backend.bat` and `start-fronten
 
 ## Technology
 
-- **Frontend:** React 19, Vite 8, Ant Design 6, Framer Motion, Axios, Day.js
+- **Frontend:** React 19, Vite 8, Ant Design 6, native Fetch, Day.js
 - **Backend:** Node.js, Express 5, MySQL via `mysql2/promise`
 - **Security:** JWT sessions, bcrypt password hashes, Helmet, CORS allow-list, rate-limited auth routes
 - **Operations:** Windows Task Scheduler, `mysqldump`, compressed HTTP responses, structured runtime logs
+
+The production build deliberately avoids a separate frontend server, WebGL/3D UI libraries,
+and a second application framework. Route chunks are warmed during browser idle time, stale
+table requests are cancelled, short-lived read results are reused, and the PDF parser is
+loaded only when an administrator actually parses a PDF. This keeps the shared production
+machine quiet without changing the familiar interface.
 
 ## Repository layout
 

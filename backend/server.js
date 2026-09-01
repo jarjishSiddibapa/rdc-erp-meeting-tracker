@@ -55,7 +55,12 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 app.use(compression());
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'tiny' : 'dev'));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'tiny' : 'dev', {
+  // Static assets are immutable/cached and health probes are routine. Logging either on a
+  // shared Windows server creates avoidable console/file I/O without operational value.
+  skip: req => process.env.NODE_ENV === 'production'
+    && (!req.path.startsWith('/api') || req.path === '/api/health'),
+}));
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -104,9 +109,15 @@ const FRONTEND_DIST = path.join(__dirname, '..', 'frontend', 'dist');
 app.use(express.static(FRONTEND_DIST, {
   index: false,
   setHeaders: (res, filePath) => {
-    res.setHeader('Cache-Control', filePath.includes(`${path.sep}assets${path.sep}`)
-      ? 'public, max-age=31536000, immutable'
-      : 'no-cache');
+    if (path.basename(filePath) === 'index.html') {
+      res.setHeader('Cache-Control', 'no-cache');
+    } else if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else {
+      // Public logos, favicons and login artwork have stable names. Cache briefly and allow
+      // stale reuse while revalidating so repeat visits do not hit Node for multi-megabyte art.
+      res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+    }
   },
 }));
 app.use((req, res, next) => {
@@ -126,13 +137,15 @@ const PORT = process.env.PORT || 777;
 
 async function start() {
   await initDb();
-  await verifyMailer();
   await initScheduler();
   initManageEngineScheduler();
   const server = app.listen(PORT, () => {
     console.log(`ERP Meeting Tracker API running on http://localhost:${PORT}`);
     startHeartbeat();
   });
+  // SMTP verification can take seconds when the mail server is slow or unavailable. It is
+  // diagnostic only, so do it after the HTTP listener is ready instead of delaying the app.
+  verifyMailer().catch(error => console.warn('Mailer verification failed:', error.message));
 
   const shutdown = async (signal) => {
     console.log(`${signal} received — shutting down gracefully...`);

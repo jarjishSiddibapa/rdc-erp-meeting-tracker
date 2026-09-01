@@ -5,9 +5,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import GlobalLoadingIndicator, { LoadingNotice } from './components/ui/LoadingNotice';
 
 // App.jsx is the root — anything imported here eagerly ends up in every route's initial
-// bundle, /login included. Login and Dashboard each pull in their own antd surface,
-// framer-motion, and (for Login) the mascot/doodle components, so route-level lazy() here
-// keeps an authenticated user from paying for Login's weight and vice versa — the same
+// bundle, /login included. Login and Dashboard each pull in their own antd surface, so
+// route-level lazy() here keeps an authenticated user from paying for Login's weight and vice versa — the same
 // pattern Dashboard.jsx already uses one level down for its own sub-pages.
 const Login = lazy(() => import('./pages/Login'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
@@ -50,8 +49,13 @@ export default function App() {
         token: {
           colorPrimary: BRAND,
           colorInfo: BRAND,
-          borderRadius: 8,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          borderRadius: 10,
+          fontFamily: 'Aptos, "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif',
+          controlHeight: 36,
+          controlHeightLG: 42,
+          motionDurationFast: '0.1s',
+          motionDurationMid: '0.15s',
+          motionDurationSlow: '0.2s',
         },
         components: {
           Table: { fontSize: 13 },

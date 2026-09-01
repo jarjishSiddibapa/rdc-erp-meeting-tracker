@@ -6,20 +6,33 @@ import {
   FileExcelOutlined, DashboardOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
   BarChartOutlined,
 } from '@ant-design/icons';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import AmbientBackground from '../components/ui/AmbientBackground';
 import { LoadingNotice } from '../components/ui/LoadingNotice';
 import DashboardHome from './DashboardHome';
 
-// Route-level code splitting: only the landing page (DashboardHome, above) loads eagerly;
-// everything else — including UpdateTasks's heavy xlsx dep — loads on first visit.
-const SRPage = lazy(() => import('./SRPage'));
-const UserManagement = lazy(() => import('./UserManagement'));
-const ChangePassword = lazy(() => import('./ChangePassword'));
-const UpdateTasks = lazy(() => import('./UpdateTasks'));
-const BackupSettings = lazy(() => import('./BackupSettings'));
-const Reports = lazy(() => import('./Reports'));
+// Keep route chunks small, then warm them while the browser is idle so the first click feels
+// instant. XLSX remains a second-level dynamic import and is not downloaded until requested.
+const PAGE_LOADERS = {
+  SR: () => import('./SRPage'),
+  Digitization: () => import('./SRPage'),
+  reports: () => import('./Reports'),
+  'update-tasks': () => import('./UpdateTasks'),
+  users: () => import('./UserManagement'),
+  backup: () => import('./BackupSettings'),
+  password: () => import('./ChangePassword'),
+};
+const SRPage = lazy(PAGE_LOADERS.SR);
+const UserManagement = lazy(PAGE_LOADERS.users);
+const ChangePassword = lazy(PAGE_LOADERS.password);
+const UpdateTasks = lazy(PAGE_LOADERS['update-tasks']);
+const BackupSettings = lazy(PAGE_LOADERS.backup);
+const Reports = lazy(PAGE_LOADERS.reports);
+
+function preloadPage(key) {
+  // Prefetching is opportunistic. A temporary network failure must never create an
+  // unhandled rejection or prevent React.lazy from trying again on the real click.
+  PAGE_LOADERS[key]?.().catch(() => {});
+}
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -79,6 +92,20 @@ export default function Dashboard() {
 
   useEffect(() => { setCollapsed(isMobile); }, [isMobile]);
   useEffect(() => { sessionStorage.setItem('activeKey', activeKey); }, [activeKey]);
+  useEffect(() => {
+    const connection = navigator.connection;
+    if (connection?.saveData || connection?.effectiveType === '2g') return undefined;
+    const allowedKeys = isAdmin
+      ? Object.keys(PAGE_LOADERS)
+      : ['SR', 'Digitization', 'reports', 'password'];
+    const warmRoutes = () => allowedKeys.forEach(preloadPage);
+    if ('requestIdleCallback' in window) {
+      const handle = window.requestIdleCallback(warmRoutes, { timeout: 1800 });
+      return () => window.cancelIdleCallback(handle);
+    }
+    const handle = window.setTimeout(warmRoutes, 800);
+    return () => window.clearTimeout(handle);
+  }, [isAdmin]);
 
   function handleNavigateToSR(category, name) {
     // Filter strictly by the Pending With column (exact match), not a free-text search —
@@ -89,7 +116,10 @@ export default function Dashboard() {
 
   const menuItems = MENU_ITEMS
     .filter(item => !item.adminOnly || isAdmin)
-    .map(({ key, icon, label, type }) => ({ key, icon, label, type }));
+    .map(({ key, icon, label, type }) => ({
+      key, icon, type,
+      label: key ? <span onPointerEnter={() => preloadPage(key)}>{label}</span> : label,
+    }));
 
   const userMenu = {
     items: [
@@ -120,7 +150,7 @@ export default function Dashboard() {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100dvh' }}>
       {isMobile && !collapsed && (
         <div
           onClick={() => setCollapsed(true)}
@@ -133,7 +163,7 @@ export default function Dashboard() {
           .ant-layout-sider for its collapse animation, which silently overrides a
           transform set on that same element. */}
       <div style={isMobile ? {
-        position: 'fixed', insetInlineStart: 0, top: 0, bottom: 0, zIndex: 1000, height: '100vh',
+        position: 'fixed', insetInlineStart: 0, top: 0, bottom: 0, zIndex: 1000, height: '100dvh',
         transform: collapsed ? 'translateX(-100%)' : 'translateX(0)',
         transition: 'transform 0.25s ease',
       } : undefined}>
@@ -206,8 +236,8 @@ export default function Dashboard() {
         }}>
           <Space size={{ xs: 8, sm: 16 }}>
             <Tooltip title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
-              <motion.div
-                whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }}
+              <div
+                className="sidebar-toggle"
                 onClick={() => setCollapsed(c => !c)}
                 style={{
                   width: 36, height: 36, borderRadius: 8, display: 'flex',
@@ -216,7 +246,7 @@ export default function Dashboard() {
                 }}
               >
                 {collapsed ? <MenuUnfoldOutlined style={{ fontSize: 16 }} /> : <MenuFoldOutlined style={{ fontSize: 16 }} />}
-              </motion.div>
+              </div>
             </Tooltip>
             <Text strong style={{ fontSize: 15, whiteSpace: 'nowrap' }}>{TITLES[activeKey] || ''}</Text>
           </Space>
@@ -238,22 +268,10 @@ export default function Dashboard() {
             overflowY: 'auto', overflowX: 'hidden', width: '100%',
           }}
         >
-          <AmbientBackground />
-          <div style={{ position: 'relative', zIndex: 1, display: 'grid', minWidth: 0 }}>
-            <AnimatePresence initial={false}>
-              <motion.div
-                key={activeKey}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                style={{ gridArea: '1 / 1', minWidth: 0 }}
-              >
-                <Suspense fallback={<LoadingNotice />}>
-                  {renderContent()}
-                </Suspense>
-              </motion.div>
-            </AnimatePresence>
+          <div style={{ position: 'relative', minWidth: 0 }}>
+            <Suspense fallback={<LoadingNotice />}>
+              {renderContent()}
+            </Suspense>
           </div>
         </Content>
         <Footer style={{

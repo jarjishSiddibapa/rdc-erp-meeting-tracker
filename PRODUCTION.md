@@ -28,10 +28,15 @@ Configure `backend/.env` before running the build:
 - Set `NODE_ENV=production` and normally keep `PORT=777`.
 - Use a long random `JWT_SECRET`. Preserve the same secret during later updates unless intentionally invalidating every active login.
 - Enter the production MySQL host, port, database, username, and password.
+- Keep the default shared-host pool (`DB_POOL_SIZE=5`, `DB_POOL_IDLE=3`) unless monitoring
+  shows a reason to tune it. Each additional application should use its own conservative pool.
 - Configure the initial administrator values. They are used only when the database has no users and by the one-time SQLite migration.
 - Configure SMTP values for password-reset and account emails.
 - Set `MYSQLDUMP_PATH` if `mysqldump.exe` is not available on the Task Scheduler account's `PATH`.
 - Configure the optional ManageEngine refresh-token values when automatic SR synchronization is required; see [ManageEngine sync](docs/MANAGEENGINE_SYNC.md). Never copy the short-lived authorization code into Git.
+
+`start-all.bat` sets `NODE_ENV=production` itself, so Task Scheduler receives production
+static-cache and logging behavior even if the Windows account has no global environment value.
 
 If this clone replaces an older production folder, copy its existing `backend/.env` into the new checkout instead of generating new credentials. The active MySQL database is not stored in Git. Preserve any existing `backend/db-backup` files separately if their history is required.
 

@@ -5,11 +5,8 @@ import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Reveal } from '../components/ui/Reveal';
 import BrandButton from '../components/ui/BrandButton';
-import { Sparkle } from '../components/ui/Doodles';
 
 const { Title, Text } = Typography;
-const BRAND = '#00B51A';
-
 export default function ChangePassword() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -35,7 +32,6 @@ export default function ChangePassword() {
   return (
     <Reveal>
       <Card className="shadow-soft" style={{ maxWidth: 480, borderRadius: 10, position: 'relative', overflow: 'hidden' }}>
-        <Sparkle className="doodle-glow" style={{ position: 'absolute', top: 14, right: 18, color: BRAND, opacity: 0.4 }} />
         <Title level={5}>Change Password</Title>
         <Text type="secondary">Logged in as: {user?.full_name} ({user?.email})</Text>
 

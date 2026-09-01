@@ -374,6 +374,28 @@ const DISTINCT_FIELDS = {
   createdByName: 'created_by_name',
   processOwner: 'process_owner',
 };
+
+// The SR screen needs three filter lists at once. Returning them from one small query avoids
+// three HTTP round trips and three separate DISTINCT scans every time a user opens the page.
+router.get('/meta/options', async (req, res, next) => {
+  try {
+    const category = req.query.category || 'SR';
+    const [rows] = await pool.execute(`
+      SELECT type, pending_with, assigned_to
+      FROM srs
+      WHERE category = ? AND is_deleted = 0
+    `, [category]);
+    const unique = field => [...new Set(rows
+      .map(row => String(row[field] || '').trim())
+      .filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    res.json({
+      types: category === 'Digitization' ? [] : unique('type'),
+      pendingWith: unique('pending_with'),
+      assignedTo: category === 'Digitization' ? [] : unique('assigned_to'),
+    });
+  } catch (e) { next(e); }
+});
+
 router.get('/meta/distinct', async (req, res, next) => {
   try {
     const { category, field } = req.query;

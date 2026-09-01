@@ -10,7 +10,7 @@ export function LoadingNotice({ fullPage = false }) {
       className="loading-notice"
       role="status"
       aria-live="polite"
-      style={{ minHeight: fullPage ? '100vh' : 160 }}
+      style={{ minHeight: fullPage ? '100dvh' : 160 }}
     >
       <Spin size="large" />
       <span>{LOADING_MESSAGE}</span>

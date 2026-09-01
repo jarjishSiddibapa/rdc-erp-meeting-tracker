@@ -190,6 +190,8 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
   const [searchText, setSearchText] = useState(initialSearch);
   const [colWidths, setColWidths] = useState({});
   const searchDebounceRef = useRef(null);
+  const listAbortRef = useRef(null);
+  const statsAbortRef = useRef(null);
 
   const [exporting, setExporting] = useState(false);
   const [syncingManageEngine, setSyncingManageEngine] = useState(false);
@@ -208,6 +210,9 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
   const fetchSeqRef = useRef(0);
   const fetchSRs = useCallback(async () => {
     const seq = ++fetchSeqRef.current;
+    listAbortRef.current?.abort();
+    const controller = new AbortController();
+    listAbortRef.current = controller;
     setLoading(true);
     try {
       const params = { category, page: pagination.page, limit: pagination.limit };
@@ -221,11 +226,12 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
       if (filters.assignedTo) params.assignedTo = filters.assignedTo;
       if (filters.search) params.search = filters.search;
       if (filters.sortField) { params.sortField = filters.sortField; params.sortOrder = filters.sortOrder; }
-      const res = await srAPI.list(params);
+      const res = await srAPI.list(params, { signal: controller.signal });
       if (seq !== fetchSeqRef.current) return;
       setSrs(res.data.data);
       setTotal(res.data.total);
-    } catch {
+    } catch (error) {
+      if (error.name === 'AbortError') return;
       if (seq === fetchSeqRef.current) message.error('Failed to load data');
     } finally {
       if (seq === fetchSeqRef.current) setLoading(false);
@@ -236,6 +242,9 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
   // that's what the tiles themselves set) so they "auto change" to match whatever the
   // table is narrowed to, e.g. after navigating in from a Dashboard person-click.
   const fetchStats = useCallback(async () => {
+    statsAbortRef.current?.abort();
+    const controller = new AbortController();
+    statsAbortRef.current = controller;
     try {
       const params = { category };
       if (filters.scope) params.scope = filters.scope;
@@ -243,32 +252,47 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
       if (filters.pendingWith) params.pendingWith = filters.pendingWith;
       if (filters.assignedTo) params.assignedTo = filters.assignedTo;
       if (filters.search) params.search = filters.search;
-      const res = await srAPI.stats(params);
+      const res = await srAPI.stats(params, { signal: controller.signal });
       setStats(res.data);
-    } catch {}
+    } catch (error) {
+      // Keep the last valid tiles during a transient refresh failure. Aborts are expected
+      // whenever the user changes filters before the previous response arrives.
+      if (error.name !== 'AbortError') { /* no-op */ }
+    }
   }, [category, filters.scope, filters.type, filters.pendingWith, filters.assignedTo, filters.search]);
 
-  useEffect(() => { fetchSRs(); fetchStats(); }, [fetchSRs, fetchStats]);
-  useEffect(() => { setPagination(p => ({ ...p, page: 1 })); }, [category, filters]);
+  const listScopeKey = JSON.stringify([category, filters]);
+  const previousListScopeRef = useRef(listScopeKey);
+  useEffect(() => {
+    const scopeChanged = previousListScopeRef.current !== listScopeKey;
+    previousListScopeRef.current = listScopeKey;
+    if (scopeChanged && pagination.page !== 1) {
+      setPagination(p => ({ ...p, page: 1 }));
+      return;
+    }
+    fetchSRs();
+  }, [fetchSRs, listScopeKey, pagination.page]);
+  useEffect(() => { fetchStats(); }, [fetchStats]);
 
   // Type, Assigned To, and Pending With can change during a ManageEngine sync, so keep their
   // server-derived filter choices behind one refresh function shared by initial load and the
   // manual Sync action below.
   const fetchFilterOptions = useCallback(async () => {
-    const requests = [];
-    if (category !== 'Digitization') {
-      requests.push(
-        srAPI.distinctValues(category, 'type').then(res => setTypeOptions(res.data)),
-        srAPI.distinctValues(category, 'assignedTo').then(res => setAssignedToOptions(res.data)),
-      );
-    }
-    requests.push(srAPI.distinctValues(category, 'pendingWith').then(res => setPendingWithOptions(res.data)));
-    await Promise.allSettled(requests);
+    try {
+      const res = await srAPI.filterOptions(category);
+      setTypeOptions(res.data.types);
+      setPendingWithOptions(res.data.pendingWith);
+      setAssignedToOptions(res.data.assignedTo);
+    } catch { /* Filters remain usable with their fixed options if metadata refresh fails. */ }
   }, [category]);
 
   useEffect(() => { fetchFilterOptions(); }, [fetchFilterOptions]);
 
-  useEffect(() => () => clearTimeout(searchDebounceRef.current), []);
+  useEffect(() => () => {
+    clearTimeout(searchDebounceRef.current);
+    listAbortRef.current?.abort();
+    statsAbortRef.current?.abort();
+  }, []);
 
   // Auto-search once at least 5 characters are typed, debounced so it doesn't fire a
   // request on every keystroke. Pressing Enter / the search icon (onSearch below) still

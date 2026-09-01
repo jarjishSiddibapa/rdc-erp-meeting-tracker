@@ -61,6 +61,12 @@ The `migrate:mysql` script is only for the one-time historical SQLite migration.
 ## Frontend conventions
 
 - Keep heavy packages such as `xlsx` behind dynamic imports.
+- Use the native wrapper in `services/api.js`; do not add a second HTTP client. Pass an
+  `AbortSignal` for live table requests that can become obsolete.
+- Preserve immediate feedback: local button loading states begin on click and the shared API
+  indicator uses `One sec… pretending this is very complicated 😎` for meaningful waits.
+- Prefer short CSS transitions on opacity, transform, and color. Avoid perpetual decorative
+  animation, WebGL, backdrop blur, and page-exit animations in data-heavy screens.
 - Use `defaultPageSize` for ordinary Ant Design tables; only truly server-controlled tables should pass controlled pagination props.
 - Memoize column builders in table-heavy pages.
 - Check `category` before assuming a field belongs to an SR or Digitization Project.

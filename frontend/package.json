@@ -11,17 +11,12 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.2",
-    "@react-three/drei": "^10.7.8",
-    "@react-three/fiber": "^9.7.0",
     "antd": "^6.5.0",
-    "axios": "^1.18.1",
     "dayjs": "^1.11.21",
-    "framer-motion": "^12.43.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-resizable": "^3.0.5",
     "react-router-dom": "^7.18.0",
-    "three": "^0.185.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

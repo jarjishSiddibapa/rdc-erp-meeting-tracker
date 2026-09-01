@@ -27,17 +27,17 @@ importing Deloitte's status-report PDF and keeping SRs synced against it. Small-
 scale (tens–low hundreds of records, a handful of concurrent users), not internet-scale —
 weigh any performance/architecture decision against that reality, not hypothetical scale.
 
-Not a git repository. No automated test suite — all verification happens by exercising the
-real running app (see "How changes get verified" below).
+This is a Git repository with focused backend unit tests. Final verification still exercises
+the real production-style build (see "How changes get verified" below).
 
 ### Stack
 
 - **Backend**: Node.js + Express 5, MySQL via `mysql2/promise` (connection pool, no ORM).
   JWT auth (`jsonwebtoken`), `bcryptjs` for passwords, `multer` for uploads, `node-cron` for
   scheduled backups, `nodemailer` for email, `pdf-parse` v2.x for the Deloitte PDF importer.
-- **Frontend**: React 19 + Vite 8 + antd v6. `axios` for API calls, `dayjs` for dates,
-  `framer-motion` + `three`/`@react-three/fiber` for the login page's animated mascot scene,
-  `xlsx` for Excel import/export (dynamically imported at click-time, not bundled eagerly).
+- **Frontend**: React 19 + Vite 8 + antd v6. Native `fetch` for API calls, `dayjs` for dates,
+  lightweight CSS transitions plus the SVG/CSS `GreenMonster` login mascot, and `xlsx` for
+  Excel import/export (dynamically imported at click-time, not bundled eagerly).
 - **Hosting**: single-port. The backend (port 777) serves the built frontend
   (`frontend/dist`, via `express.static`) AND the API from the same origin. `frontend/dist`
   must be rebuilt (`npm run build` inside `frontend/`) and the backend restarted for frontend
@@ -70,9 +70,9 @@ frontend/src/
   pages/                    — one file per route/screen (SRPage, Dashboard, DashboardHome,
                                 Reports, UpdateTasks, UserManagement, BackupSettings, etc.)
   components/               — SRDetail.jsx (view/edit modal), SRForm.jsx (add/edit form),
-                                CommentCell.jsx, ClosureDateCell.jsx, LoginScene.jsx (3D mascot)
+                                CommentCell.jsx, ClosureDateCell.jsx
   components/ui/            — small reusable UI primitives (BrandButton, Reveal, TiltCard, ...)
-  services/api.js           — axios wrapper, one *API object per route group
+  services/api.js           — native Fetch wrapper, request tracking/cache, one API object per route group
   utils/pagination.js        — shared antd Table pagination config (see gotcha below)
   utils/excelIO.js, exportExcel.js — xlsx read/write helpers, dynamically imported
 ```
@@ -122,8 +122,11 @@ frontend/src/
   wait on the RDC user, not Deloitte). `/parse` is read-only; `/apply` writes in one
   transaction. `/parse` returns a `pageSummary` (per-page classification) and per-row
   `needsReview` flag so the admin can verify parser coverage.
-- **Bundle size**: heavy deps (`xlsx`, lazy routes) are dynamic-imported at click/route time,
-  not bundled eagerly — keep new heavy dependencies behind the same pattern.
+- **Bundle and interaction performance**: routes are lazy-loaded and prewarmed on idle/hover;
+  `xlsx` stays dynamically imported at click time. `services/api.js` coalesces/cache safe reads,
+  while live SR list requests pass `AbortSignal` and deliberately bypass coalescing. Keep heavy
+  dependencies behind dynamic imports and do not reintroduce WebGL or page-exit animation for
+  the data-heavy shell.
 - **Table re-render cost**: antd/rc-table treats a new `columns` array reference as changed —
   memoize column builders (`useMemo`/`useCallback`) in table-heavy pages.
 - **Backend query batching**: prefer `WHERE x IN (...)` + in-memory `Map` lookup over N+1
@@ -137,19 +140,15 @@ frontend/src/
   `routes/srs.js` (`GET /` via `?overdue=true`, `GET /stats/summary`) and `routes/stats.js`
   (`catStats`, SR-only) compute this server-side; never derive it client-side against the
   wrong field for Digitization.
-- **This dev sandbox's Browser pane stalls `requestAnimationFrame` when not actively
-  displayed/composited** (confirmed via a direct rAF probe timing out). Causes two non-bugs to
-  watch for when verifying UI here: `AnimatedCounter.jsx` (DashboardHome's StatCards) sticks at
-  `0` instead of animating up, and `Dashboard.jsx`'s `AnimatePresence` page-transition exit
-  never completes, so the previous page's DOM can stay stacked under the new one — text reads
-  can return both pages concatenated, and a naive element query can click a stale element from
-  the old page. Trust a direct API fetch and non-animated DOM state over anything animated;
-  scope queries narrowly (e.g. to a container with text unique to the target page) rather than
-  assuming the app is broken when a click "does nothing."
+- **Shared-host runtime budget**: the MySQL pool defaults to five connections and three idle
+  connections; tune with `DB_POOL_SIZE`, `DB_POOL_IDLE`, and `DB_POOL_IDLE_TIMEOUT_MS`. The
+  Deloitte `pdf-parse` module is intentionally required inside the parse action, not at server
+  startup. Production static caching/log filtering depends on `NODE_ENV=production`, which
+  `start-all.bat` sets explicitly.
 
 ### How changes get verified
 
-No automated test suite — verification means exercising the real running app:
+Focused backend tests exist, but verification also means exercising the real running app:
 
 1. Start the backend (`cd backend && node server.js`), confirm port 777 is actually listening
    before assuming it's up.
@@ -165,6 +164,11 @@ No automated test suite — verification means exercising the real running app:
 
 Most-recent-relevant-first:
 
+- **Low-overhead responsiveness pass** — removed the Three.js/Framer/Axios runtime, kept the
+  existing Ant Design visual language, made counters and page switches deterministic, warmed
+  route chunks during idle time, cancelled stale SR requests, batched filter metadata, added
+  conservative client read caching, deferred the PDF parser, reduced the DB pool, improved
+  production asset caching/logging, and added a complete RDC favicon set.
 - **Automatic ManageEngine Cloud synchronization** — `services/manageengine-sync.js` refreshes
   OAuth access tokens and updates existing SRs every 30 minutes (plus an optional startup run).
   It matches local `sr_number` against ManageEngine `display_id`, and also auto-creates
