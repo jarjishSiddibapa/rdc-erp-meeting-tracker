@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const { pool } = require('../db/pool');
+const { serviceDeskApiDomainFor, trimTrailingSlash } = require('../utils/manageengine-domain');
 
 const ACCEPT = 'application/vnd.manageengine.sdp.v3+json';
 const CLOSED_STATUSES = new Set(['closed', 'resolved', 'cancelled', 'canceled', 'rejected', 'completed']);
@@ -17,26 +18,22 @@ function envFlag(name, fallback = false) {
   return ['1', 'true', 'yes', 'on'].includes(String(raw).trim().toLowerCase());
 }
 
-function trimTrailingSlash(value) {
-  return String(value || '').trim().replace(/\/+$/, '');
-}
-
 function getConfig() {
   const interval = Number.parseInt(process.env.MANAGEENGINE_SYNC_INTERVAL_MINUTES, 10);
+  const accountsUrl = trimTrailingSlash(process.env.MANAGEENGINE_ACCOUNTS_URL || DEFAULT_ACCOUNTS_URL);
   return {
     enabled: envFlag('MANAGEENGINE_SYNC_ENABLED'),
     runOnStart: envFlag('MANAGEENGINE_SYNC_RUN_ON_START', true),
     intervalMinutes: Number.isInteger(interval) && interval > 0 && interval <= 60 && 60 % interval === 0
       ? interval
       : DEFAULT_INTERVAL_MINUTES,
-    accountsUrl: trimTrailingSlash(process.env.MANAGEENGINE_ACCOUNTS_URL || DEFAULT_ACCOUNTS_URL),
-    apiDomain: trimTrailingSlash(process.env.MANAGEENGINE_API_DOMAIN),
+    accountsUrl,
+    apiDomain: trimTrailingSlash(process.env.MANAGEENGINE_API_DOMAIN || serviceDeskApiDomainFor(accountsUrl)),
     portal: String(process.env.MANAGEENGINE_PORTAL || '').trim(),
     clientId: String(process.env.MANAGEENGINE_CLIENT_ID || '').trim(),
     clientSecret: String(process.env.MANAGEENGINE_CLIENT_SECRET || '').trim(),
     refreshToken: String(process.env.MANAGEENGINE_REFRESH_TOKEN || '').trim(),
     externalTechnician: String(process.env.MANAGEENGINE_EXTERNAL_TECHNICIAN || 'Deloitte ERP Support').trim(),
-    autoCreateCategory: String(process.env.MANAGEENGINE_AUTO_CREATE_CATEGORY || 'Oracle ERP').trim(),
     timeZone: String(process.env.MANAGEENGINE_TIME_ZONE || 'Asia/Kolkata').trim(),
     maxPages: Math.max(1, Number.parseInt(process.env.MANAGEENGINE_SYNC_MAX_PAGES, 10) || 100),
   };
@@ -102,11 +99,17 @@ function dateTimeFromApi(value, timeZone = 'Asia/Kolkata') {
 
 function normalizeRequest(request, config = getConfig()) {
   const remoteStatus = String(request?.status?.name || '').trim();
-  const status = mapStatus(remoteStatus);
+  const mappedStatus = mapStatus(remoteStatus);
   const technician = String(request?.technician?.name || '').trim() || null;
-  const requester = String(request?.requester?.name || request?.created_by?.name || '').trim() || null;
   const createdBy = String(request?.created_by?.name || request?.requester?.name || '').trim() || null;
   const pendingParty = pendingPartyFor(request);
+  const status = mappedStatus === 'Closed' || mappedStatus === 'On Hold'
+    ? mappedStatus
+    : pendingParty === 'User'
+      ? 'Pending with User'
+      : pendingParty === 'Technician'
+        ? 'Pending'
+        : mappedStatus;
   const createdAt = dateTimeFromApi(request?.created_time, config.timeZone);
   const closedAt = dateTimeFromApi(request?.completed_time, config.timeZone);
 
@@ -115,7 +118,7 @@ function normalizeRequest(request, config = getConfig()) {
     status,
     manageengine_status: remoteStatus || null,
     manageengine_pending_party: pendingParty,
-    pending_with: pendingParty === 'Technician' ? technician : pendingParty === 'User' ? requester : null,
+    pending_with: pendingParty === 'Technician' ? technician : pendingParty === 'User' ? 'Pending with User' : null,
     assigned_to: technician,
     scope: namesMatch(technician, config.externalTechnician)
       ? 'External'
@@ -127,14 +130,6 @@ function normalizeRequest(request, config = getConfig()) {
     manageengine_closed_at: status === 'Closed' ? closedAt : null,
     closed_date: status === 'Closed' && closedAt ? closedAt.slice(0, 10) : null,
   };
-}
-
-function isAutoCreateCandidate(request, config = getConfig()) {
-  const status = String(request?.status?.name || '').trim();
-  return requestLookupKeys(request).length > 0
-    && !!status
-    && !isClosedFamily(status)
-    && namesMatch(request?.category?.name, config.autoCreateCategory);
 }
 
 async function fetchWithRetry(url, options, attempts = 3) {
@@ -245,67 +240,40 @@ function requestLookupKeys(request) {
     .map(value => String(value).trim());
 }
 
+function matchTrackedRequests(requests, wanted, matches = new Map()) {
+  for (const request of requests) {
+    for (const key of requestLookupKeys(request)) {
+      if (wanted.has(key) && !matches.has(key)) matches.set(key, request);
+    }
+  }
+  return matches;
+}
+
 async function fetchMatchingRequests(config, localNumbers) {
   const wanted = new Set(localNumbers.map(value => String(value).trim()));
   const matches = new Map();
-  const autoCreateCandidates = new Map();
   let scanned = 0;
   let startIndex = 1;
   let pages = 0;
 
-  // Always inspect at least the newest page. This provides a safe fallback for discovering
-  // newly-created Oracle ERP requests if a portal rejects the optional category-filtered scan.
-  while (pages < config.maxPages && (pages === 0 || matches.size < wanted.size)) {
+  // There is nothing to discover: ManageEngine is deliberately update-only. A request must
+  // already exist locally before this job will fetch and apply its current portal values.
+  if (wanted.size === 0) return { matches, scanned, pages };
+
+  while (pages < config.maxPages && matches.size < wanted.size) {
     const payload = await fetchRequestPage(config, startIndex);
     const rows = Array.isArray(payload.requests) ? payload.requests : [];
     scanned += rows.length;
     pages++;
 
-    for (const request of rows) {
-      if (isAutoCreateCandidate(request, config)) {
-        autoCreateCandidates.set(normalizeRequest(request, config).remoteId, request);
-      }
-      for (const key of requestLookupKeys(request)) {
-        if (wanted.has(key) && !matches.has(key)) matches.set(key, request);
-      }
-    }
+    matchTrackedRequests(rows, wanted, matches);
 
     const hasMore = payload?.list_info?.has_more_rows === true || payload?.list_info?.has_more_rows === 'true';
     if (!hasMore || rows.length === 0) break;
     startIndex += rows.length;
   }
 
-  return { matches, autoCreateCandidates, scanned, pages };
-}
-
-async function fetchAutoCreateRequests(config) {
-  const candidates = new Map();
-  let scanned = 0;
-  let startIndex = 1;
-  let pages = 0;
-  const categoryCriteria = {
-    field: 'category.name',
-    condition: 'is',
-    values: [config.autoCreateCategory],
-  };
-
-  while (pages < config.maxPages) {
-    const payload = await fetchRequestPage(config, startIndex, false, categoryCriteria);
-    const rows = Array.isArray(payload.requests) ? payload.requests : [];
-    scanned += rows.length;
-    pages++;
-
-    for (const request of rows) {
-      if (!isAutoCreateCandidate(request, config)) continue;
-      candidates.set(normalizeRequest(request, config).remoteId, request);
-    }
-
-    const hasMore = payload?.list_info?.has_more_rows === true || payload?.list_info?.has_more_rows === 'true';
-    if (!hasMore || rows.length === 0) break;
-    startIndex += rows.length;
-  }
-
-  return { candidates, scanned, pages };
+  return { matches, scanned, pages };
 }
 
 function comparable(value) {
@@ -366,34 +334,6 @@ async function applyRequestUpdate(conn, local, remote, config) {
   return changes.length;
 }
 
-async function createAutoRequest(conn, remote, config) {
-  if (!isAutoCreateCandidate(remote, config)) return false;
-  const desired = normalizeRequest(remote, config);
-  const lookupKeys = [...new Set(requestLookupKeys(remote))];
-  const placeholders = lookupKeys.map(() => '?').join(', ');
-  const [existing] = await conn.query(
-    `SELECT id FROM srs WHERE category = 'SR' AND sr_number IN (${placeholders}) LIMIT 1`,
-    lookupKeys
-  );
-  // Includes soft-deleted SRs: an automatic sync must never resurrect something an admin deleted.
-  if (existing.length) return false;
-
-  const [result] = await conn.execute(`
-    INSERT INTO srs (
-      sr_number, category, scope, status, pending_with, assigned_to,
-      description, type, creation_date, created_by_name,
-      manageengine_status, manageengine_pending_party, manageengine_created_at,
-      manageengine_closed_at, manageengine_last_synced_at,
-      created_by, updated_by
-    ) VALUES (?, 'SR', ?, ?, ?, ?, '', ?, ?, ?, ?, ?, ?, NULL, NOW(), NULL, NULL)
-  `, [
-    desired.remoteId, desired.scope, desired.status, desired.pending_with, desired.assigned_to,
-    desired.type, desired.creation_date, desired.created_by_name, desired.manageengine_status,
-    desired.manageengine_pending_party, desired.manageengine_created_at,
-  ]);
-  return result.affectedRows === 1;
-}
-
 async function beginRun(triggeredBy) {
   const [result] = await pool.execute(
     "INSERT INTO manageengine_sync_runs (status, triggered_by) VALUES ('running', ?)",
@@ -439,20 +379,6 @@ async function executeSync(triggeredBy = 'schedule') {
     counts.matched = localRows.filter(row => remoteResult.matches.has(String(row.sr_number).trim())).length;
     counts.missing = localRows.length - counts.matched;
 
-    // The filtered call keeps the scheduled job lightweight while still finding all active
-    // Oracle ERP requests, including a one-time backlog. Some older portals reject nested
-    // search fields, so retain candidates from the normal newest-first scan as a fallback.
-    const autoCreateCandidates = new Map(remoteResult.autoCreateCandidates);
-    try {
-      const createResult = await fetchAutoCreateRequests(config);
-      counts.scanned += createResult.scanned;
-      for (const [remoteId, request] of createResult.candidates) {
-        autoCreateCandidates.set(remoteId, request);
-      }
-    } catch (error) {
-      console.warn(`ManageEngine category-filtered discovery failed; using normal scan fallback: ${error.message}`);
-    }
-
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
@@ -462,9 +388,6 @@ async function executeSync(triggeredBy = 'schedule') {
         const changedFields = await applyRequestUpdate(conn, local, remote, config);
         if (changedFields) counts.updated++;
         else counts.unchanged++;
-      }
-      for (const remote of autoCreateCandidates.values()) {
-        if (await createAutoRequest(conn, remote, config)) counts.created++;
       }
       await conn.commit();
     } catch (error) {
@@ -537,14 +460,14 @@ function initManageEngineScheduler() {
 }
 
 module.exports = {
-  createAutoRequest,
   getConfig,
   getSyncStatus,
   initManageEngineScheduler,
   isClosedFamily,
-  isAutoCreateCandidate,
+  matchTrackedRequests,
   mapStatus,
   normalizeRequest,
   pendingPartyFor,
   runManageEngineSync,
+  serviceDeskApiDomainFor,
 };

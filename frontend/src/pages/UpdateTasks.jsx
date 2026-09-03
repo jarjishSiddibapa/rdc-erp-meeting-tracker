@@ -435,10 +435,8 @@ function UploadDeloittePdf() {
 
 // ── Update SRs from ManageEngine (reconcile against a per-technician CSV export) ──
 // Pick a technician (Assigned To), upload their ManageEngine export, and this reconciles
-// three ways: tickets open in ManageEngine but not tracked here become new SRs; SRs we track
-// as open that ManageEngine now shows closed/resolved get closed here too; closed
-// ManageEngine tickets that were never tracked here are never picked up at all - they stay
-// untracked, on purpose (we only move forward, never backfill closed history we never had).
+// tracked open SRs that ManageEngine now shows closed/resolved. Requests absent from the
+// local tracker are reported as ignored and can never be created by this workflow.
 function UpdateFromManageEngine() {
   const [syncStatus, setSyncStatus] = useState(null);
   const [syncLoading, setSyncLoading] = useState(false);
@@ -450,7 +448,6 @@ function UpdateFromManageEngine() {
   const [parsed, setParsed] = useState(null);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
-  const [selectedCreateKeys, setSelectedCreateKeys] = useState([]);
   const [selectedCloseKeys, setSelectedCloseKeys] = useState([]);
   const [detailSR, setDetailSR] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -474,7 +471,7 @@ function UpdateFromManageEngine() {
     try {
       const res = await manageEngineImportAPI.syncNow();
       const summary = res.data;
-      message.success(`ManageEngine sync complete: ${summary.created || 0} created, ${summary.updated || 0} updated, ${summary.unchanged || 0} unchanged`);
+      message.success(`ManageEngine sync complete: ${summary.updated || 0} updated, ${summary.unchanged || 0} unchanged`);
       await refreshSyncStatus();
     } catch (e) {
       setError(e.response?.data?.message || 'ManageEngine API sync failed. Check the API configuration and server log.');
@@ -548,7 +545,6 @@ function UpdateFromManageEngine() {
       formData.append('assignedTo', assignedTo);
       const res = await manageEngineImportAPI.parse(formData);
       setParsed(res.data);
-      setSelectedCreateKeys(res.data.toCreate.map(r => r.request_id));
       setSelectedCloseKeys(res.data.toClose.map(r => r.sr_id));
     } catch (e) {
       setError(e.response?.data?.message || "Could not read that CSV - make sure it's a ManageEngine export with the expected columns.");
@@ -562,9 +558,8 @@ function UpdateFromManageEngine() {
     if (!parsed) return;
     setApplying(true);
     try {
-      const toCreate = parsed.toCreate.filter(r => selectedCreateKeys.includes(r.request_id));
       const toClose = parsed.toClose.filter(r => selectedCloseKeys.includes(r.sr_id));
-      const res = await manageEngineImportAPI.apply({ assignedTo, toCreate, toClose });
+      const res = await manageEngineImportAPI.apply({ assignedTo, toClose });
       setResult(res.data);
     } catch (e) {
       setError(e.response?.data?.message || 'Failed to apply updates.');
@@ -575,16 +570,8 @@ function UpdateFromManageEngine() {
 
   function reset() {
     setParsed(null); setResult(null); setError(''); setFileName('');
-    setSelectedCreateKeys([]); setSelectedCloseKeys([]);
+    setSelectedCloseKeys([]);
   }
-
-  const createColumns = [
-    { title: 'Request ID', dataIndex: 'request_id', width: 100 },
-    { title: 'Subject', dataIndex: 'subject', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
-    { title: 'Requester', dataIndex: 'requester', width: 170, render: v => v || <Text type="secondary">-</Text> },
-    { title: 'Status', dataIndex: 'status', width: 110, render: v => <Tag color="blue">{v}</Tag> },
-    { title: 'Created', dataIndex: 'created', width: 160, render: v => v || <Text type="secondary">-</Text> },
-  ];
 
   const closeColumns = [
     { title: 'SR Number', dataIndex: 'sr_number', width: 100 },
@@ -623,7 +610,7 @@ function UpdateFromManageEngine() {
     },
   ];
 
-  const totalActions = selectedCreateKeys.length + selectedCloseKeys.length;
+  const totalActions = selectedCloseKeys.length;
 
   return (
     <div>
@@ -646,14 +633,13 @@ function UpdateFromManageEngine() {
               type={syncStatus.enabled ? 'success' : 'info'}
               showIcon
               message={syncStatus.enabled ? `Automatic sync runs every ${syncStatus.interval_minutes} minutes` : 'API is configured; automatic sync is currently disabled'}
-              description="Existing SRs are refreshed. New active Oracle ERP requests are created automatically; other new categories and already-closed tickets are ignored. Local descriptions are never overwritten."
+              description="Only SR numbers that already exist in this tracker are refreshed. Untracked ManageEngine requests are ignored and never created automatically. Local descriptions are never overwritten."
             />
             {syncStatus.last_run && (
               <Row gutter={[12, 12]} style={{ marginTop: 14 }}>
                 {[
                   ['Last result', syncStatus.last_run.status],
                   ['Matched', syncStatus.last_run.matched],
-                  ['Created', syncStatus.last_run.created],
                   ['Updated', syncStatus.last_run.updated],
                   ['Unchanged', syncStatus.last_run.unchanged],
                   ['Not found', syncStatus.last_run.missing],
@@ -673,12 +659,9 @@ function UpdateFromManageEngine() {
       <Title level={5} style={{ marginBottom: 6 }}>Manual CSV fallback</Title>
       <Paragraph type="secondary" style={{ marginBottom: 20 }}>
         Reconcile this app against a ManageEngine export for one technician. Pick who the export
-        belongs to (Assigned To), then upload it. Tickets open in ManageEngine but not yet tracked
-        here become new SRs (Scope fixed to <Text strong>Internal</Text>, since these are RDC's own
-        helpdesk tickets). SRs we're tracking as open that ManageEngine now shows Closed/Resolved/
-        Cancelled get closed here too - with full history, same as closing by hand. Closed
-        ManageEngine tickets that were never tracked here are <Text strong>never</Text> picked up -
-        they stay untracked, since we're only moving forward. Nothing is written until you review
+        belongs to (Assigned To), then upload it. Only SRs already tracked here can be closed from
+        the export, with full history just like closing them by hand. Open or closed ManageEngine
+        tickets that do not exist in this tracker are ignored. Nothing is written until you review
         the preview below and click Apply.
       </Paragraph>
 
@@ -708,7 +691,7 @@ function UpdateFromManageEngine() {
               <p className="ant-upload-text">
                 {parsing ? `Reading ${fileName}...` : assignedTo ? 'Click or drag the ManageEngine CSV export here' : 'Select a technician above first'}
               </p>
-              <p className="ant-upload-hint">Expects the standard ManageEngine columns: Request ID, Subject, Requester.Name, Technician.Name, Created Date, Status.Name.</p>
+              <p className="ant-upload-hint">Expects these ManageEngine columns: Request ID, Technician.Name, Status.Name.</p>
             </Dragger>
           </Space>
         </Card>
@@ -723,7 +706,7 @@ function UpdateFromManageEngine() {
           )}
 
           <Alert type="info" showIcon
-            message={`${parsed.toCreate.length} new SR${parsed.toCreate.length === 1 ? '' : 's'} to create, ${parsed.toClose.length} to close, ${parsed.alreadyOpenBothCount} already tracked and still open (no action), ${parsed.closedNeverTrackedCount} closed-and-never-tracked (correctly skipped)`}
+            message={`${parsed.toClose.length} tracked SR${parsed.toClose.length === 1 ? '' : 's'} to close, ${parsed.alreadyOpenBothCount} already tracked and still open (no action), ${parsed.untrackedOpenCount} open-and-untracked ignored, ${parsed.closedNeverTrackedCount} closed-and-untracked ignored`}
           />
 
           {parsed.ambiguous.length > 0 && (
@@ -738,14 +721,6 @@ function UpdateFromManageEngine() {
             </>
           )}
 
-          <Card size="small" title={`New SRs to create (${parsed.toCreate.length})`}>
-            <Table
-              rowKey="request_id" size="small" columns={createColumns} dataSource={parsed.toCreate}
-              rowSelection={{ selectedRowKeys: selectedCreateKeys, onChange: setSelectedCreateKeys }}
-              pagination={parsed.toCreate.length > 10 ? compactPaginationConfig('SRs', { defaultPageSize: 10 }) : false}
-            />
-          </Card>
-
           <Card size="small" title={`SRs to close (${parsed.toClose.length})`}>
             <Table
               rowKey="sr_id" size="small" columns={closeColumns} dataSource={parsed.toClose}
@@ -759,7 +734,7 @@ function UpdateFromManageEngine() {
             <BrandButton icon={<UploadOutlined />} loading={applying}
               disabled={totalActions === 0}
               onClick={handleApply}>
-              Apply ({selectedCreateKeys.length} create, {selectedCloseKeys.length} close)
+              Apply ({selectedCloseKeys.length} close)
             </BrandButton>
           </Space>
         </Space>
@@ -773,10 +748,9 @@ function UpdateFromManageEngine() {
           >
             <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
               {[
-                { label: 'SRs Created', value: result.created, color: '#722ed1' },
                 { label: 'SRs Closed', value: result.closed, color: BRAND },
               ].map(t => (
-                <Col xs={12} sm={12} key={t.label}>
+                <Col xs={24} key={t.label}>
                   <Card size="small">
                     <Title level={4} style={{ color: t.color, margin: 0 }}>{t.value}</Title>
                     <Text type="secondary" style={{ fontSize: 12 }}>{t.label}</Text>

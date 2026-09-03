@@ -42,14 +42,16 @@ the [architecture guide](ARCHITECTURE.md).
 - OAuth refresh-token integration with configurable Zoho data-center and portal values.
 - Scheduled synchronization every 30 minutes, optional startup run, and guarded manual run.
 - Existing local SRs matched to ManageEngine `display_id`.
-- Automatic creation of previously untracked **active** requests in category `Oracle ERP`.
-- Closed requests and new requests from other categories are not automatically created.
+- Strict update-only behavior: an SR must already exist locally before ManageEngine can change it.
+- Untracked remote requests are ignored, regardless of category or status.
 - Source status, exact created/closed timestamps, requester, category, and technician mapping.
 - Pending side derived from official `unreplied_count`, with explicit pending statuses taking precedence.
+- Technician-side work shows Status `Pending` and Pending With as the Assigned To technician;
+  user-side work shows `Pending with User` in both fields.
 - `Deloitte ERP Support` classified as External; other technicians classified as Internal.
 - Missing remote requests remain unchanged and soft-deleted records are never recreated.
-- Per-run counts for scanned, matched, created, updated, unchanged, missing, and errors.
-- CSV parse/apply fallback when API synchronization is unavailable.
+- Per-run counts for scanned, matched, updated, unchanged, missing, and errors.
+- Update-only CSV parse/apply fallback when API synchronization is unavailable.
 
 ## Update Tasks
 

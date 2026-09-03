@@ -52,17 +52,13 @@ function loadRows(buffer) {
   const header = rows[0] || [];
   const idx = {};
   header.forEach((h, i) => idx[h.trim()] = i);
-  const required = ['Request ID', 'Subject', 'Requester.Name', 'Technician.Name', 'Created Date', 'Status.Name'];
+  const required = ['Request ID', 'Technician.Name', 'Status.Name'];
   const missing = required.filter(h => idx[h] === undefined);
   if (missing.length) throw new Error(`CSV is missing expected column(s): ${missing.join(', ')}`);
   return rows.slice(1).map(r => ({
     request_id: (r[idx['Request ID']] || '').trim(),
-    subject: (r[idx['Subject']] || '').trim(),
-    requester: (r[idx['Requester.Name']] || '').trim(),
     technician: (r[idx['Technician.Name']] || '').trim(),
-    created: (r[idx['Created Date']] || '').trim(),
     status: (r[idx['Status.Name']] || '').trim(),
-    due_by: idx['Due by date'] !== undefined ? (r[idx['Due by date']] || '').trim() : '',
   })).filter(r => r.request_id);
 }
 
@@ -73,28 +69,6 @@ function loadRows(buffer) {
 // side (silently treated as done).
 const CLOSED_STATUSES = new Set(['closed', 'resolved', 'cancelled', 'canceled', 'rejected']);
 function isClosedFamily(status) { return CLOSED_STATUSES.has((status || '').toLowerCase().trim()); }
-
-// ManageEngine's open-family status labels, normalized to this app's own status vocabulary.
-// Anything unrecognized defaults to 'Open' rather than being dropped — a genuinely open
-// ticket should never silently vanish just because its exact label wasn't anticipated.
-const OPEN_STATUS_MAP = {
-  'open': 'Open', 'on hold': 'On Hold', 'onhold': 'On Hold',
-  'in progress': 'In Progress', 'inprogress': 'In Progress',
-  'pending': 'Pending', 'pending with user': 'Pending with User', 'pending on user': 'Pending with User',
-};
-function mapOpenStatus(status) {
-  return OPEN_STATUS_MAP[(status || '').toLowerCase().trim()] || 'Open';
-}
-
-// "Dec 17, 2024 01:44 PM" -> "2024-12-17". Local date parts, not toISOString(), to avoid a
-// UTC-conversion day-shift for timezones ahead of UTC (same reasoning as csv-import.js's
-// normalizeDate).
-function parseManageEngineDate(v) {
-  if (!v) return null;
-  const d = new Date(v);
-  if (isNaN(d.getTime())) return null;
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
 
 // assigned_to (not pending_with) is the match key — confirmed against live data that
 // assigned_to is the stable "who owns this ticket" field mirroring ManageEngine's
@@ -111,12 +85,7 @@ async function crossReference(rows, assignedTo) {
   );
   const dbBySrNumber = new Map(dbRows.map(r => [r.sr_number, r]));
 
-  const toCreate = openRows
-    .filter(r => !dbBySrNumber.has(r.request_id))
-    .map(r => ({
-      request_id: r.request_id, subject: r.subject, requester: r.requester,
-      status: mapOpenStatus(r.status), created: r.created, due_by: r.due_by,
-    }));
+  const untrackedOpenCount = openRows.filter(r => !dbBySrNumber.has(r.request_id)).length;
 
   const toClose = closedRows
     .filter(r => dbBySrNumber.has(r.request_id) && dbBySrNumber.get(r.request_id).status !== 'Closed')
@@ -144,7 +113,7 @@ async function crossReference(rows, assignedTo) {
     ? { csvTechnician: dominantTechnician[0], csvTechnicianCount: dominantTechnician[1], totalRows: rows.length }
     : null;
 
-  return { toCreate, toClose, alreadyOpenBothCount, closedNeverTrackedCount, ambiguous, technicianMismatch, totalRows: rows.length };
+  return { toClose, untrackedOpenCount, alreadyOpenBothCount, closedNeverTrackedCount, ambiguous, technicianMismatch, totalRows: rows.length };
 }
 
 // POST /api/manageengine-import/parse — multipart, field "csv", body field "assignedTo".
@@ -164,34 +133,18 @@ router.post('/parse', upload.single('csv'), async (req, res, next) => {
   }
 });
 
-// POST /api/manageengine-import/apply — body: { assignedTo, toCreate: [...], toClose: [...] }
-// (the same shape /parse returned, optionally trimmed to just the rows the admin wants applied).
+// POST /api/manageengine-import/apply — body: { assignedTo, toClose: [...] }
+// ManageEngine reconciliation is update-only: untracked rows from the uploaded export are
+// never accepted here, even if an older client submits a toCreate payload.
 router.post('/apply', async (req, res, next) => {
   const conn = await pool.getConnection();
   try {
     const assignedTo = (req.body.assignedTo || '').trim();
-    const toCreate = Array.isArray(req.body.toCreate) ? req.body.toCreate : [];
     const toClose = Array.isArray(req.body.toClose) ? req.body.toClose : [];
     if (!assignedTo) return res.status(400).json({ message: 'assignedTo is required' });
 
-    let created = 0, closed = 0;
+    let closed = 0;
     await conn.beginTransaction();
-
-    for (const row of toCreate) {
-      const creationDate = parseManageEngineDate(row.created) || new Date().toISOString().split('T')[0];
-      await conn.execute(`
-        INSERT INTO srs (
-          sr_number, category, scope, status, pending_with, assigned_to,
-          description, creation_date, created_by_name, expected_closure_date,
-          created_by, updated_by
-        ) VALUES (?, 'SR', 'Internal', ?, NULL, ?, ?, ?, ?, ?, ?, ?)
-      `, [
-        row.request_id, row.status, assignedTo, row.subject || null,
-        creationDate, row.requester || null, parseManageEngineDate(row.due_by),
-        req.user.id, req.user.id,
-      ]);
-      created++;
-    }
 
     const cd = new Date().toISOString().split('T')[0];
     for (const row of toClose) {
@@ -204,7 +157,7 @@ router.post('/apply', async (req, res, next) => {
     }
 
     await conn.commit();
-    res.json({ created, closed });
+    res.json({ closed });
   } catch (e) {
     await conn.rollback();
     next(e);

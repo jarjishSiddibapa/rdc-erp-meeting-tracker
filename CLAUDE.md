@@ -205,14 +205,15 @@ Chronological, most-recent-relevant-first, for context on *why* rather than just
   route chunks during idle time, cancelled stale SR requests, batched filter metadata, added
   conservative client read caching, deferred the PDF parser, reduced the DB pool, improved
   production asset caching/logging, and added a complete RDC favicon set.
-- **Automatic ManageEngine Cloud synchronization** — `services/manageengine-sync.js` refreshes
+- **Update-only ManageEngine Cloud synchronization** — `services/manageengine-sync.js` refreshes
   OAuth access tokens and updates existing SRs every 30 minutes (plus an optional startup run).
-  It matches local `sr_number` against ManageEngine `display_id`, and also auto-creates
-  previously untracked active requests whose category is exactly `Oracle ERP`. New requests
-  from other categories and already-closed requests are ignored; soft-deleted SRs are never
-  recreated. Descriptions are never overwritten (API-created SRs start empty), and not-found
-  local records stay unchanged. Pending side comes from the official `unreplied_count` field
-  (>0 = Technician, 0 = User), with explicit pending statuses taking precedence. Exact source
+  It matches local `sr_number` against ManageEngine `display_id` and never creates local SRs;
+  users explicitly add the requests that require tracking before the integration can update them.
+  Untracked and soft-deleted requests are ignored, descriptions are never overwritten, and
+  not-found local records stay unchanged. Pending side comes from the official `unreplied_count` field
+  (>0 = Technician, 0 = User), with explicit pending statuses taking precedence. Technician-side
+  work uses local status `Pending` and the exact Assigned To name in `pending_with`; user-side
+  work uses `Pending with User` for both. `Closed` and `On Hold` remain authoritative. Exact source
   timestamps and the raw source status are stored in `manageengine_*` columns; real field
   changes are written to `sr_history` with a null system actor. Credentials and the offline
   refresh token live only in `backend/.env`.

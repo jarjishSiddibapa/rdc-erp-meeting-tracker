@@ -82,7 +82,7 @@ The response is:
 | `GET` | `/api/manageengine-import/sync-status` | Admin | Configuration and latest run state |
 | `POST` | `/api/manageengine-import/sync-now` | Admin | Start the guarded API synchronization |
 | `POST` | `/api/manageengine-import/parse` | Admin | Parse ManageEngine CSV fallback |
-| `POST` | `/api/manageengine-import/apply` | Admin | Apply reviewed CSV fallback rows |
+| `POST` | `/api/manageengine-import/apply` | Admin | Close reviewed, already-tracked CSV fallback rows; untracked rows are rejected by design |
 
 PDF and CSV parse endpoints use multipart uploads. Apply endpoints accept the reviewed JSON
 result, keeping inspection separate from mutation.

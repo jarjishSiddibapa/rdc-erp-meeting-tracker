@@ -41,7 +41,7 @@ Cloud, Excel-based bulk operations, role administration, and recoverable MySQL b
 | --- | --- |
 | Operational dashboard | Current workload, overdue exposure, rolling seven-day movement, formulas, and workload share by owner |
 | Unified work tracking | Searchable, filterable, resizable tables for SRs and Digitization Projects with category-specific fields |
-| ManageEngine automation | OAuth-based sync every 30 minutes, manual sync, guarded field mapping, and automatic intake of active `Oracle ERP` requests |
+| ManageEngine automation | OAuth-based sync every 30 minutes, manual sync, guarded field mapping, and an update-only boundary for locally tracked SRs |
 | Auditability | Field-level history, appended comments, soft deletion, diff-only updates, and transparent import previews |
 | Controlled bulk updates | Download/edit/upload Excel round trip with separate SR and Digitization sheets and transactional writes |
 | Deloitte workflow | Review-first weekly PDF parsing with page classification, match status, and per-row review flags |
@@ -114,9 +114,8 @@ flowchart TD
   Scheduler[30-minute scheduler] --> Sync[ManageEngine sync]
   Manual[Manual Sync button] --> Sync
   Sync --> Existing[Update matching local SRs]
-  Sync --> New[Create new active Oracle ERP SRs]
+  Sync --> Ignore[Ignore untracked remote SRs]
   Existing --> Diff[Write only changed fields]
-  New --> Empty[Create with empty local description]
   Diff --> History[Field-level audit history]
   PDF[Weekly Deloitte PDF] --> Preview[Parse and review]
   Preview -->|Admin confirms| Apply[Transactional apply]

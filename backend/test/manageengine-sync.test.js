@@ -1,15 +1,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  createAutoRequest,
-  isAutoCreateCandidate,
+  matchTrackedRequests,
   mapStatus,
   normalizeRequest,
   pendingPartyFor,
+  serviceDeskApiDomainFor,
 } = require('../services/manageengine-sync');
 
 const config = {
-  autoCreateCategory: 'Oracle ERP',
   externalTechnician: 'Deloitte ERP Support',
   timeZone: 'Asia/Kolkata',
 };
@@ -33,6 +32,12 @@ test('normalizes ManageEngine status names conservatively', () => {
   assert.equal(mapStatus('Custom active workflow'), 'Open');
 });
 
+test('maps Zoho account regions to ServiceDesk product API domains', () => {
+  assert.equal(serviceDeskApiDomainFor('https://accounts.zoho.com'), 'https://sdpondemand.manageengine.com');
+  assert.equal(serviceDeskApiDomainFor('https://accounts.zoho.in/'), 'https://sdpondemand.manageengine.in');
+  assert.equal(serviceDeskApiDomainFor('https://accounts.zohocloud.ca'), 'https://servicedeskplus.ca');
+});
+
 test('maps a Deloitte ticket to External and preserves full timestamps', () => {
   const request = normalizeRequest({
     display_id: '12345',
@@ -48,6 +53,7 @@ test('maps a Deloitte ticket to External and preserves full timestamps', () => {
   }, config);
 
   assert.equal(request.scope, 'External');
+  assert.equal(request.status, 'Pending');
   assert.equal(request.pending_with, 'Deloitte ERP Support');
   assert.equal(request.manageengine_pending_party, 'Technician');
   assert.equal(request.created_by_name, 'Original Sender');
@@ -67,78 +73,42 @@ test('maps a technician response to the requester without inventing closure time
   }, config);
 
   assert.equal(request.scope, 'Internal');
+  assert.equal(request.status, 'Pending with User');
   assert.equal(request.manageengine_pending_party, 'User');
-  assert.equal(request.pending_with, 'Business User');
+  assert.equal(request.pending_with, 'Pending with User');
   assert.equal(request.manageengine_closed_at, null);
   assert.equal(request.closed_date, null);
 });
 
-test('auto-creates only active Oracle ERP requests with a usable request ID', () => {
-  const request = {
-    display_id: '20001',
-    status: { name: 'In Progress' },
-    category: { name: 'Oracle ERP' },
-  };
-  assert.equal(isAutoCreateCandidate(request, config), true);
-  assert.equal(isAutoCreateCandidate({ ...request, status: { name: 'On Hold' } }, config), true);
-  assert.equal(isAutoCreateCandidate({ ...request, status: { name: 'Resolved' } }, config), false);
-  assert.equal(isAutoCreateCandidate({ ...request, category: { name: 'Network' } }, config), false);
-  assert.equal(isAutoCreateCandidate({ ...request, display_id: '', id: '' }, config), false);
+test('preserves authoritative Closed and On Hold statuses', () => {
+  assert.equal(normalizeRequest({
+    status: { name: 'On Hold' },
+    unreplied_count: 0,
+    technician: { name: 'RDC IT' },
+  }, config).status, 'On Hold');
+  assert.equal(normalizeRequest({
+    status: { name: 'Closed' },
+    unreplied_count: 3,
+    technician: { name: 'RDC IT' },
+  }, config).status, 'Closed');
 });
 
-test('Oracle ERP and external-technician matching is trim-aware and case-insensitive', () => {
+test('external-technician matching is trim-aware and case-insensitive', () => {
   const request = {
     id: '20002',
     status: { name: 'Open' },
-    category: { name: ' oracle erp ' },
     technician: { name: 'deloitte erp support' },
   };
-  assert.equal(isAutoCreateCandidate(request, config), true);
   assert.equal(normalizeRequest(request, config).scope, 'External');
   assert.equal(normalizeRequest(request, config).assigned_to, 'deloitte erp support');
 });
 
-test('creates a new Oracle ERP SR with an empty description and exact technician name', async () => {
-  let insert;
-  const conn = {
-    query: async sql => {
-      assert.match(sql, /category = 'SR'/);
-      assert.doesNotMatch(sql, /is_deleted = 0/);
-      return [[]];
-    },
-    execute: async (sql, values) => {
-      insert = { sql, values };
-      return [{ affectedRows: 1 }];
-    },
-  };
-  const created = await createAutoRequest(conn, {
-    display_id: '20003',
-    status: { name: 'Open' },
-    unreplied_count: 1,
-    category: { name: 'Oracle ERP' },
-    technician: { name: 'Deloitte ERP Support - L2' },
-    requester: { name: 'Business User' },
-    created_by: { name: 'Original Sender' },
-  }, config);
+test('matches only request IDs already tracked locally', () => {
+  const tracked = { display_id: '20001', category: { name: 'Oracle ERP' } };
+  const untracked = { display_id: '20002', category: { name: 'Oracle ERP' } };
+  const matches = matchTrackedRequests([tracked, untracked], new Set(['20001']));
 
-  assert.equal(created, true);
-  assert.match(insert.sql, /VALUES \(\?, 'SR', \?, \?, \?, \?, '',/);
-  assert.deepEqual(insert.values.slice(0, 6), [
-    '20003', 'Internal', 'Open', 'Deloitte ERP Support - L2',
-    'Deloitte ERP Support - L2', 'Oracle ERP',
-  ]);
-  assert.equal(insert.values[7], 'Original Sender');
-});
-
-test('does not recreate an Oracle ERP request that already exists, even if soft-deleted', async () => {
-  const conn = {
-    query: async () => [[{ id: 99 }]],
-    execute: async () => { throw new Error('insert must not run'); },
-  };
-  const created = await createAutoRequest(conn, {
-    display_id: '20004',
-    status: { name: 'Open' },
-    category: { name: 'Oracle ERP' },
-  }, config);
-  assert.equal(created, false);
+  assert.deepEqual([...matches.keys()], ['20001']);
+  assert.equal(matches.get('20001'), tracked);
+  assert.equal(matches.has('20002'), false);
 });

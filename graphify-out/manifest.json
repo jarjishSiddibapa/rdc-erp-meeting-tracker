@@ -175,13 +175,13 @@
     "semantic_hash": "91f03f042e762a928d51cdac2b6bac88"
   },
   "frontend/src/pages/SRPage.jsx": {
-    "mtime": 1788237524.716609,
-    "ast_hash": "c596664c96e20c89e42343262a3dfea9",
+    "mtime": 1788415043.0623538,
+    "ast_hash": "e91430c1267168caafae62cbf335e09e",
     "semantic_hash": ""
   },
   "frontend/src/pages/UpdateTasks.jsx": {
-    "mtime": 1788169643.9637089,
-    "ast_hash": "5fcdcb3899cd17dd4b21e21862c4801e",
+    "mtime": 1788415565.0232308,
+    "ast_hash": "8df793c9b45030010687435c8bdb21ea",
     "semantic_hash": ""
   },
   "frontend/src/pages/UserManagement.jsx": {
@@ -280,8 +280,8 @@
     "semantic_hash": "d659b1d219873a464b3f1a2bc848c1df"
   },
   "backend/routes/manageengine-import.js": {
-    "mtime": 1788153577.208481,
-    "ast_hash": "6af8d6bf85b51897123ce2d4af0e51f4",
+    "mtime": 1788414995.6764052,
+    "ast_hash": "dd8a0c4108688b9ae10b92bca0c25a3a",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20260825_095625_use_https___github_com_leonxlnx_taste_skill_to_imp.md": {
@@ -310,8 +310,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1788258989.6435935,
-    "ast_hash": "1b1c15cc00639345ce16b6e3a1010c4c",
+    "mtime": 1788415100.327315,
+    "ast_hash": "f926b0ba058c3918c1ca51b98c6e1381",
     "semantic_hash": ""
   },
   "PRODUCTION.md": {
@@ -340,8 +340,8 @@
     "semantic_hash": ""
   },
   "backend/README.md": {
-    "mtime": 1788258938.1902006,
-    "ast_hash": "94db2fdb9eb36bbd6afc535ab5539e43",
+    "mtime": 1788415109.8223827,
+    "ast_hash": "fa539352c79d1d6c9193f361827becca",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -360,8 +360,8 @@
     "semantic_hash": ""
   },
   "docs/USER_GUIDE.md": {
-    "mtime": 1788258938.1866488,
-    "ast_hash": "dbce4e3314feed1d0152808f98fe93b3",
+    "mtime": 1788415100.518782,
+    "ast_hash": "00d2063aa5f6296bfe7e8598052a0858",
     "semantic_hash": ""
   },
   "docs/images/dashboard-overview.png": {
@@ -375,28 +375,28 @@
     "semantic_hash": ""
   },
   "docs/images/update-tasks.png": {
-    "mtime": 1788240308.476796,
-    "ast_hash": "990d79ff4cfb6e49faa48983b6bee119",
+    "mtime": 1788415475.35192,
+    "ast_hash": "74935b4f4e1a42db70cfea4fa2c2797c",
     "semantic_hash": ""
   },
   "backend/scripts/exchange-manageengine-code.js": {
-    "mtime": 1788168988.5140638,
-    "ast_hash": "0e9ce2d0b59882d1eaa4f6ff009aebc7",
+    "mtime": 1788416185.773805,
+    "ast_hash": "bb89b50406797f65e1726acff800aa0c",
     "semantic_hash": ""
   },
   "backend/services/manageengine-sync.js": {
-    "mtime": 1788169887.408248,
-    "ast_hash": "d5a3a881403ac5638fc98210f02644a4",
+    "mtime": 1788416185.7728052,
+    "ast_hash": "8df9db89f2d27ada779c65562e7fefdf",
     "semantic_hash": ""
   },
   "backend/test/manageengine-sync.test.js": {
-    "mtime": 1788169887.4242258,
-    "ast_hash": "59427cc9d1cd75f7b93c10a6b2457414",
+    "mtime": 1788416027.1083293,
+    "ast_hash": "c167d7b0ead323e5675ff015ffc8e0d9",
     "semantic_hash": ""
   },
   "docs/MANAGEENGINE_SYNC.md": {
-    "mtime": 1788169643.9637089,
-    "ast_hash": "380014d89b192f76148c2167f035a1a4",
+    "mtime": 1788416051.3361938,
+    "ast_hash": "5a9c714dcd4587e9c56c8ae5caeb9258",
     "semantic_hash": ""
   },
   "frontend/src/components/ui/LoadingNotice.jsx": {
@@ -415,13 +415,13 @@
     "semantic_hash": ""
   },
   "docs/API_REFERENCE.md": {
-    "mtime": 1788258890.3273604,
-    "ast_hash": "add71b47c98ec5124d0c32fe3cb64065",
+    "mtime": 1788415157.4036148,
+    "ast_hash": "0f8cbfd364352d6cdd432587ae0a7ff0",
     "semantic_hash": ""
   },
   "docs/FEATURES.md": {
-    "mtime": 1788258890.3264582,
-    "ast_hash": "b9947adfda191bb0b46d962d82efcfa4",
+    "mtime": 1788415324.1889794,
+    "ast_hash": "adc76c9f7d17a2a53fc894dfcb6a2798",
     "semantic_hash": ""
   },
   "docs/images/backup-settings.png": {
@@ -447,6 +447,16 @@
   "docs/images/user-management.png": {
     "mtime": 1788240347.4687274,
     "ast_hash": "e29cf52a39af47267afccf24109d6d8d",
+    "semantic_hash": ""
+  },
+  "backend/test/manageengine-update-only.test.js": {
+    "mtime": 1788415129.028965,
+    "ast_hash": "abcccd3ad3fddf89b117d1315efa2240",
+    "semantic_hash": ""
+  },
+  "backend/utils/manageengine-domain.js": {
+    "mtime": 1788416185.771804,
+    "ast_hash": "1c8577d0e2bf7a9512aa7f12a024de90",
     "semantic_hash": ""
   }
 }

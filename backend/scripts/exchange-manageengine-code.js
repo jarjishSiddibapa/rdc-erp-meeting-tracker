@@ -1,6 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
+const { serviceDeskApiDomainFor, trimTrailingSlash } = require('../utils/manageengine-domain');
 
 const ENV_PATH = path.resolve(__dirname, '..', '.env');
 
@@ -17,7 +18,7 @@ function removeEnvValue(contents, name) {
 }
 
 async function main() {
-  const accountsUrl = String(process.env.MANAGEENGINE_ACCOUNTS_URL || 'https://accounts.zoho.com').replace(/\/+$/, '');
+  const accountsUrl = trimTrailingSlash(process.env.MANAGEENGINE_ACCOUNTS_URL || 'https://accounts.zoho.com');
   const clientId = String(process.env.MANAGEENGINE_CLIENT_ID || '').trim();
   const clientSecret = String(process.env.MANAGEENGINE_CLIENT_SECRET || '').trim();
   const code = String(process.env.MANAGEENGINE_AUTH_CODE || '').trim();
@@ -51,7 +52,12 @@ async function main() {
 
   let envContents = fs.readFileSync(ENV_PATH, 'utf8');
   envContents = upsertEnvValue(envContents, 'MANAGEENGINE_REFRESH_TOKEN', payload.refresh_token);
-  if (payload.api_domain) envContents = upsertEnvValue(envContents, 'MANAGEENGINE_API_DOMAIN', payload.api_domain);
+  const configuredApiDomain = String(process.env.MANAGEENGINE_API_DOMAIN || '').trim();
+  const configuredIsProductDomain = /manageengine|servicedeskplus/i.test(configuredApiDomain);
+  const apiDomain = configuredIsProductDomain
+    ? trimTrailingSlash(configuredApiDomain)
+    : serviceDeskApiDomainFor(accountsUrl);
+  if (apiDomain) envContents = upsertEnvValue(envContents, 'MANAGEENGINE_API_DOMAIN', apiDomain);
   envContents = removeEnvValue(envContents, 'MANAGEENGINE_AUTH_CODE');
   fs.writeFileSync(ENV_PATH, envContents, 'utf8');
 

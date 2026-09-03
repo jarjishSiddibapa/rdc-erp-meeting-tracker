@@ -19,5 +19,5 @@ and the [API reference](../docs/API_REFERENCE.md). Production operations are doc
 [PRODUCTION.md](../PRODUCTION.md).
 
 The focused Node test suite covers deterministic ManageEngine normalization, pending-side
-logic, field mapping, and automatic Oracle ERP intake. User-visible or database changes still
+logic, field mapping, and the update-only tracked-SR boundary. User-visible or database changes still
 receive production-style verification against the built application with disposable data.
