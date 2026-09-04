@@ -41,9 +41,18 @@ function parseEtaDate(day, monthStr, year) {
   let y = parseInt(year, 10);
   if (mon === undefined || !d || !y) return null;
   if (y < 100) y += 2000;
-  const dt = new Date(y, mon, d);
-  if (isNaN(dt.getTime()) || dt.getMonth() !== mon) return null;
-  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+  const dt = new Date(Date.UTC(y, mon, d));
+  if (isNaN(dt.getTime()) || dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mon || dt.getUTCDate() !== d) return null;
+  return `${y}-${String(mon + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+function isIsoDate(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+  const parsed = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  return parsed.getUTCFullYear() === Number(match[1])
+    && parsed.getUTCMonth() === Number(match[2]) - 1
+    && parsed.getUTCDate() === Number(match[3]);
 }
 
 // Finds the last ETA-labeled date in `text`. Also reports `mentionedUnparsed`: true when the
@@ -145,6 +154,96 @@ function parsePendingRow(chunk) {
   return { requestId, subject, trackFound: !!trackMatch };
 }
 
+function compactText(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function parsedRowSignature(row) {
+  return JSON.stringify([
+    row.type,
+    compactText(row.subject),
+    compactText(row.comment),
+    row.eta || null,
+  ]);
+}
+
+// A Request ID occasionally appears more than once in Deloitte's PDF. Identical repeats are
+// harmless and collapse to one operation. Conflicting repeats (different table, ETA, comment,
+// or subject) are never guessed at: one preview row is returned with every variant attached,
+// marked for review, and blocked from /apply. This is the failure mode that previously created
+// SR 231590 twice and left the wrong duplicate's ETA visible after the correct row was deleted.
+function consolidateParsedRows(wip = [], pendingWithUser = []) {
+  const groups = new Map();
+  const tagged = [
+    ...wip.map(row => ({ ...row, type: 'wip' })),
+    ...pendingWithUser.map(row => ({ ...row, type: 'pending_with_user' })),
+  ];
+
+  for (const row of tagged) {
+    const requestId = String(row.requestId || row.request_id || '').trim();
+    if (!requestId) continue;
+    const normalized = {
+      ...row,
+      requestId,
+      sourcePage: row.sourcePage ?? row.source_page ?? null,
+    };
+    const existing = groups.get(requestId) || [];
+    existing.push(normalized);
+    groups.set(requestId, existing);
+  }
+
+  const consolidated = { wip: [], pendingWithUser: [] };
+  const duplicateIds = [];
+  const conflictingIds = [];
+  let identicalRowsCollapsed = 0;
+
+  for (const [requestId, rows] of groups) {
+    const variants = [...new Map(rows.map(row => [parsedRowSignature(row), row])).values()];
+    const sourcePages = [...new Set(rows.map(row => row.sourcePage).filter(page => page !== null))];
+    const inheritedBlock = rows.some(row =>
+      row.canApply === false || row.can_apply === false || row.duplicateConflict || row.duplicate_conflict
+    );
+    const duplicateConflict = variants.length > 1 || inheritedBlock;
+
+    if (rows.length > 1) {
+      duplicateIds.push(requestId);
+      identicalRowsCollapsed += rows.length - variants.length;
+    }
+    if (duplicateConflict) conflictingIds.push(requestId);
+
+    const first = rows[0];
+    const output = {
+      ...first,
+      requestId,
+      duplicateCount: rows.length,
+      sourcePages,
+      duplicateConflict,
+      canApply: !duplicateConflict,
+      conflictVariants: duplicateConflict
+        ? variants.map(row => ({
+          type: row.type,
+          subject: compactText(row.subject) || null,
+          comment: compactText(row.comment) || null,
+          eta: row.eta || null,
+          source_page: row.sourcePage,
+        }))
+        : [],
+    };
+
+    if (output.type === 'wip') consolidated.wip.push(output);
+    else consolidated.pendingWithUser.push(output);
+  }
+
+  return {
+    ...consolidated,
+    duplicateSummary: {
+      duplicateIds,
+      conflictingIds,
+      identicalRowsCollapsed,
+    },
+  };
+}
+
 // Returns the parsed rows AND a page-by-page account of what happened to every single page in
 // the PDF (recognized as Work in Progress / Pending with User / not relevant) — this is what
 // lets the preview show "here's every page and what we did with it" instead of asking for
@@ -173,14 +272,14 @@ async function extractRows(buffer) {
       let count = 0;
       for (const chunk of splitRows(text)) {
         const row = parseWipRow(chunk);
-        if (row) { wip.push(row); count++; }
+        if (row) { wip.push({ ...row, sourcePage: page.num }); count++; }
       }
       pageSummary.push({ page: page.num, firstLine, classification: 'Work in Progress', rowsFound: count });
     } else if (PENDING_HEADER_RE.test(firstLine)) {
       let count = 0;
       for (const chunk of splitRows(text)) {
         const row = parsePendingRow(chunk);
-        if (row) { pendingWithUser.push(row); count++; }
+        if (row) { pendingWithUser.push({ ...row, sourcePage: page.num }); count++; }
       }
       pageSummary.push({ page: page.num, firstLine, classification: 'Pending with User', rowsFound: count });
     } else {
@@ -204,7 +303,11 @@ async function matchRows(requestIds) {
     `SELECT id, sr_number, status, expected_closure_date, assigned_to, pending_with FROM srs WHERE sr_number IN (${unique.map(() => '?').join(',')}) AND category = 'SR' AND is_deleted = 0`,
     unique
   );
-  for (const row of rows) map.set(row.sr_number, row);
+  for (const row of rows) {
+    const matches = map.get(row.sr_number) || [];
+    matches.push(row);
+    map.set(row.sr_number, matches);
+  }
   return map;
 }
 
@@ -242,12 +345,19 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No PDF file uploaded' });
 
-    const { wip, pendingWithUser, pageSummary } = await extractRows(req.file.buffer);
+    const extracted = await extractRows(req.file.buffer);
+    const { wip, pendingWithUser, duplicateSummary } = consolidateParsedRows(
+      extracted.wip,
+      extracted.pendingWithUser
+    );
     const matches = await matchRows([...wip, ...pendingWithUser].map(r => r.requestId));
 
     const wipOut = [];
     for (const row of wip) {
-      const sr = matches.get(row.requestId) || null;
+      const dbMatches = matches.get(row.requestId) || [];
+      const databaseDuplicate = dbMatches.length > 1;
+      const sr = dbMatches.length === 1 ? dbMatches[0] : null;
+      const canApply = row.canApply && !databaseDuplicate;
       wipOut.push({
         type: 'wip',
         request_id: row.requestId,
@@ -262,13 +372,22 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
         current_pending_with: sr?.pending_with ?? null,
         // Track not found is always suspect (Subject/Comment split may be wrong). A row that
         // says "ETA" but couldn't be parsed into a date is equally suspect — see findLastEta.
-        needsReview: !row.trackFound || row.etaMentionedUnparsed,
+        needsReview: !row.trackFound || row.etaMentionedUnparsed || !canApply,
+        can_apply: canApply,
+        duplicate_count: row.duplicateCount,
+        duplicate_conflict: row.duplicateConflict,
+        source_pages: row.sourcePages,
+        conflict_variants: row.conflictVariants,
+        database_duplicate: databaseDuplicate,
       });
     }
 
     const pendingOut = [];
     for (const row of pendingWithUser) {
-      const sr = matches.get(row.requestId) || null;
+      const dbMatches = matches.get(row.requestId) || [];
+      const databaseDuplicate = dbMatches.length > 1;
+      const sr = dbMatches.length === 1 ? dbMatches[0] : null;
+      const canApply = row.canApply && !databaseDuplicate;
       pendingOut.push({
         type: 'pending_with_user',
         request_id: row.requestId,
@@ -280,11 +399,22 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
         // with User SRs never keep an ECD, see the clearing logic in /apply.
         current_ecd: sr?.expected_closure_date ?? null,
         current_assigned_to: sr?.assigned_to ?? null,
-        needsReview: !row.trackFound,
+        needsReview: !row.trackFound || !canApply,
+        can_apply: canApply,
+        duplicate_count: row.duplicateCount,
+        duplicate_conflict: row.duplicateConflict,
+        source_pages: row.sourcePages,
+        conflict_variants: row.conflictVariants,
+        database_duplicate: databaseDuplicate,
       });
     }
 
-    res.json({ wip: wipOut, pendingWithUser: pendingOut, pageSummary });
+    res.json({
+      wip: wipOut,
+      pendingWithUser: pendingOut,
+      pageSummary: extracted.pageSummary,
+      duplicateSummary,
+    });
   } catch (e) { next(e); }
 });
 
@@ -310,29 +440,80 @@ async function createSrFromRow(conn, requestId, subject, status, ecd, pendingWit
 router.post('/apply', async (req, res, next) => {
   const conn = await pool.getConnection();
   try {
-    const wip = Array.isArray(req.body.wip) ? req.body.wip : [];
-    const pendingWithUser = Array.isArray(req.body.pendingWithUser) ? req.body.pendingWithUser : [];
+    const submittedWip = Array.isArray(req.body.wip) ? req.body.wip : [];
+    const submittedPending = Array.isArray(req.body.pendingWithUser) ? req.body.pendingWithUser : [];
+    // Never trust the preview's matched/sr_id/current_* snapshot. It can be stale, duplicated,
+    // or tampered with by the time Apply is clicked. Consolidate the request IDs again and
+    // resolve every current row inside this transaction.
+    const { wip, pendingWithUser } = consolidateParsedRows(submittedWip, submittedPending);
+    if ([...wip, ...pendingWithUser].some(row => !/^\d{6}$/.test(row.requestId))) {
+      const error = new Error('The PDF preview contains an invalid SR number. Upload and review the PDF again.');
+      error.status = 400;
+      throw error;
+    }
+    if (wip.some(row => row.eta && !isIsoDate(row.eta))) {
+      const error = new Error('The PDF preview contains an invalid Expected Closure Date. Upload and review the PDF again.');
+      error.status = 400;
+      throw error;
+    }
 
-    let commentsAdded = 0, ecdUpdated = 0, ecdCleared = 0, statusUpdated = 0, skippedClosed = 0, srsCreated = 0, assignedToUpdated = 0, pendingWithUpdated = 0;
+    let commentsAdded = 0, ecdUpdated = 0, ecdCleared = 0, statusUpdated = 0,
+      skippedClosed = 0, skippedConflicts = 0, srsCreated = 0,
+      assignedToUpdated = 0, pendingWithUpdated = 0;
 
     // Same transactional pattern csv-import.js already uses for its bulk writes — a PDF can
     // touch 40-80 SRs in one go, so a failure partway through (e.g. a bad row) should roll
     // back everything rather than leave the import half-applied.
     await conn.beginTransaction();
 
-    for (const row of wip) {
-      let srId = row.sr_id;
-      let currentEcd = row.current_ecd;
+    const requestIds = [...new Set([...wip, ...pendingWithUser]
+      .map(row => row.requestId)
+      .filter(Boolean))];
+    const activeByNumber = new Map();
+    if (requestIds.length) {
+      const [currentRows] = await conn.query(
+        `SELECT id, sr_number, status, expected_closure_date, assigned_to, pending_with
+         FROM srs
+         WHERE category = 'SR' AND is_deleted = 0
+           AND sr_number IN (${requestIds.map(() => '?').join(',')})
+         FOR UPDATE`,
+        requestIds
+      );
+      for (const current of currentRows) {
+        if (activeByNumber.has(current.sr_number)) {
+          const error = new Error(`SR ${current.sr_number} exists more than once. Resolve the duplicate before importing.`);
+          error.status = 409;
+          throw error;
+        }
+        activeByNumber.set(current.sr_number, current);
+      }
+    }
 
-      if (!row.matched) {
+    for (const row of wip) {
+      if (!row.canApply) { skippedConflicts++; continue; }
+      const requestId = row.requestId;
+      let current = activeByNumber.get(requestId) || null;
+      const wasExisting = !!current;
+      let srId = current?.id;
+      const currentEcd = current?.expected_closure_date ?? null;
+
+      if (!current) {
         // Work in Progress means Deloitte is actively on it — that's a status, not a guess.
         // Pending With is set to Deloitte at creation too, for the same reason.
-        srId = await createSrFromRow(conn, row.request_id, row.subject, 'In Progress', row.eta, 'Deloitte', req.user.id);
-        currentEcd = null;
+        srId = await createSrFromRow(conn, requestId, row.subject, 'In Progress', row.eta, 'Deloitte', req.user.id);
+        current = {
+          id: srId,
+          sr_number: requestId,
+          status: 'In Progress',
+          expected_closure_date: row.eta || null,
+          assigned_to: 'Deloitte',
+          pending_with: 'Deloitte',
+        };
+        activeByNumber.set(requestId, current);
         srsCreated++;
       } else {
-        if (await ensureAssignedToDeloitte(conn, srId, row.current_assigned_to, req.user.id)) assignedToUpdated++;
-        if (await ensurePendingWithDeloitte(conn, srId, row.current_pending_with, req.user.id)) pendingWithUpdated++;
+        if (await ensureAssignedToDeloitte(conn, srId, current.assigned_to, req.user.id)) assignedToUpdated++;
+        if (await ensurePendingWithDeloitte(conn, srId, current.pending_with, req.user.id)) pendingWithUpdated++;
       }
 
       if (row.comment) {
@@ -345,7 +526,7 @@ router.post('/apply', async (req, res, next) => {
 
       // For a brand-new SR the ECD was already set at creation (no prior value to diff
       // against, so no history row) — only log a change when updating an existing one.
-      if (row.matched && row.eta && row.eta !== currentEcd) {
+      if (wasExisting && row.eta && row.eta !== currentEcd) {
         await conn.execute('UPDATE srs SET expected_closure_date = ?, updated_by = ? WHERE id = ?', [row.eta, req.user.id, srId]);
         await conn.execute(
           'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by) VALUES (?, ?, ?, ?, ?)',
@@ -356,38 +537,50 @@ router.post('/apply', async (req, res, next) => {
     }
 
     for (const row of pendingWithUser) {
-      if (!row.matched) {
+      if (!row.canApply) { skippedConflicts++; continue; }
+      const requestId = row.requestId;
+      const current = activeByNumber.get(requestId) || null;
+
+      if (!current) {
         // Pending With is left blank here (not "Deloitte") — this row is waiting on the RDC
         // user to respond, not on Deloitte, same reasoning as ensurePendingWithDeloitte above.
         // ECD is always null at creation — an SR waiting on the RDC user has no Deloitte-quoted
         // closure date, so there's nothing to set (and nothing to log a history row against).
-        await createSrFromRow(conn, row.request_id, row.subject, 'Pending with User', null, null, req.user.id);
+        const srId = await createSrFromRow(conn, requestId, row.subject, 'Pending with User', null, null, req.user.id);
+        activeByNumber.set(requestId, {
+          id: srId,
+          sr_number: requestId,
+          status: 'Pending with User',
+          expected_closure_date: null,
+          assigned_to: 'Deloitte',
+          pending_with: null,
+        });
         srsCreated++;
         continue;
       }
 
-      if (await ensureAssignedToDeloitte(conn, row.sr_id, row.current_assigned_to, req.user.id)) assignedToUpdated++;
+      if (await ensureAssignedToDeloitte(conn, current.id, current.assigned_to, req.user.id)) assignedToUpdated++;
 
       // Pending with User means the ball is in the RDC user's court — Deloitte isn't working
       // toward a date for it, so any ECD the SR is still carrying (e.g. quoted during an
       // earlier Work in Progress week) is stale and gets cleared, with a normal history entry
       // recording what it changed from so the trail isn't lost.
-      if (row.current_ecd !== null) {
-        await conn.execute('UPDATE srs SET expected_closure_date = NULL, updated_by = ? WHERE id = ?', [req.user.id, row.sr_id]);
+      if (current.expected_closure_date !== null) {
+        await conn.execute('UPDATE srs SET expected_closure_date = NULL, updated_by = ? WHERE id = ?', [req.user.id, current.id]);
         await conn.execute(
           'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by) VALUES (?, ?, ?, ?, ?)',
-          [row.sr_id, 'expected_closure_date', row.current_ecd, null, req.user.id]
+          [current.id, 'expected_closure_date', current.expected_closure_date, null, req.user.id]
         );
         ecdCleared++;
       }
 
-      if (row.current_status === 'Closed') { skippedClosed++; continue; }
-      if (row.current_status === 'Pending with User') continue;
+      if (current.status === 'Closed') { skippedClosed++; continue; }
+      if (current.status === 'Pending with User') continue;
 
-      await conn.execute('UPDATE srs SET status = ?, updated_by = ? WHERE id = ?', ['Pending with User', req.user.id, row.sr_id]);
+      await conn.execute('UPDATE srs SET status = ?, updated_by = ? WHERE id = ?', ['Pending with User', req.user.id, current.id]);
       await conn.execute(
         'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by) VALUES (?, ?, ?, ?, ?)',
-        [row.sr_id, 'status', row.current_status, 'Pending with User', req.user.id]
+        [current.id, 'status', current.status, 'Pending with User', req.user.id]
       );
       statusUpdated++;
     }
@@ -396,7 +589,7 @@ router.post('/apply', async (req, res, next) => {
     res.json({
       comments_added: commentsAdded, ecd_updated: ecdUpdated, ecd_cleared: ecdCleared, status_updated: statusUpdated,
       skipped_closed: skippedClosed, srs_created: srsCreated, assigned_to_updated: assignedToUpdated,
-      pending_with_updated: pendingWithUpdated,
+      pending_with_updated: pendingWithUpdated, skipped_conflicts: skippedConflicts,
     });
   } catch (e) {
     await conn.rollback();
@@ -407,3 +600,11 @@ router.post('/apply', async (req, res, next) => {
 });
 
 module.exports = router;
+module.exports._test = {
+  consolidateParsedRows,
+  findLastEta,
+  isIsoDate,
+  parseEtaDate,
+  parsePendingRow,
+  parseWipRow,
+};

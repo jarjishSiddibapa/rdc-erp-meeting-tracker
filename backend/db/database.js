@@ -77,6 +77,9 @@ async function createTables() {
       created_by INT NULL,
       updated_by INT NULL,
       is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+      active_sr_identity VARCHAR(130) GENERATED ALWAYS AS (
+        CASE WHEN is_deleted = 0 THEN CONCAT(category, ':', TRIM(sr_number)) ELSE NULL END
+      ) STORED,
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -86,7 +89,8 @@ async function createTables() {
       INDEX idx_srs_status (status),
       INDEX idx_srs_pending_with (pending_with),
       INDEX idx_srs_assigned_to (assigned_to),
-      INDEX idx_srs_list (category, is_deleted, status)
+      INDEX idx_srs_list (category, is_deleted, status),
+      UNIQUE INDEX uq_srs_active_identity (active_sr_identity)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
 
@@ -226,6 +230,111 @@ async function migrateSRsTable() {
   }
 }
 
+// An SR number is one business record. Older versions only performed a read-before-insert
+// check, which could be bypassed by duplicate rows inside one import or by concurrent writes.
+// Consolidate any legacy active duplicates first, then let MySQL enforce the invariant. Deleted
+// rows deliberately produce NULL so historical/soft-deleted copies do not block the one active
+// record from being restored or recreated.
+async function migrateUniqueActiveSrNumbers() {
+  const [duplicateGroups] = await pool.query(`
+    SELECT category, MIN(sr_number) AS sr_number
+    FROM srs
+    WHERE is_deleted = 0
+    GROUP BY category, TRIM(sr_number)
+    HAVING COUNT(*) > 1
+  `);
+
+  const fillWhenMissing = [
+    'scope', 'status', 'pending_with', 'assigned_to', 'closed_date', 'description', 'type',
+    'creation_date', 'created_by_name', 'expected_closure_date', 'manageengine_status',
+    'manageengine_pending_party', 'manageengine_created_at', 'manageengine_closed_at',
+    'manageengine_last_synced_at', 'project_name', 'process_owner', 'target_date',
+    'created_by', 'updated_by',
+  ];
+
+  for (const group of duplicateGroups) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [records] = await conn.execute(
+        `SELECT * FROM srs
+         WHERE category = ? AND TRIM(sr_number) = TRIM(?) AND is_deleted = 0
+         ORDER BY id ASC FOR UPDATE`,
+        [group.category, group.sr_number]
+      );
+      if (records.length < 2) {
+        await conn.commit();
+        continue;
+      }
+
+      // Keep the first/original record as the identity. Only fill blank fields from later copies;
+      // never overwrite established data based on an arbitrary duplicate.
+      const canonical = records[0];
+      const duplicates = records.slice(1);
+      const mergedValues = {};
+      for (const field of fillWhenMissing) {
+        if (canonical[field] !== null && canonical[field] !== '') continue;
+        const source = duplicates.find(record => record[field] !== null && record[field] !== '');
+        if (source) mergedValues[field] = source[field];
+      }
+      const mergedEntries = Object.entries(mergedValues);
+      if (mergedEntries.length) {
+        await conn.execute(
+          `UPDATE srs SET ${mergedEntries.map(([field]) => `${field} = ?`).join(', ')} WHERE id = ?`,
+          [...mergedEntries.map(([, value]) => value), canonical.id]
+        );
+      }
+
+      const duplicateIds = duplicates.map(record => record.id);
+      const placeholders = duplicateIds.map(() => '?').join(',');
+      await conn.query(`UPDATE sr_comments SET sr_id = ? WHERE sr_id IN (${placeholders})`, [canonical.id, ...duplicateIds]);
+      await conn.query(`UPDATE sr_history SET sr_id = ? WHERE sr_id IN (${placeholders})`, [canonical.id, ...duplicateIds]);
+      await conn.query(`UPDATE srs SET is_deleted = 1 WHERE id IN (${placeholders})`, duplicateIds);
+      for (const duplicateId of duplicateIds) {
+        await conn.execute(
+          `INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by)
+           VALUES (?, 'duplicate_record_merged', ?, ?, NULL)`,
+          [canonical.id, String(duplicateId), String(canonical.id)]
+        );
+      }
+      await conn.commit();
+      console.warn(
+        `Migrated: merged ${duplicates.length} duplicate active ${group.category} record(s) for ${group.sr_number} into id ${canonical.id}.`
+      );
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
+  }
+
+  const [columns] = await pool.query(
+    `SELECT COLUMN_NAME FROM information_schema.columns
+     WHERE table_schema = ? AND table_name = 'srs' AND COLUMN_NAME = 'active_sr_identity'`,
+    [DB_NAME]
+  );
+  if (columns.length === 0) {
+    await pool.query(`
+      ALTER TABLE srs ADD COLUMN active_sr_identity VARCHAR(130)
+      GENERATED ALWAYS AS (
+        CASE WHEN is_deleted = 0 THEN CONCAT(category, ':', TRIM(sr_number)) ELSE NULL END
+      ) STORED AFTER is_deleted
+    `);
+    console.log('Migrated: added the active SR identity guard.');
+  }
+
+  const [indexes] = await pool.query(
+    `SELECT INDEX_NAME FROM information_schema.statistics
+     WHERE table_schema = ? AND table_name = 'srs' AND INDEX_NAME = 'uq_srs_active_identity'`,
+    [DB_NAME]
+  );
+  if (indexes.length === 0) {
+    await pool.query('ALTER TABLE srs ADD UNIQUE INDEX uq_srs_active_identity (active_sr_identity)');
+    console.log('Migrated: active SR numbers are now database-enforced unique.');
+  }
+}
+
 async function migrateManageEngineSyncRuns() {
   const [cols] = await pool.query(
     `SELECT COLUMN_NAME FROM information_schema.columns
@@ -278,6 +387,7 @@ async function initDb() {
   await migrateUsersTable();
   await migrateUsersCanEditDigitization();
   await migrateSRsTable();
+  await migrateUniqueActiveSrNumbers();
   await migrateManageEngineSyncRuns();
   await seedDefaults();
 }

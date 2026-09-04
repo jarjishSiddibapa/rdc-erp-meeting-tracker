@@ -112,7 +112,7 @@ router.post('/execute', async (req, res, next) => {
             ? (normalizeDate(row.closed_date) || new Date().toISOString().split('T')[0])
             : normalizeDate(row.closed_date);
 
-          await conn.execute(`
+          const [insertResult] = await conn.execute(`
             INSERT INTO srs (
               sr_number, category, scope, status, pending_with, assigned_to,
               description, type, creation_date, created_by_name, expected_closure_date,
@@ -134,6 +134,10 @@ router.post('/execute', async (req, res, next) => {
             closedDate,
             req.user.id, req.user.id
           ]);
+          // A later row in the same workbook with this SR number must update this record,
+          // never perform a second INSERT from the lookup snapshot taken before the loop.
+          const [insertedRows] = await conn.execute('SELECT * FROM srs WHERE id = ?', [insertResult.insertId]);
+          existingBySrNumber.set(srNum, insertedRows[0]);
           imported++;
           continue;
         }

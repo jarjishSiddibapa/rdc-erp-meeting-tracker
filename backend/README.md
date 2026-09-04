@@ -19,5 +19,8 @@ and the [API reference](../docs/API_REFERENCE.md). Production operations are doc
 [PRODUCTION.md](../PRODUCTION.md).
 
 The focused Node test suite covers deterministic ManageEngine normalization, pending-side
-logic, field mapping, and the update-only tracked-SR boundary. User-visible or database changes still
-receive production-style verification against the built application with disposable data.
+logic, field mapping, the update-only tracked-SR boundary, Deloitte ETA parsing, and duplicate
+PDF-row conflict handling. MySQL enforces one active record for each category/SR-number pair;
+startup migrations safely consolidate legacy active duplicates before adding that guard.
+User-visible or database changes still receive production-style verification against the built
+application with disposable data.

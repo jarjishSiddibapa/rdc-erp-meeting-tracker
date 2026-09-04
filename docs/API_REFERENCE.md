@@ -77,8 +77,8 @@ The response is:
 | Method | Endpoint | Access | Purpose |
 | --- | --- | --- | --- |
 | `POST` | `/api/csv-import/execute` | Admin or editor | Transactional SR/Digitization bulk create/update |
-| `POST` | `/api/deloitte-import/parse` | Admin | Read-only PDF parse and match preview |
-| `POST` | `/api/deloitte-import/apply` | Admin | Apply reviewed Deloitte rows transactionally |
+| `POST` | `/api/deloitte-import/parse` | Admin | Read-only PDF preview with page coverage and duplicate-conflict metadata |
+| `POST` | `/api/deloitte-import/apply` | Admin | Re-resolve current SRs, skip conflicts, and apply safe rows transactionally |
 | `GET` | `/api/manageengine-import/sync-status` | Admin | Configuration and latest run state |
 | `POST` | `/api/manageengine-import/sync-now` | Admin | Start the guarded API synchronization |
 | `POST` | `/api/manageengine-import/parse` | Admin | Parse ManageEngine CSV fallback |

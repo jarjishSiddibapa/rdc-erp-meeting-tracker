@@ -1,50 +1,50 @@
-# Graph Report - anesh-sir-erp-meeting-tracker-application  (2026-09-03)
+# Graph Report - anesh-sir-erp-meeting-tracker-application  (2026-09-04)
 
 ## Corpus Check
-- 75 files · ~92,002 words
+- 76 files · ~93,930 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 679 nodes · 1053 edges · 46 communities (45 shown, 1 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 40 edges (avg confidence: 0.53)
+- 687 nodes · 1070 edges · 46 communities (45 shown, 1 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 46 edges (avg confidence: 0.53)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `667e0036`
+- Built from commit: `023e0a0b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - SRPage.jsx
 - server.js
-- App.jsx
+- users.js
 - dependencies
 - migrate-sqlite-to-mysql.js
 - SRForm.jsx
 - dependencies
 - deloitte-import.js
-- services/backup.js
+- routes/backup.js
 - frontend/package.json
 - GreenMonster.jsx
-- users.js
+- routes/auth.js
 - manageengine-import.js
 - api.js
 - UpdateTasks.jsx
 - srs.js
 - SRDetail.jsx
-- middleware/auth.js
-- pool.js
 - csv-import.js
+- stats.js
+- UserManagement.jsx
 - .oxlintrc.json
 - Feature reference
 - Development guide
-- Reports.jsx
+- DashboardHome.jsx
 - DEVELOPMENT.md
 - Q: Use https://github.com/Leonxlnx/taste-skill to improve the UI of our web application, keep it smooth and lightweight.
 - Q: Make the most of the taste skill and overhaul the web application so it works and looks as amazing as possible.
 - Q: Use company color #00B51A and the taste skill to improve fonts, colors, sizes, smoothness, and overall UI quality.
 - README.md
-- DashboardHome.jsx
+- Dashboard.jsx
 - react
 - pull_request_template.md
 - manageengine-sync.js
@@ -52,7 +52,7 @@
 - Architecture
 - User guide
 - Contributing
-- routes/backup.js
+- pool.js
 - Security policy
 - PRODUCTION.md
 - API reference
@@ -65,9 +65,9 @@
 1. `react` - 20 edges
 2. `useAuth()` - 18 edges
 3. `pool` - 14 edges
-4. `main()` - 11 edges
-5. `Feature reference` - 11 edges
-6. `initDb()` - 10 edges
+4. `initDb()` - 11 edges
+5. `main()` - 11 edges
+6. `Feature reference` - 11 edges
 7. `authenticate()` - 10 edges
 8. `paginationConfig()` - 9 edges
 9. `API reference` - 9 edges
@@ -80,10 +80,10 @@
   backend/server.js → backend/db/database.js
 - `extractRows()` --references--> `pdf-parse`  [EXTRACTED]
   backend/routes/deloitte-import.js → backend/package.json
+- `provisionUser()` --calls--> `createResetToken()`  [EXTRACTED]
+  backend/routes/users.js → backend/utils/resetToken.js
 - `start()` --calls--> `initScheduler()`  [EXTRACTED]
   backend/server.js → backend/services/backup.js
-- `start()` --calls--> `verifyMailer()`  [EXTRACTED]
-  backend/server.js → backend/services/mailer.js
 
 ## Import Cycles
 - None detected.
@@ -98,17 +98,17 @@ Nodes (14): ClosureDateCell(), fmt(), fmtDT(), ResizableTitle(), buildColumns(),
 Cohesion: 0.06
 Nodes (40): ALLOWED_ORIGIN_PATTERNS, ALLOWED_ORIGINS, app, authLimiter, authRoutes, backupRoutes, compression, cors (+32 more)
 
-### Community 2 - "App.jsx"
-Cohesion: 0.18
-Nodes (10): App(), Dashboard, ForgotPassword, Login, ResetPassword, GlobalLoadingIndicator(), LOADING_MESSAGE, LoadingNotice() (+2 more)
+### Community 2 - "users.js"
+Cohesion: 0.15
+Nodes (14): { authenticate, requireRole }, bcrypt, { createResetToken }, express, { generateRandomPassword }, { pool }, provisionUser(), { RDC_EMAIL_REGEX } (+6 more)
 
 ### Community 3 - "dependencies"
 Cohesion: 0.04
 Nodes (47): author, dependencies, bcryptjs, better-sqlite3, compression, cors, csv-parse, dotenv (+39 more)
 
 ### Community 4 - "migrate-sqlite-to-mysql.js"
-Cohesion: 0.14
-Nodes (30): assertDefaultAdminConfigured(), bcrypt, createTables(), DEFAULT_ADMIN, ensureDatabaseExists(), initDb(), migrateManageEngineSyncRuns(), migrateSRsTable() (+22 more)
+Cohesion: 0.13
+Nodes (31): assertDefaultAdminConfigured(), bcrypt, createTables(), DEFAULT_ADMIN, ensureDatabaseExists(), initDb(), migrateManageEngineSyncRuns(), migrateSRsTable() (+23 more)
 
 ### Community 5 - "SRForm.jsx"
 Cohesion: 0.28
@@ -119,12 +119,12 @@ Cohesion: 0.07
 Nodes (26): @ant-design/icons, antd, dayjs, dependencies, @ant-design/icons, antd, dayjs, react (+18 more)
 
 ### Community 7 - "deloitte-import.js"
-Cohesion: 0.12
-Nodes (21): { authenticate, requireRole }, DELOITTE_FIELDS, ensureAssignedToDeloitte(), ensureFieldValue(), ensurePendingWithDeloitte(), ETA_RE, express, extractRows() (+13 more)
+Cohesion: 0.10
+Nodes (27): { authenticate, requireRole }, compactText(), consolidateParsedRows(), DELOITTE_FIELDS, ensureAssignedToDeloitte(), ensureFieldValue(), ensurePendingWithDeloitte(), ETA_RE (+19 more)
 
-### Community 8 - "services/backup.js"
-Cohesion: 0.22
-Nodes (12): BACKUP_DIR, cron, fs, getSettings(), initScheduler(), path, { pool, DB_NAME }, resolveMysqldump() (+4 more)
+### Community 8 - "routes/backup.js"
+Cohesion: 0.13
+Nodes (19): { authenticate, requireRole }, express, fs, path, { pool }, router, { runBackup, getSettings, rescheduleBackups, BACKUP_DIR }, BACKUP_DIR (+11 more)
 
 ### Community 9 - "frontend/package.json"
 Cohesion: 0.10
@@ -134,9 +134,9 @@ Nodes (20): devDependencies, oxlint, @types/react, @types/react-dom, vite, @vite
 Cohesion: 0.27
 Nodes (10): ANCHOR, anchorToPage(), angleBetween(), caretRelativeX(), computeFaceMove(), getMirror(), GreenMonster(), MIRROR_PROPS (+2 more)
 
-### Community 11 - "users.js"
-Cohesion: 0.07
-Nodes (32): { authenticate }, bcrypt, crypto, { EMAIL_REGEX }, express, { hashToken, createResetToken }, jwt, { pool } (+24 more)
+### Community 11 - "routes/auth.js"
+Cohesion: 0.12
+Nodes (14): { authenticate }, bcrypt, crypto, { EMAIL_REGEX }, express, { hashToken, createResetToken }, jwt, { pool } (+6 more)
 
 ### Community 12 - "manageengine-import.js"
 Cohesion: 0.16
@@ -144,31 +144,31 @@ Nodes (13): { authenticate, requireRole }, CLOSED_STATUSES, crossReference(), ex
 
 ### Community 13 - "api.js"
 Cohesion: 0.18
-Nodes (14): api, authAPI, clearReadCache(), executeRequest(), get(), httpError(), inFlightGets, loadingSubscribers (+6 more)
+Nodes (18): GlobalLoadingIndicator(), LOADING_MESSAGE, LoadingNotice(), api, clearReadCache(), executeRequest(), get(), getApiLoadingSnapshot() (+10 more)
 
 ### Community 14 - "UpdateTasks.jsx"
-Cohesion: 0.11
-Nodes (15): CLASSIFICATION_COLOR, fmtEta(), SHEET_NAMES, TASK_FIELDS, UpdateFromManageEngine(), UploadDeloittePdf(), BULK_USER_FIELDS, BulkAddUsersModal() (+7 more)
+Cohesion: 0.15
+Nodes (7): CLASSIFICATION_COLOR, fmtEta(), SHEET_NAMES, TASK_FIELDS, UploadDeloittePdf(), csvImportAPI, deloitteImportAPI
 
 ### Community 15 - "srs.js"
 Cohesion: 0.15
 Nodes (10): addInFilter(), addPendingWithFilter(), { authenticate, requireRole }, DISTINCT_FIELDS, express, { pool }, router, SORTABLE_FIELDS (+2 more)
 
 ### Community 16 - "SRDetail.jsx"
-Cohesion: 0.21
-Nodes (9): ALL_STATUSES, BASE_STATUSES, fmt(), fmtDT(), SCOPE_COLORS, SR_TYPES, SRDetail(), STATUS_COLORS (+1 more)
+Cohesion: 0.13
+Nodes (16): CommentCell(), fmtDT(), ALL_STATUSES, BASE_STATUSES, fmt(), fmtDT(), SCOPE_COLORS, SR_TYPES (+8 more)
 
-### Community 17 - "middleware/auth.js"
-Cohesion: 0.25
-Nodes (7): authenticate(), jwt, requireRole(), { authenticate }, express, { pool }, router
+### Community 17 - "csv-import.js"
+Cohesion: 0.13
+Nodes (12): authenticate(), jwt, requireRole(), { authenticate, requireRole }, express, { pool }, router, VALID_STATUSES (+4 more)
 
-### Community 18 - "pool.js"
-Cohesion: 0.18
-Nodes (8): CONNECTION_LIMIT, MAX_IDLE, mysql, pool, { authenticate }, express, { pool }, router
+### Community 18 - "stats.js"
+Cohesion: 0.29
+Nodes (4): { authenticate }, express, { pool }, router
 
-### Community 19 - "csv-import.js"
-Cohesion: 0.22
-Nodes (5): { authenticate, requireRole }, express, { pool }, router, VALID_STATUSES
+### Community 19 - "UserManagement.jsx"
+Cohesion: 0.20
+Nodes (12): BackupSettings(), formatBytes(), STATUS_TAG, UpdateFromManageEngine(), BULK_USER_FIELDS, BulkAddUsersModal(), ROLE_COLORS, UserManagement() (+4 more)
 
 ### Community 20 - ".oxlintrc.json"
 Cohesion: 0.25
@@ -182,9 +182,9 @@ Nodes (14): Backup and production operations, Dashboard and operational visibili
 Cohesion: 0.18
 Nodes (11): Database and migrations, Development guide, Development workflows, Documentation and screenshots, Frontend conventions, Hot reload, Prerequisites, Production-style single port (+3 more)
 
-### Community 24 - "Reports.jsx"
-Cohesion: 0.24
-Nodes (8): CommentCell(), fmtDT(), Reveal(), AssignedToEcdReport(), fmt(), STATUS_COLORS, reportsAPI, srAPI
+### Community 24 - "DashboardHome.jsx"
+Cohesion: 0.16
+Nodes (7): AnimatedCounter(), Reveal(), RevealGroup(), TiltCard(), MONTHS, PALETTE, statsAPI
 
 ### Community 26 - "Q: Use https://github.com/Leonxlnx/taste-skill to improve the UI of our web application, keep it smooth and lightweight."
 Cohesion: 0.40
@@ -202,13 +202,13 @@ Nodes (4): Answer, Outcome, Q: Use company color #00B51A and the taste skill to 
 Cohesion: 0.14
 Nodes (13): Architecture, Configuration, Documentation, Integration flow, License and data boundary, Local production-style run, Product capabilities, Quality gates (+5 more)
 
-### Community 30 - "DashboardHome.jsx"
-Cohesion: 0.08
-Nodes (20): AnimatedCounter(), RevealGroup(), TiltCard(), ALL_KEYS, BackupSettings, ChangePassword, Dashboard(), MENU_ITEMS (+12 more)
+### Community 30 - "Dashboard.jsx"
+Cohesion: 0.15
+Nodes (14): ALL_KEYS, BackupSettings, ChangePassword, Dashboard(), MENU_ITEMS, PAGE_LOADERS, preloadPage(), Reports (+6 more)
 
 ### Community 31 - "react"
-Cohesion: 0.19
-Nodes (13): ProtectedRoute(), PublicRoute(), BrandButton(), AuthContext, AuthProvider(), useAuth(), BackupSettings(), formatBytes() (+5 more)
+Cohesion: 0.13
+Nodes (15): App(), Dashboard, ForgotPassword, Login, ProtectedRoute(), PublicRoute(), ResetPassword, BrandButton() (+7 more)
 
 ### Community 32 - "pull_request_template.md"
 Cohesion: 0.50
@@ -234,9 +234,9 @@ Nodes (8): Dashboard, Loading and refresh behavior, Recommended daily workflow, 
 Cohesion: 0.40
 Nodes (4): Commit guidance, Contributing, Required checks, Workflow
 
-### Community 38 - "routes/backup.js"
-Cohesion: 0.25
-Nodes (7): { authenticate, requireRole }, express, fs, path, { pool }, router, { runBackup, getSettings, rescheduleBackups, BACKUP_DIR }
+### Community 38 - "pool.js"
+Cohesion: 0.24
+Nodes (8): CONNECTION_LIMIT, MAX_IDLE, mysql, pool, createResetToken(), crypto, hashToken(), { pool }
 
 ### Community 39 - "Security policy"
 Cohesion: 0.33
@@ -267,7 +267,7 @@ Cohesion: 0.67
 Nodes (3): Client structure, Commands, Frontend
 
 ## Knowledge Gaps
-- **338 isolated node(s):** `mysql`, `bcrypt`, `{ pool, DB_NAME }`, `mysql`, `CONNECTION_LIMIT` (+333 more)
+- **340 isolated node(s):** `mysql`, `bcrypt`, `{ pool, DB_NAME }`, `mysql`, `CONNECTION_LIMIT` (+335 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -279,12 +279,12 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `pdf-parse` connect `dependencies` to `deloitte-import.js`?**
   _High betweenness centrality (0.054) - this node is a cross-community bridge._
 - **What connects `mysql`, `bcrypt`, `{ pool, DB_NAME }` to the rest of the system?**
-  _338 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _340 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `server.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0627177700348432 - nodes in this community are weakly interconnected._
 - **Should `dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.041666666666666664 - nodes in this community are weakly interconnected._
 - **Should `migrate-sqlite-to-mysql.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.1350806451612903 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13068181818181818 - nodes in this community are weakly interconnected._
 - **Should `dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.07126436781609195 - nodes in this community are weakly interconnected._

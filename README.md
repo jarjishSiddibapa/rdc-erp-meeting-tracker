@@ -44,7 +44,7 @@ Cloud, Excel-based bulk operations, role administration, and recoverable MySQL b
 | ManageEngine automation | OAuth-based sync every 30 minutes, manual sync, guarded field mapping, and an update-only boundary for locally tracked SRs |
 | Auditability | Field-level history, appended comments, soft deletion, diff-only updates, and transparent import previews |
 | Controlled bulk updates | Download/edit/upload Excel round trip with separate SR and Digitization sheets and transactional writes |
-| Deloitte workflow | Review-first weekly PDF parsing with page classification, match status, and per-row review flags |
+| Deloitte workflow | Review-first weekly PDF parsing with deterministic ETA handling, duplicate/conflict detection, and per-row review flags |
 | Delivery reporting | Assigned-to-Deloitte report showing the full Expected Closure Date revision sequence |
 | Administration | Admin/editor/viewer roles, optional Digitization edit permission, bulk user creation, password lifecycle, and scheduled backups |
 
@@ -136,6 +136,9 @@ runtime, data-model, authorization, and endpoint details.
 - Records and users use soft deletion, including protection against recreating intentionally
   deleted ManageEngine requests.
 - Overdue logic is category-aware: SR Expected Closure Date versus Digitization Target Date.
+- One active record per category/SR number is enforced by MySQL, not only by UI checks.
+- Repeated Deloitte rows are consolidated; conflicting dates/details are blocked for review
+  instead of creating duplicates or choosing an arbitrary value.
 
 ### Performance on a shared server
 

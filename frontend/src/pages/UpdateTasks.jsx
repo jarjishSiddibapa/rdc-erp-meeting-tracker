@@ -209,7 +209,8 @@ function UpdateTaskData() {
 // database until Apply is clicked.
 function fmtEta(v) { return v ? dayjs(v).format('DD-MMM-YYYY') : '-'; }
 
-function MatchTag({ matched }) {
+function MatchTag({ matched, canApply = true }) {
+  if (!canApply) return <Tag color="red">Conflict - skipped</Tag>;
   return matched ? <Tag color="green">Found</Tag> : <Tag color="gold">Will create new SR</Tag>;
 }
 
@@ -290,11 +291,16 @@ function UploadDeloittePdf() {
   const pendingMatched = parsed?.pendingWithUser.filter(r => r.matched).length ?? 0;
   const totalMatched = wipMatched + pendingMatched;
   const totalRows = (parsed?.wip.length ?? 0) + (parsed?.pendingWithUser.length ?? 0);
-  const needsReviewCount = (parsed?.wip.filter(r => r.needsReview).length ?? 0) + (parsed?.pendingWithUser.filter(r => r.needsReview).length ?? 0);
+  const needsReviewCount = (parsed?.wip.filter(r => r.needsReview && r.can_apply).length ?? 0)
+    + (parsed?.pendingWithUser.filter(r => r.needsReview && r.can_apply).length ?? 0);
+  const conflictRows = parsed ? [...parsed.wip, ...parsed.pendingWithUser].filter(r => !r.can_apply) : [];
+  const applicableRows = totalRows - conflictRows.length;
 
   const reviewColumn = {
     title: 'Review', dataIndex: 'needsReview', width: 110,
-    render: v => v ? <Tag color="red">Check manually</Tag> : <Tag color="green">OK</Tag>,
+    render: (v, row) => !row.can_apply
+      ? <Tag color="red">Blocked</Tag>
+      : v ? <Tag color="orange">Check manually</Tag> : <Tag color="green">OK</Tag>,
   };
 
   const wipColumns = [
@@ -302,7 +308,7 @@ function UploadDeloittePdf() {
     { title: 'Subject', dataIndex: 'subject', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
     { title: 'Comment', dataIndex: 'comment', render: v => v || <Text type="secondary">-</Text> },
     { title: 'New Expected Closure', dataIndex: 'eta', width: 150, render: fmtEta },
-    { title: 'Match', dataIndex: 'matched', width: 150, render: v => <MatchTag matched={v} /> },
+    { title: 'Match', dataIndex: 'matched', width: 150, render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} /> },
     reviewColumn,
   ];
 
@@ -316,7 +322,7 @@ function UploadDeloittePdf() {
         ? <Space size={4}><Text delete type="secondary">{fmtEta(v)}</Text><Text type="secondary">→ will be cleared</Text></Space>
         : <Text type="secondary">- (already empty)</Text>,
     },
-    { title: 'Match', dataIndex: 'matched', width: 150, render: v => <MatchTag matched={v} /> },
+    { title: 'Match', dataIndex: 'matched', width: 150, render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} /> },
     reviewColumn,
   ];
 
@@ -334,8 +340,10 @@ function UploadDeloittePdf() {
         user, so a stale ECD from an earlier week is removed (with full history, same as any
         other change). A Request ID that doesn't match any existing SR gets created from scratch
         (Subject as the description, Internal/External fixed to External) - nothing is left out
-        just because it's new. Nothing is written to the database until you review the preview
-        below and click Apply.
+        just because it's new. Repeated identical rows are collapsed. If the same SR appears with
+        conflicting dates or details, it is visibly blocked and skipped instead of guessing which
+        value is correct. Nothing is written to the database until you review the preview below
+        and click Apply.
       </Paragraph>
 
       {error && <Alert type="error" showIcon message={error} style={{ marginBottom: 16 }} />}
@@ -357,10 +365,12 @@ function UploadDeloittePdf() {
       {parsed && !result && (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Alert
-            type={totalMatched === totalRows ? 'success' : 'info'}
+            type={conflictRows.length > 0 ? 'warning' : totalMatched === totalRows ? 'success' : 'info'}
             showIcon
             message={
-              totalMatched === totalRows
+              conflictRows.length > 0
+                ? `${applicableRows} safe row${applicableRows === 1 ? '' : 's'} ready; ${conflictRows.length} conflicting SR${conflictRows.length === 1 ? '' : 's'} blocked`
+                : totalMatched === totalRows
                 ? `All ${totalRows} rows matched an existing SR`
                 : `${totalMatched} of ${totalRows} rows matched an existing SR - the other ${totalRows - totalMatched} will be created as new SRs`
             }
@@ -372,6 +382,25 @@ function UploadDeloittePdf() {
               showIcon
               message={`${needsReviewCount} row${needsReviewCount === 1 ? '' : 's'} need a manual look - marked "Check manually" below`}
               description="Either the Track label (DBA / P2P / O2C / Finance / PTM) that separates Subject from Comment wasn't found - so the whole line was kept as Subject and Comment may be blank - or the row mentions an ETA that couldn't be parsed into a date, meaning this week's PDF used a date format the parser doesn't recognize yet. Verify these against the PDF before applying."
+            />
+          )}
+
+          {conflictRows.length > 0 && (
+            <Alert
+              type="error"
+              showIcon
+              message={`${conflictRows.length} conflicting SR${conflictRows.length === 1 ? '' : 's'} will not be applied`}
+              description={(
+                <Space direction="vertical" size={2}>
+                  {conflictRows.map(row => (
+                    <Text key={row.request_id}>
+                      SR {row.request_id}: found {row.duplicate_count} times
+                      {row.source_pages?.length ? ` on page${row.source_pages.length === 1 ? '' : 's'} ${row.source_pages.join(', ')}` : ''}.
+                      {' '}Verify the source PDF and update this SR manually.
+                    </Text>
+                  ))}
+                </Space>
+              )}
             />
           )}
 
@@ -393,8 +422,8 @@ function UploadDeloittePdf() {
 
           <Space>
             <Button onClick={reset}>Cancel</Button>
-            <BrandButton icon={<UploadOutlined />} loading={applying} disabled={totalRows === 0} onClick={handleApply}>
-              Apply Updates
+            <BrandButton icon={<UploadOutlined />} loading={applying} disabled={applicableRows === 0} onClick={handleApply}>
+              Apply {applicableRows} Safe Update{applicableRows === 1 ? '' : 's'}
             </BrandButton>
           </Space>
         </Space>
@@ -403,7 +432,8 @@ function UploadDeloittePdf() {
       {result && (
         <Card>
           <Result
-            status="success" title="Updates Applied"
+            status={result.skipped_conflicts > 0 ? 'warning' : 'success'}
+            title={result.skipped_conflicts > 0 ? 'Safe Updates Applied; Conflicts Skipped' : 'Updates Applied'}
             extra={<Button type="primary" onClick={() => window.location.reload()}>View SRs</Button>}
           >
             <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
@@ -416,6 +446,7 @@ function UploadDeloittePdf() {
                 { label: 'Assigned To Updated', value: result.assigned_to_updated, color: '#13c2c2' },
                 { label: 'Pending With Updated', value: result.pending_with_updated, color: '#eb2f96' },
                 { label: 'Skipped (Closed)', value: result.skipped_closed, color: '#faad14' },
+                { label: 'Skipped (Conflicts)', value: result.skipped_conflicts, color: '#cf1322' },
               ].map(t => (
                 <Col xs={12} sm={8} key={t.label}>
                   <Card size="small">

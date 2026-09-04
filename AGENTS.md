@@ -122,6 +122,13 @@ frontend/src/
   wait on the RDC user, not Deloitte). `/parse` is read-only; `/apply` writes in one
   transaction. `/parse` returns a `pageSummary` (per-page classification) and per-row
   `needsReview` flag so the admin can verify parser coverage.
+- **SR-number uniqueness / Deloitte duplicate defense**: MySQL's generated
+  `active_sr_identity` key enforces one active row per `(category, trimmed sr_number)`; the
+  startup migration consolidates legacy active duplicates before adding the unique index.
+  Deloitte parsing collapses identical repeated Request IDs, but blocks conflicting repeats
+  (different table/subject/comment/ETA) instead of guessing. `/apply` consolidates again and
+  re-reads current rows with `FOR UPDATE`; never trust preview `matched`, `sr_id`, or current
+  values as authoritative. ETA parsing is explicit UTC-safe day/month/year parsing.
 - **Bundle and interaction performance**: routes are lazy-loaded and prewarmed on idle/hover;
   `xlsx` stays dynamically imported at click time. `services/api.js` coalesces/cache safe reads,
   while live SR list requests pass `AbortSignal` and deliberately bypass coalescing. Keep heavy
@@ -169,6 +176,9 @@ Focused backend tests exist, but verification also means exercising the real run
 
 Most-recent-relevant-first:
 
+- **SR uniqueness and conflict-safe Deloitte imports** — added a database-enforced active
+  SR-number identity, a legacy duplicate consolidation migration, transaction-time rechecks,
+  deterministic ETA parsing, and preview/apply blocking for conflicting repeated PDF rows.
 - **Portfolio-quality documentation** — README now presents the product, architecture,
   integration flows, engineering outcomes, quality gates, and a sanitized product tour.
   `docs/FEATURES.md` inventories the complete feature set and `docs/API_REFERENCE.md` documents

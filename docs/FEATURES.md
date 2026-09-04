@@ -71,6 +71,11 @@ the [architecture guide](ARCHITECTURE.md).
 - Memory-backed PDF upload with a review-only parse stage.
 - Per-page classification summary for Work in Progress, Pending with User, and skipped pages.
 - Row-level matching and `needsReview` indicators for ambiguous parsing.
+- Deterministic day-month parsing keeps `03-Aug-26` as `03-Aug-2026`.
+- Identical repeated Request IDs collapse to one operation. Conflicting repeats are blocked,
+  show their source pages, and cannot be applied accidentally.
+- Apply re-reads current SRs inside its transaction, while a MySQL unique guard guarantees one
+  active record for each category/SR-number pair.
 - Admin confirmation before one transactional apply.
 - Deloitte assignment applied consistently; WIP also sets Pending With to Deloitte.
 

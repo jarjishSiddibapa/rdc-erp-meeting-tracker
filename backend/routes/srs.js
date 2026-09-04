@@ -216,7 +216,12 @@ router.post('/', async (req, res, next) => {
 
     const [rows] = await pool.execute('SELECT * FROM srs WHERE id = ?', [result.insertId]);
     res.status(201).json(rows[0]);
-  } catch (e) { next(e); }
+  } catch (e) {
+    if (e.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'An active record with this SR Number already exists' });
+    }
+    next(e);
+  }
 });
 
 // Update SR — category-aware, see canWriteCategory above
