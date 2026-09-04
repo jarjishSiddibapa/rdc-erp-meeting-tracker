@@ -2,11 +2,15 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const {
+  collectEtaCandidates,
   consolidateParsedRows,
   findLastEta,
+  findReportPeriod,
   isIsoDate,
   parseEtaDate,
+  parseNumericEtaDate,
   parseWipRow,
+  splitRows,
 } = require('../routes/deloitte-import')._test;
 
 test('parses Deloitte ETA dates deterministically without swapping day and month', () => {
@@ -16,6 +20,51 @@ test('parses Deloitte ETA dates deterministically without swapping day and month
   assert.equal(parseEtaDate('31', 'Apr', '26'), null);
   assert.equal(isIsoDate('2026-08-03'), true);
   assert.equal(isIsoDate('2026-02-30'), false);
+});
+
+test('accepts explicit Deloitte ETA variants without locale-dependent Date parsing', () => {
+  assert.equal(parseNumericEtaDate('3', '9', '2026'), '2026-09-03');
+  assert.equal(findLastEta('Dev ETA: 03/09/2026').eta, '2026-09-03');
+  assert.equal(findLastEta('Revised ETA - 2026-09-03').eta, '2026-09-03');
+  assert.equal(findLastEta('ETA 3rd September 2026').eta, '2026-09-03');
+  assert.equal(collectEtaCandidates('The comment mentions 03-Sep-26 without an ETA label').length, 0);
+});
+
+test('flags malformed and conflicting ETA text instead of silently accepting it', () => {
+  const invalid = findLastEta('ETA | 31-Apr-26');
+  assert.equal(invalid.eta, null);
+  assert.equal(invalid.mentionedUnparsed, true);
+
+  const conflicting = findLastEta('Accounting ETA | 02-Sep-26; Revised ETA | 04-Sep-26');
+  assert.equal(conflicting.eta, '2026-09-04');
+  assert.equal(conflicting.multipleDistinct, true);
+  assert.deepEqual(conflicting.candidates, ['2026-09-02', '2026-09-04']);
+});
+
+test('separates the complete Expected Closure cell from the PDF Comments column', () => {
+  const dev = parseWipRow('229295 Example subject O2C Enhancement | Fix in progress. Dev ETA | 04-Sep-26');
+  assert.equal(dev.comment, 'Enhancement | Fix in progress.');
+  assert.equal(dev.eta, '2026-09-04');
+  assert.equal(dev.etaSource, 'Dev ETA | 04-Sep-26');
+
+  const qualified = parseWipRow('211595 Example subject O2C Waiting on Oracle ETA | 03-Sep-26 | Dependent on SR');
+  assert.equal(qualified.comment, 'Waiting on Oracle');
+  assert.equal(qualified.etaSource, 'ETA | 03-Sep-26 | Dependent on SR');
+
+  const punctuatedTrack = parseWipRow('223431 Example subject P2P’ Dev in Progress ETA | 08-Sep-26');
+  assert.equal(punctuatedTrack.comment, 'Dev in Progress');
+});
+
+test('reads the report period independently from Expected Closure dates', () => {
+  const pages = [{ text: 'RDC Concrete AMS\nWeekly Status Report: 22-Aug-2026 – 28-Aug-2026' }];
+  assert.deepEqual(findReportPeriod(pages), { start: '2026-08-22', end: '2026-08-28' });
+});
+
+test('does not append the PDF copyright footer to a final row with no ETA', () => {
+  const rows = splitRows('Header\n230257 Example Finance Still investigating\n© 2026. For information, contact Deloitte Touche Tohmatsu Limited.');
+  const parsed = parseWipRow(rows[0]);
+  assert.equal(parsed.comment, 'Still investigating');
+  assert.equal(parsed.eta, null);
 });
 
 test('collapses identical repeated PDF rows into one safe operation', () => {

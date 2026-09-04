@@ -70,8 +70,13 @@ the [architecture guide](ARCHITECTURE.md).
 
 - Memory-backed PDF upload with a review-only parse stage.
 - Per-page classification summary for Work in Progress, Pending with User, and skipped pages.
-- Row-level matching and `needsReview` indicators for ambiguous parsing.
-- Deterministic day-month parsing keeps `03-Aug-26` as `03-Aug-2026`.
+- Row-level matching and explicit review reasons for missing Track delimiters, malformed or
+  multiple ETA values, and ETA dates earlier than the report period read from the cover.
+- Suspicious rows fail closed: they remain visible in preview but are excluded from bulk apply.
+- Deterministic UTC-safe parsing supports named-month, DMY numeric, and ISO dates and keeps
+  `03-Aug-26` as `03-Aug-2026`—the importer never silently changes the source month.
+- The complete Expected Closure cell is separated from Comments, so prefixes such as
+  `Dev ETA` / `Analysis ETA` and suffixes such as `Dependent on SR` do not pollute comments.
 - Identical repeated Request IDs collapse to one operation. Conflicting repeats are blocked,
   show their source pages, and cannot be applied accidentally.
 - Apply re-reads current SRs inside its transaction, while a MySQL unique guard guarantees one

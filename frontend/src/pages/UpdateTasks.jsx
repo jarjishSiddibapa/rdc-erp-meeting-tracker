@@ -209,8 +209,8 @@ function UpdateTaskData() {
 // database until Apply is clicked.
 function fmtEta(v) { return v ? dayjs(v).format('DD-MMM-YYYY') : '-'; }
 
-function MatchTag({ matched, canApply = true }) {
-  if (!canApply) return <Tag color="red">Conflict - skipped</Tag>;
+function MatchTag({ matched, canApply = true, duplicateConflict = false }) {
+  if (!canApply) return <Tag color="red">{duplicateConflict ? 'Conflict - skipped' : 'Review - skipped'}</Tag>;
   return matched ? <Tag color="green">Found</Tag> : <Tag color="gold">Will create new SR</Tag>;
 }
 
@@ -291,24 +291,29 @@ function UploadDeloittePdf() {
   const pendingMatched = parsed?.pendingWithUser.filter(r => r.matched).length ?? 0;
   const totalMatched = wipMatched + pendingMatched;
   const totalRows = (parsed?.wip.length ?? 0) + (parsed?.pendingWithUser.length ?? 0);
-  const needsReviewCount = (parsed?.wip.filter(r => r.needsReview && r.can_apply).length ?? 0)
-    + (parsed?.pendingWithUser.filter(r => r.needsReview && r.can_apply).length ?? 0);
-  const conflictRows = parsed ? [...parsed.wip, ...parsed.pendingWithUser].filter(r => !r.can_apply) : [];
-  const applicableRows = totalRows - conflictRows.length;
+  const blockedRows = parsed ? [...parsed.wip, ...parsed.pendingWithUser].filter(r => !r.can_apply) : [];
+  const conflictRows = blockedRows.filter(r => r.duplicate_conflict || r.database_duplicate);
+  const reviewRows = blockedRows.filter(r => !r.duplicate_conflict && !r.database_duplicate);
+  const applicableRows = totalRows - blockedRows.length;
 
   const reviewColumn = {
     title: 'Review', dataIndex: 'needsReview', width: 110,
     render: (v, row) => !row.can_apply
-      ? <Tag color="red">Blocked</Tag>
-      : v ? <Tag color="orange">Check manually</Tag> : <Tag color="green">OK</Tag>,
+      ? <Tag color="red" title={row.review_reasons?.join('; ')}>{row.duplicate_conflict ? 'Conflict' : 'Review - skipped'}</Tag>
+      : v
+        ? <Tag color="orange" title={row.review_reasons?.join('; ')}>Check manually</Tag>
+        : <Tag color="green">OK</Tag>,
   };
 
   const wipColumns = [
     { title: 'SR Number', dataIndex: 'request_id', width: 100 },
     { title: 'Subject', dataIndex: 'subject', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
     { title: 'Comment', dataIndex: 'comment', render: v => v || <Text type="secondary">-</Text> },
-    { title: 'New Expected Closure', dataIndex: 'eta', width: 150, render: fmtEta },
-    { title: 'Match', dataIndex: 'matched', width: 150, render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} /> },
+    {
+      title: 'New Expected Closure', dataIndex: 'eta', width: 150,
+      render: (v, row) => <span title={row.eta_source || ''}>{fmtEta(v)}</span>,
+    },
+    { title: 'Match', dataIndex: 'matched', width: 150, render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} duplicateConflict={row.duplicate_conflict} /> },
     reviewColumn,
   ];
 
@@ -322,7 +327,7 @@ function UploadDeloittePdf() {
         ? <Space size={4}><Text delete type="secondary">{fmtEta(v)}</Text><Text type="secondary">→ will be cleared</Text></Space>
         : <Text type="secondary">- (already empty)</Text>,
     },
-    { title: 'Match', dataIndex: 'matched', width: 150, render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} /> },
+    { title: 'Match', dataIndex: 'matched', width: 150, render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} duplicateConflict={row.duplicate_conflict} /> },
     reviewColumn,
   ];
 
@@ -364,24 +369,34 @@ function UploadDeloittePdf() {
 
       {parsed && !result && (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          {parsed.reportPeriod && (
+            <Alert
+              type="info"
+              showIcon
+              message={`PDF report period: ${fmtEta(parsed.reportPeriod.start)} to ${fmtEta(parsed.reportPeriod.end)}`}
+              description="Dates shown below are parsed exactly from the Expected Closure Date cells; the importer never changes Aug to Sep or otherwise guesses a correction."
+            />
+          )}
           <Alert
-            type={conflictRows.length > 0 ? 'warning' : totalMatched === totalRows ? 'success' : 'info'}
+            type={blockedRows.length > 0 ? 'warning' : totalMatched === totalRows ? 'success' : 'info'}
             showIcon
             message={
-              conflictRows.length > 0
-                ? `${applicableRows} safe row${applicableRows === 1 ? '' : 's'} ready; ${conflictRows.length} conflicting SR${conflictRows.length === 1 ? '' : 's'} blocked`
+              blockedRows.length > 0
+                ? `${applicableRows} safe row${applicableRows === 1 ? '' : 's'} ready; ${blockedRows.length} row${blockedRows.length === 1 ? '' : 's'} blocked for review`
                 : totalMatched === totalRows
                 ? `All ${totalRows} rows matched an existing SR`
                 : `${totalMatched} of ${totalRows} rows matched an existing SR - the other ${totalRows - totalMatched} will be created as new SRs`
             }
           />
 
-          {needsReviewCount > 0 && (
+          {reviewRows.length > 0 && (
             <Alert
               type="warning"
               showIcon
-              message={`${needsReviewCount} row${needsReviewCount === 1 ? '' : 's'} need a manual look - marked "Check manually" below`}
-              description="Either the Track label (DBA / P2P / O2C / Finance / PTM) that separates Subject from Comment wasn't found - so the whole line was kept as Subject and Comment may be blank - or the row mentions an ETA that couldn't be parsed into a date, meaning this week's PDF used a date format the parser doesn't recognize yet. Verify these against the PDF before applying."
+              message={`${reviewRows.length} suspicious source row${reviewRows.length === 1 ? '' : 's'} excluded from Apply`}
+              description={reviewRows
+                .map(row => `SR ${row.request_id}: ${row.review_reasons?.join('; ') || 'verify the parsed row'}`)
+                .join(' | ')}
             />
           )}
 
@@ -396,6 +411,9 @@ function UploadDeloittePdf() {
                     <Text key={row.request_id}>
                       SR {row.request_id}: found {row.duplicate_count} times
                       {row.source_pages?.length ? ` on page${row.source_pages.length === 1 ? '' : 's'} ${row.source_pages.join(', ')}` : ''}.
+                      {row.conflict_variants?.some(variant => variant.eta)
+                        ? ` Source dates: ${[...new Set(row.conflict_variants.map(variant => variant.eta).filter(Boolean).map(fmtEta))].join(' vs ')}.`
+                        : ''}
                       {' '}Verify the source PDF and update this SR manually.
                     </Text>
                   ))}

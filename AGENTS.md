@@ -121,14 +121,20 @@ frontend/src/
   `pending_with = 'Deloitte'` — "Pending with User" rows leave `pending_with` untouched (those
   wait on the RDC user, not Deloitte). `/parse` is read-only; `/apply` writes in one
   transaction. `/parse` returns a `pageSummary` (per-page classification) and per-row
-  `needsReview` flag so the admin can verify parser coverage.
+  `needsReview` flag plus exact review reasons so the admin can verify parser coverage. The
+  report period is extracted from the cover. ETA values support named-month, DMY numeric, and
+  ISO forms; impossible/unrecognized dates, multiple distinct ETAs, and dates before the
+  report period are surfaced for review and excluded from bulk apply. The entire trailing
+  Expected Closure cell is removed before deriving Comments so labels such as `Dev ETA`
+  cannot leak into comment history.
 - **SR-number uniqueness / Deloitte duplicate defense**: MySQL's generated
   `active_sr_identity` key enforces one active row per `(category, trimmed sr_number)`; the
   startup migration consolidates legacy active duplicates before adding the unique index.
   Deloitte parsing collapses identical repeated Request IDs, but blocks conflicting repeats
   (different table/subject/comment/ETA) instead of guessing. `/apply` consolidates again and
   re-reads current rows with `FOR UPDATE`; never trust preview `matched`, `sr_id`, or current
-  values as authoritative. ETA parsing is explicit UTC-safe day/month/year parsing.
+  values as authoritative. ETA parsing is explicit UTC-safe day/month/year parsing and never
+  silently changes a source month (for example, `03-Aug-26` remains August).
 - **Bundle and interaction performance**: routes are lazy-loaded and prewarmed on idle/hover;
   `xlsx` stays dynamically imported at click time. `services/api.js` coalesces/cache safe reads,
   while live SR list requests pass `AbortSignal` and deliberately bypass coalescing. Keep heavy

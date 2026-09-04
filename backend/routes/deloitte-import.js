@@ -12,24 +12,21 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 
 const TRACKS = ['DBA', 'P2P', 'O2C', 'Finance', 'PTM'];
 const TRACK_RE = new RegExp('\\b(' + TRACKS.join('|') + ')\\b');
 
-// ETA extraction is deliberately tolerant of the format drift this exact weekly template has
-// already shown between runs: the label's punctuation varies ("ETA |", "ETA:", "ETA –", or just
-// "ETA "), the date's own separators vary (-, /, ., or a bare space), the month may be
-// abbreviated or spelled out, the year may be 2 or 4 digits, a day may carry an ordinal suffix
-// ("17th"), and PDF text extraction sometimes injects a stray extra space inside the date itself
-// (observed live: "21-Aug- 26", "18- Aug-26"). Anchoring to end-of-string (the original
-// approach) broke on any trailing qualifier after the date too (observed live: "ETA | 21-Aug-26
-// | Dependent on SR"). Instead this scans for every "ETA <date>" occurrence anywhere in the row
-// and keeps the LAST one — a row can mention an earlier superseded ETA before a final one
-// (observed live: "Accounting ETA | 17-Aug-26 Efforts ETA | 18-Aug-26" should resolve to
-// 18-Aug-26), so "last occurrence wins" preserves that behavior while fixing the false negatives.
-// A bare date with no "ETA" label at all (e.g. a date mentioned in prose) is deliberately never
-// treated as an ETA — that would be guessing, not parsing.
+// ETA extraction is deliberately tolerant of format drift while remaining label-anchored: a
+// bare date in a comment is never guessed to be the closure date. Deloitte has used optional
+// qualifiers ("Dev ETA", "Analysis ETA", "Revised ETA"), varied punctuation, named or numeric
+// months, 2/4-digit years, ordinal days, and whitespace inserted by PDF extraction. Every
+// recognized ETA is retained as a candidate. The final candidate remains the selected value for
+// backwards compatibility, but multiple different candidates are visibly flagged for review.
 const MONTH_RE = '(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)';
 const MONTH_INDEX = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
 const DATE_TOKEN_SRC = `(\\d{1,2})(?:st|nd|rd|th)?\\s*[-/.\\s]\\s*(${MONTH_RE})\\s*[-/.,\\s]\\s*(\\d{2,4})`;
-const ETA_RE = new RegExp(`ETA\\s*[:|\\-–—]?\\s*${DATE_TOKEN_SRC}`, 'gi');
+const NUMERIC_DATE_TOKEN_SRC = '(\\d{1,2})\\s*[-/.]\\s*(\\d{1,2})\\s*[-/.]\\s*(\\d{2,4})';
+const ISO_DATE_TOKEN_SRC = '(\\d{4})\\s*[-/.]\\s*(\\d{1,2})\\s*[-/.]\\s*(\\d{1,2})';
+const ETA_QUALIFIER_SRC = '(?:(?:Dev(?:elopment)?|Analysis|Accounting|Efforts?|UAT|Testing|Revised|Final)\\s+)?';
+const ETA_LABEL_SRC = `${ETA_QUALIFIER_SRC}\\bETA\\b\\s*[:|\\-–—]?\\s*`;
 const ETA_WORD_RE = /\bETA\b/i;
+const ETA_WORD_GLOBAL_RE = /\bETA\b/gi;
 
 // Builds a real Date from captured (day, month-name, year) parts instead of handing a loosely-
 // formatted string to `new Date(...)` (locale/engine-dependent parsing risk). Cross-checks the
@@ -46,6 +43,17 @@ function parseEtaDate(day, monthStr, year) {
   return `${y}-${String(mon + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
+function parseNumericEtaDate(day, month, year) {
+  const mon = Number(month) - 1;
+  const d = Number(day);
+  let y = Number(year);
+  if (y < 100) y += 2000;
+  if (!d || mon < 0 || mon > 11 || !y) return null;
+  const dt = new Date(Date.UTC(y, mon, d));
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mon || dt.getUTCDate() !== d) return null;
+  return `${y}-${String(mon + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
 function isIsoDate(value) {
   const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return false;
@@ -55,16 +63,52 @@ function isIsoDate(value) {
     && parsed.getUTCDate() === Number(match[3]);
 }
 
-// Finds the last ETA-labeled date in `text`. Also reports `mentionedUnparsed`: true when the
-// literal word "ETA" appears but no date could be parsed after it — a signal that this row's
-// format doesn't match any variant handled above, so it should be surfaced for manual review
-// instead of silently treated the same as "this row simply has no ETA this week" (which is a
-// normal, expected case — see parseWipRow).
+function collectEtaCandidates(text) {
+  const candidates = [];
+  const patterns = [
+    {
+      regex: new RegExp(`${ETA_LABEL_SRC}${DATE_TOKEN_SRC}`, 'gi'),
+      parse: match => parseEtaDate(match[1], match[2], match[3]),
+    },
+    {
+      regex: new RegExp(`${ETA_LABEL_SRC}${ISO_DATE_TOKEN_SRC}`, 'gi'),
+      parse: match => parseNumericEtaDate(match[3], match[2], match[1]),
+    },
+    {
+      regex: new RegExp(`${ETA_LABEL_SRC}${NUMERIC_DATE_TOKEN_SRC}`, 'gi'),
+      parse: match => parseNumericEtaDate(match[1], match[2], match[3]),
+    },
+  ];
+
+  for (const pattern of patterns) {
+    for (const match of text.matchAll(pattern.regex)) {
+      candidates.push({ match, eta: pattern.parse(match) });
+    }
+  }
+  candidates.sort((a, b) => a.match.index - b.match.index);
+  return candidates;
+}
+
+// Finds the final valid ETA-labelled date and preserves enough diagnostics to avoid silent
+// failures. An impossible date (31-Apr), an unknown ETA format, or two different ETA values is
+// a review condition even if another candidate in the same cell was valid.
 function findLastEta(text) {
-  let last = null;
-  for (const match of text.matchAll(ETA_RE)) last = match;
-  if (last) return { eta: parseEtaDate(last[1], last[2], last[3]), match: last, mentionedUnparsed: false };
-  return { eta: null, match: null, mentionedUnparsed: ETA_WORD_RE.test(text) };
+  const candidates = collectEtaCandidates(text);
+  const valid = candidates.filter(candidate => candidate.eta);
+  const last = valid.at(-1) || null;
+  const etaMentions = [...text.matchAll(ETA_WORD_GLOBAL_RE)].length;
+  const distinctEtas = [...new Set(valid.map(candidate => candidate.eta))];
+  const firstEtaIndex = text.search(ETA_WORD_RE);
+  const firstMatch = candidates[0]?.match || null;
+  return {
+    eta: last?.eta || null,
+    match: last?.match || null,
+    firstMatch,
+    closureStart: firstMatch?.index ?? (firstEtaIndex >= 0 ? firstEtaIndex : null),
+    mentionedUnparsed: etaMentions > candidates.length || candidates.some(candidate => !candidate.eta),
+    multipleDistinct: distinctEtas.length > 1,
+    candidates: valid.map(candidate => candidate.eta),
+  };
 }
 
 // Rows in both tables always start with a Request ID (6 digits, optionally prefixed with a
@@ -73,6 +117,7 @@ function findLastEta(text) {
 // boundary is "up to the next line that itself starts with a Request ID", not one PDF text
 // line.
 const ROW_START_RE = /^[•●\-*]?\s*\d{6}\b/;
+const REPORT_FOOTER_RE = /(?:©|�|\(c\))\s*20\d{2}\.?\s+For information, contact Deloitte/i;
 
 // Table-header classification, tolerant of the separator between "Incident Details" and the
 // table name changing (pipe/colon/dash observed across other headers in this same template
@@ -84,6 +129,10 @@ function splitRows(pageText) {
   const rows = [];
   let cur = [];
   for (const line of lines) {
+    // The footer is emitted after the last data row by some PDF engines. Ignore it explicitly
+    // so a last-row Work in Progress item with a blank ECD cannot absorb copyright text into
+    // its imported comment.
+    if (REPORT_FOOTER_RE.test(line)) continue;
     if (ROW_START_RE.test(line.trim())) {
       if (cur.length) rows.push(cur.join('\n'));
       cur = [line];
@@ -96,7 +145,13 @@ function splitRows(pageText) {
 }
 
 function flatten(chunk) {
-  return chunk.split('\n').map(l => l.trim()).filter(Boolean).join(' ');
+  return chunk.split('\n').map(l => l.trim()).filter(Boolean).join(' ')
+    // Some PowerPoint-generated PDFs expose punctuation as double-decoded UTF-8. Normalize the
+    // common sequences before a subject/comment can be stored in a newly created tracker row.
+    .replace(/â€“/g, '–')
+    .replace(/â€”/g, '—')
+    .replace(/â€™/g, '’')
+    .replace(/â€œ|â€/g, '"');
 }
 
 // Comments column: everything between the Track token and the trailing "ETA | date" (if
@@ -119,24 +174,35 @@ function parseWipRow(chunk) {
   const requestId = m[1];
   let rest = m[2];
 
-  const { eta, match, mentionedUnparsed } = findLastEta(rest);
-  if (match) {
-    // Remove just the matched "ETA <date>" substring, not everything after it — so a trailing
-    // qualifier like "| Dependent on SR" (observed live) stays in the comment instead of being
-    // silently dropped along with the date.
-    rest = (rest.slice(0, match.index) + rest.slice(match.index + match[0].length))
-      .replace(/\s{2,}/g, ' ').trim();
-  }
+  const etaResult = findLastEta(rest);
+  const { eta, mentionedUnparsed, multipleDistinct, candidates, closureStart } = etaResult;
+  const etaSource = closureStart === null ? null : rest.slice(closureStart).trim();
+  // Expected Closure Date is the final table column. Remove the whole cell, including prefixes
+  // such as "Dev"/"Analysis" and suffixes such as "Dependent on SR", so those values cannot
+  // leak into the imported Comments column.
+  if (closureStart !== null) rest = rest.slice(0, closureStart).trim();
 
   const trackMatch = rest.match(TRACK_RE);
   const subject = trackMatch ? rest.slice(0, trackMatch.index).trim() : rest;
-  const comment = trackMatch ? rest.slice(trackMatch.index + trackMatch[0].length).trim() : '';
+  const comment = trackMatch
+    ? rest.slice(trackMatch.index + trackMatch[0].length).trim().replace(/^[|:;,\-–—'’]+\s*/, '')
+    : '';
 
-  // Some rows (e.g. SR 211595, 220547 in a real sample) simply have no ETA that week — eta
-  // stays null and only the comment gets applied. That's normal. `etaMentionedUnparsed` is the
+  // Some rows simply have no ETA that week — eta stays null and only the comment gets applied.
+  // That's normal. `etaMentionedUnparsed` is the
   // different, always-suspicious case: the row does say "ETA" but no variant above could parse
   // a date out of it, meaning the format moved in a way this parser doesn't know about yet.
-  return { requestId, subject, comment, eta, trackFound: !!trackMatch, etaMentionedUnparsed: mentionedUnparsed };
+  return {
+    requestId,
+    subject,
+    comment,
+    eta,
+    etaSource,
+    etaCandidates: candidates,
+    etaMultipleDistinct: multipleDistinct,
+    trackFound: !!trackMatch,
+    etaMentionedUnparsed: mentionedUnparsed,
+  };
 }
 
 // Pending with User rows never carry an ETA — an SR sitting here is waiting on the RDC user to
@@ -156,6 +222,29 @@ function parsePendingRow(chunk) {
 
 function compactText(value) {
   return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function findReportPeriod(pages) {
+  const coverText = (pages.slice(0, 3).map(page => page.text || '').join('\n'));
+  const headingIndex = coverText.search(/Weekly Status Report\s*:/i);
+  if (headingIndex < 0) return null;
+  const headingText = coverText.slice(headingIndex, headingIndex + 200);
+  const matches = [...headingText.matchAll(new RegExp(DATE_TOKEN_SRC, 'gi'))]
+    .map(match => parseEtaDate(match[1], match[2], match[3]))
+    .filter(Boolean);
+  if (matches.length < 2) return null;
+  return { start: matches[0], end: matches[1] };
+}
+
+function reviewReasons(row, reportPeriod) {
+  const reasons = [];
+  if (!row.trackFound) reasons.push('Track column could not be identified');
+  if (row.etaMentionedUnparsed) reasons.push('ETA text contains an invalid or unsupported date');
+  if (row.etaMultipleDistinct) reasons.push('Expected Closure cell contains multiple different ETA dates');
+  if (row.eta && reportPeriod?.start && row.eta < reportPeriod.start) {
+    reasons.push('ETA is earlier than the weekly report period; verify the source date');
+  }
+  return reasons;
 }
 
 function parsedRowSignature(row) {
@@ -264,18 +353,22 @@ async function extractRows(buffer) {
   const wip = [];
   const pendingWithUser = [];
   const pageSummary = [];
+  const reportPeriod = findReportPeriod(pages);
 
   for (const page of pages) {
     const text = page.text || '';
     const firstLine = (text.split('\n')[0] || '').trim();
-    if (WIP_HEADER_RE.test(firstLine)) {
+    // Restrict classification to the title area but do not require the title to be literally
+    // the first extracted line; logos and accessibility tags can precede it in future exports.
+    const titleArea = text.split('\n').slice(0, 8).join(' ');
+    if (WIP_HEADER_RE.test(titleArea)) {
       let count = 0;
       for (const chunk of splitRows(text)) {
         const row = parseWipRow(chunk);
         if (row) { wip.push({ ...row, sourcePage: page.num }); count++; }
       }
       pageSummary.push({ page: page.num, firstLine, classification: 'Work in Progress', rowsFound: count });
-    } else if (PENDING_HEADER_RE.test(firstLine)) {
+    } else if (PENDING_HEADER_RE.test(titleArea)) {
       let count = 0;
       for (const chunk of splitRows(text)) {
         const row = parsePendingRow(chunk);
@@ -285,11 +378,11 @@ async function extractRows(buffer) {
     } else {
       // Not one of the two actionable tables (cover, ticket snapshot, pending approval/on
       // hold, weekly summary, testing status, thank-you) — recorded, not silently dropped.
-      pageSummary.push({ page: page.num, firstLine, classification: 'Not relevant — skipped', rowsFound: null });
+      pageSummary.push({ page: page.num, firstLine, classification: 'Not relevant - skipped', rowsFound: null });
     }
   }
 
-  return { wip, pendingWithUser, pageSummary };
+  return { wip, pendingWithUser, pageSummary, reportPeriod };
 }
 
 // Matches every parsed request ID against the live SRs table in one query instead of one
@@ -357,13 +450,19 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
       const dbMatches = matches.get(row.requestId) || [];
       const databaseDuplicate = dbMatches.length > 1;
       const sr = dbMatches.length === 1 ? dbMatches[0] : null;
-      const canApply = row.canApply && !databaseDuplicate;
+      const rowReviewReasons = reviewReasons(row, extracted.reportPeriod);
+      // Review flags are fail-closed. A suspicious row stays visible in preview but cannot be
+      // included in bulk apply; the admin can verify and update that SR manually without risking
+      // a guessed date or an incorrectly split comment.
+      const canApply = row.canApply && !databaseDuplicate && rowReviewReasons.length === 0;
       wipOut.push({
         type: 'wip',
         request_id: row.requestId,
         subject: row.subject,
         comment: row.comment,
         eta: row.eta,
+        eta_source: row.etaSource,
+        eta_candidates: row.etaCandidates,
         matched: !!sr,
         sr_id: sr?.id ?? null,
         current_status: sr?.status ?? null,
@@ -372,7 +471,8 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
         current_pending_with: sr?.pending_with ?? null,
         // Track not found is always suspect (Subject/Comment split may be wrong). A row that
         // says "ETA" but couldn't be parsed into a date is equally suspect — see findLastEta.
-        needsReview: !row.trackFound || row.etaMentionedUnparsed || !canApply,
+        needsReview: rowReviewReasons.length > 0 || !canApply,
+        review_reasons: rowReviewReasons,
         can_apply: canApply,
         duplicate_count: row.duplicateCount,
         duplicate_conflict: row.duplicateConflict,
@@ -387,7 +487,8 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
       const dbMatches = matches.get(row.requestId) || [];
       const databaseDuplicate = dbMatches.length > 1;
       const sr = dbMatches.length === 1 ? dbMatches[0] : null;
-      const canApply = row.canApply && !databaseDuplicate;
+      const rowReviewReasons = reviewReasons(row, extracted.reportPeriod);
+      const canApply = row.canApply && !databaseDuplicate && rowReviewReasons.length === 0;
       pendingOut.push({
         type: 'pending_with_user',
         request_id: row.requestId,
@@ -399,7 +500,8 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
         // with User SRs never keep an ECD, see the clearing logic in /apply.
         current_ecd: sr?.expected_closure_date ?? null,
         current_assigned_to: sr?.assigned_to ?? null,
-        needsReview: !row.trackFound || !canApply,
+        needsReview: rowReviewReasons.length > 0 || !canApply,
+        review_reasons: rowReviewReasons,
         can_apply: canApply,
         duplicate_count: row.duplicateCount,
         duplicate_conflict: row.duplicateConflict,
@@ -413,6 +515,7 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
       wip: wipOut,
       pendingWithUser: pendingOut,
       pageSummary: extracted.pageSummary,
+      reportPeriod: extracted.reportPeriod,
       duplicateSummary,
     });
   } catch (e) { next(e); }
@@ -601,10 +704,15 @@ router.post('/apply', async (req, res, next) => {
 
 module.exports = router;
 module.exports._test = {
+  collectEtaCandidates,
   consolidateParsedRows,
+  extractRows,
   findLastEta,
+  findReportPeriod,
   isIsoDate,
   parseEtaDate,
+  parseNumericEtaDate,
   parsePendingRow,
   parseWipRow,
+  splitRows,
 };

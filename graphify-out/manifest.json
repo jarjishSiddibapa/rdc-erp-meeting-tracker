@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "frontend/src/pages/UpdateTasks.jsx": {
-    "mtime": 1788497208.5313804,
-    "ast_hash": "04655e6e92647c0035b8b9e88ce5c169",
+    "mtime": 1788516564.6840112,
+    "ast_hash": "6913a8ffda9beb990fa4fe35664b928c",
     "semantic_hash": ""
   },
   "frontend/src/pages/UserManagement.jsx": {
@@ -255,8 +255,8 @@
     "semantic_hash": "3dcdf94d2c737bfa22fadeb790939551"
   },
   "backend/routes/deloitte-import.js": {
-    "mtime": 1788497393.5046408,
-    "ast_hash": "de7d4934d62c3ca47835257a19fcae91",
+    "mtime": 1788516815.5675719,
+    "ast_hash": "6dd329e8af0bfb9f956ccb2746f1a9d5",
     "semantic_hash": ""
   },
   "backend/routes/reports.js": {
@@ -310,8 +310,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1788497275.0046308,
-    "ast_hash": "fd3f1fd7a0469db45fb750e35be1719b",
+    "mtime": 1788516369.943386,
+    "ast_hash": "eae3d96fcab7a76d6fe1a7dca475912c",
     "semantic_hash": ""
   },
   "PRODUCTION.md": {
@@ -360,8 +360,8 @@
     "semantic_hash": ""
   },
   "docs/USER_GUIDE.md": {
-    "mtime": 1788497275.0046308,
-    "ast_hash": "f01f82568f66319acf3f196bbab63ff9",
+    "mtime": 1788516593.3676856,
+    "ast_hash": "fe7685741d15d3e1aa96e7b9b6c3779c",
     "semantic_hash": ""
   },
   "docs/images/dashboard-overview.png": {
@@ -415,13 +415,13 @@
     "semantic_hash": ""
   },
   "docs/API_REFERENCE.md": {
-    "mtime": 1788497275.0046308,
-    "ast_hash": "c58eb05cbe1eec947d2b880589b89975",
+    "mtime": 1788516369.9590771,
+    "ast_hash": "b22effd20330340cb0ffca15acb310fa",
     "semantic_hash": ""
   },
   "docs/FEATURES.md": {
-    "mtime": 1788497275.0046308,
-    "ast_hash": "32cfc9f3b00f82644a1b40a16f4f1c52",
+    "mtime": 1788516593.3595338,
+    "ast_hash": "babdb6efb34534fedf9fa39cee26f4f1",
     "semantic_hash": ""
   },
   "docs/images/backup-settings.png": {
@@ -460,8 +460,8 @@
     "semantic_hash": ""
   },
   "backend/test/deloitte-import.test.js": {
-    "mtime": 1788497057.5143452,
-    "ast_hash": "15fef7708034db10d9f80b0855ec12aa",
+    "mtime": 1788516815.5675719,
+    "ast_hash": "f2cefd687876f793bf6b54c969f983b8",
     "semantic_hash": ""
   }
 }
