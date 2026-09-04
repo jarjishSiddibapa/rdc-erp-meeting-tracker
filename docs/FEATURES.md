@@ -77,8 +77,9 @@ the [architecture guide](ARCHITECTURE.md).
   `03-Aug-26` as `03-Aug-2026`—the importer never silently changes the source month.
 - The complete Expected Closure cell is separated from Comments, so prefixes such as
   `Dev ETA` / `Analysis ETA` and suffixes such as `Dependent on SR` do not pollute comments.
-- Identical repeated Request IDs collapse to one operation. Conflicting repeats are blocked,
-  show their source pages, and cannot be applied accidentally.
+- Identical repeated Request IDs collapse to one operation. When repeats differ, the row with
+  the uniquely highest valid Expected Closure Date is kept and older variants are shown in the
+  preview. Highest-date ties and duplicates without a valid ETA remain blocked.
 - Apply re-reads current SRs inside its transaction, while a MySQL unique guard guarantees one
   active record for each category/SR-number pair.
 - Admin confirmation before one transactional apply.

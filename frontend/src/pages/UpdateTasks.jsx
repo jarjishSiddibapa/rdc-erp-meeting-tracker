@@ -294,12 +294,17 @@ function UploadDeloittePdf() {
   const blockedRows = parsed ? [...parsed.wip, ...parsed.pendingWithUser].filter(r => !r.can_apply) : [];
   const conflictRows = blockedRows.filter(r => r.duplicate_conflict || r.database_duplicate);
   const reviewRows = blockedRows.filter(r => !r.duplicate_conflict && !r.database_duplicate);
+  const latestEtaRows = parsed
+    ? [...parsed.wip, ...parsed.pendingWithUser].filter(r => r.duplicate_resolution === 'latest_eta')
+    : [];
   const applicableRows = totalRows - blockedRows.length;
 
   const reviewColumn = {
     title: 'Review', dataIndex: 'needsReview', width: 110,
     render: (v, row) => !row.can_apply
       ? <Tag color="red" title={row.review_reasons?.join('; ')}>{row.duplicate_conflict ? 'Conflict' : 'Review - skipped'}</Tag>
+      : row.duplicate_resolution === 'latest_eta'
+        ? <Tag color="blue" title="Older duplicate rows were discarded">Latest ETA kept</Tag>
       : v
         ? <Tag color="orange" title={row.review_reasons?.join('; ')}>Check manually</Tag>
         : <Tag color="green">OK</Tag>,
@@ -345,9 +350,10 @@ function UploadDeloittePdf() {
         user, so a stale ECD from an earlier week is removed (with full history, same as any
         other change). A Request ID that doesn't match any existing SR gets created from scratch
         (Subject as the description, Internal/External fixed to External) - nothing is left out
-        just because it's new. Repeated identical rows are collapsed. If the same SR appears with
-        conflicting dates or details, it is visibly blocked and skipped instead of guessing which
-        value is correct. Nothing is written to the database until you review the preview below
+        just because it's new. Repeated identical rows are collapsed. If the same SR appears more
+        than once with different dates, the row carrying the uniquely highest valid Expected
+        Closure Date is kept. A tie at the highest date, or duplicates with no valid date to rank,
+        are blocked for review. Nothing is written to the database until you review the preview below
         and click Apply.
       </Paragraph>
 
@@ -397,6 +403,18 @@ function UploadDeloittePdf() {
               description={reviewRows
                 .map(row => `SR ${row.request_id}: ${row.review_reasons?.join('; ') || 'verify the parsed row'}`)
                 .join(' | ')}
+            />
+          )}
+
+          {latestEtaRows.length > 0 && (
+            <Alert
+              type="info"
+              showIcon
+              message={`${latestEtaRows.length} duplicate SR${latestEtaRows.length === 1 ? '' : 's'} resolved using the highest Expected Closure Date`}
+              description={latestEtaRows.map(row => {
+                const discardedDates = row.discarded_variants?.map(variant => variant.eta).filter(Boolean).map(fmtEta) || [];
+                return `SR ${row.request_id}: kept ${fmtEta(row.eta)}${discardedDates.length ? `; discarded ${discardedDates.join(', ')}` : ''}`;
+              }).join(' | ')}
             />
           )}
 

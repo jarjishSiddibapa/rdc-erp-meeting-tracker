@@ -130,8 +130,9 @@ frontend/src/
 - **SR-number uniqueness / Deloitte duplicate defense**: MySQL's generated
   `active_sr_identity` key enforces one active row per `(category, trimmed sr_number)`; the
   startup migration consolidates legacy active duplicates before adding the unique index.
-  Deloitte parsing collapses identical repeated Request IDs, but blocks conflicting repeats
-  (different table/subject/comment/ETA) instead of guessing. `/apply` consolidates again and
+  Deloitte parsing collapses identical repeated Request IDs. When repeats differ, the row with
+  the uniquely highest valid ETA wins; ties at the highest ETA and duplicates with no valid ETA
+  remain blocked. `/apply` consolidates again and
   re-reads current rows with `FOR UPDATE`; never trust preview `matched`, `sr_id`, or current
   values as authoritative. ETA parsing is explicit UTC-safe day/month/year parsing and never
   silently changes a source month (for example, `03-Aug-26` remains August).
@@ -182,9 +183,10 @@ Focused backend tests exist, but verification also means exercising the real run
 
 Most-recent-relevant-first:
 
-- **SR uniqueness and conflict-safe Deloitte imports** — added a database-enforced active
+- **SR uniqueness and deterministic Deloitte duplicate imports** — added a database-enforced active
   SR-number identity, a legacy duplicate consolidation migration, transaction-time rechecks,
-  deterministic ETA parsing, and preview/apply blocking for conflicting repeated PDF rows.
+  deterministic ETA parsing, highest-ETA duplicate selection, and blocking when dates cannot
+  determine one winner.
 - **Portfolio-quality documentation** — README now presents the product, architecture,
   integration flows, engineering outcomes, quality gates, and a sanitized product tour.
   `docs/FEATURES.md` inventories the complete feature set and `docs/API_REFERENCE.md` documents

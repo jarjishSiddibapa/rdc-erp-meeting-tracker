@@ -256,11 +256,20 @@ function parsedRowSignature(row) {
   ]);
 }
 
-// A Request ID occasionally appears more than once in Deloitte's PDF. Identical repeats are
-// harmless and collapse to one operation. Conflicting repeats (different table, ETA, comment,
-// or subject) are never guessed at: one preview row is returned with every variant attached,
-// marked for review, and blocked from /apply. This is the failure mode that previously created
-// SR 231590 twice and left the wrong duplicate's ETA visible after the correct row was deleted.
+function variantSummary(row) {
+  return {
+    type: row.type,
+    subject: compactText(row.subject) || null,
+    comment: compactText(row.comment) || null,
+    eta: row.eta || null,
+    source_page: row.sourcePage,
+  };
+}
+
+// A Request ID occasionally appears more than once in Deloitte's PDF. Identical repeats collapse
+// to one operation. When different repeats have a uniquely highest valid ETA, that newest-dated
+// row wins and the older variants are retained in preview metadata for transparency. If dates
+// cannot identify one winner (no valid ETA or a tie at the highest ETA), the SR remains blocked.
 function consolidateParsedRows(wip = [], pendingWithUser = []) {
   const groups = new Map();
   const tagged = [
@@ -284,6 +293,7 @@ function consolidateParsedRows(wip = [], pendingWithUser = []) {
   const consolidated = { wip: [], pendingWithUser: [] };
   const duplicateIds = [];
   const conflictingIds = [];
+  const resolvedByLatestEtaIds = [];
   let identicalRowsCollapsed = 0;
 
   for (const [requestId, rows] of groups) {
@@ -292,30 +302,34 @@ function consolidateParsedRows(wip = [], pendingWithUser = []) {
     const inheritedBlock = rows.some(row =>
       row.canApply === false || row.can_apply === false || row.duplicateConflict || row.duplicate_conflict
     );
-    const duplicateConflict = variants.length > 1 || inheritedBlock;
+    const datedVariants = variants.filter(row => isIsoDate(row.eta));
+    const highestEta = datedVariants.reduce(
+      (highest, row) => !highest || row.eta > highest ? row.eta : highest,
+      null
+    );
+    const highestEtaVariants = highestEta ? variants.filter(row => row.eta === highestEta) : [];
+    const resolvedByLatestEta = variants.length > 1 && highestEtaVariants.length === 1 && !inheritedBlock;
+    const selected = resolvedByLatestEta ? highestEtaVariants[0] : variants[0];
+    const duplicateConflict = inheritedBlock || (variants.length > 1 && !resolvedByLatestEta);
 
     if (rows.length > 1) {
       duplicateIds.push(requestId);
       identicalRowsCollapsed += rows.length - variants.length;
     }
+    if (resolvedByLatestEta) resolvedByLatestEtaIds.push(requestId);
     if (duplicateConflict) conflictingIds.push(requestId);
 
-    const first = rows[0];
     const output = {
-      ...first,
+      ...selected,
       requestId,
       duplicateCount: rows.length,
       sourcePages,
       duplicateConflict,
       canApply: !duplicateConflict,
-      conflictVariants: duplicateConflict
-        ? variants.map(row => ({
-          type: row.type,
-          subject: compactText(row.subject) || null,
-          comment: compactText(row.comment) || null,
-          eta: row.eta || null,
-          source_page: row.sourcePage,
-        }))
+      duplicateResolution: resolvedByLatestEta ? 'latest_eta' : null,
+      conflictVariants: duplicateConflict ? variants.map(variantSummary) : [],
+      discardedVariants: resolvedByLatestEta
+        ? variants.filter(row => row !== selected).map(variantSummary)
         : [],
     };
 
@@ -328,6 +342,7 @@ function consolidateParsedRows(wip = [], pendingWithUser = []) {
     duplicateSummary: {
       duplicateIds,
       conflictingIds,
+      resolvedByLatestEtaIds,
       identicalRowsCollapsed,
     },
   };
@@ -476,8 +491,10 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
         can_apply: canApply,
         duplicate_count: row.duplicateCount,
         duplicate_conflict: row.duplicateConflict,
+        duplicate_resolution: row.duplicateResolution,
         source_pages: row.sourcePages,
         conflict_variants: row.conflictVariants,
+        discarded_variants: row.discardedVariants,
         database_duplicate: databaseDuplicate,
       });
     }
@@ -505,8 +522,10 @@ router.post('/parse', upload.single('pdf'), async (req, res, next) => {
         can_apply: canApply,
         duplicate_count: row.duplicateCount,
         duplicate_conflict: row.duplicateConflict,
+        duplicate_resolution: row.duplicateResolution,
         source_pages: row.sourcePages,
         conflict_variants: row.conflictVariants,
+        discarded_variants: row.discardedVariants,
         database_duplicate: databaseDuplicate,
       });
     }

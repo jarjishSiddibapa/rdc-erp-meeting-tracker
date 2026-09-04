@@ -86,7 +86,7 @@ test('collapses identical repeated PDF rows into one safe operation', () => {
   assert.deepEqual(result.duplicateSummary.duplicateIds, ['231590']);
 });
 
-test('blocks conflicting duplicate ETAs instead of guessing or inserting twice', () => {
+test('keeps the uniquely highest ETA when the same Request ID has different dates', () => {
   const result = consolidateParsedRows([
     {
       requestId: '231590', subject: 'Request for Customer Refund Process',
@@ -99,13 +99,17 @@ test('blocks conflicting duplicate ETAs instead of guessing or inserting twice',
   ], []);
 
   assert.equal(result.wip.length, 1);
-  assert.equal(result.wip[0].duplicateConflict, true);
-  assert.equal(result.wip[0].canApply, false);
-  assert.equal(result.wip[0].conflictVariants.length, 2);
-  assert.deepEqual(result.duplicateSummary.conflictingIds, ['231590']);
+  assert.equal(result.wip[0].eta, '2026-09-02');
+  assert.equal(result.wip[0].comment, 'Analysis in Progress');
+  assert.equal(result.wip[0].duplicateConflict, false);
+  assert.equal(result.wip[0].canApply, true);
+  assert.equal(result.wip[0].duplicateResolution, 'latest_eta');
+  assert.equal(result.wip[0].discardedVariants[0].eta, '2026-08-03');
+  assert.deepEqual(result.duplicateSummary.resolvedByLatestEtaIds, ['231590']);
+  assert.deepEqual(result.duplicateSummary.conflictingIds, []);
 });
 
-test('blocks one request appearing in both actionable Deloitte tables', () => {
+test('uses the dated row when one request appears in both actionable Deloitte tables', () => {
   const result = consolidateParsedRows(
     [{ requestId: '230519', subject: 'Attachment issue', comment: 'Analysis', eta: '2026-09-01' }],
     [{ requestId: '230519', subject: 'Attachment issue' }]
@@ -113,5 +117,18 @@ test('blocks one request appearing in both actionable Deloitte tables', () => {
 
   assert.equal(result.wip.length, 1);
   assert.equal(result.pendingWithUser.length, 0);
+  assert.equal(result.wip[0].canApply, true);
+  assert.equal(result.wip[0].duplicateResolution, 'latest_eta');
+});
+
+test('blocks conflicting duplicate rows when the highest ETA is tied', () => {
+  const result = consolidateParsedRows([
+    { requestId: '231590', subject: 'Refund', comment: 'Analysis', eta: '2026-09-02' },
+    { requestId: '231590', subject: 'Refund', comment: 'Testing', eta: '2026-09-02' },
+  ], []);
+
+  assert.equal(result.wip.length, 1);
   assert.equal(result.wip[0].canApply, false);
+  assert.equal(result.wip[0].duplicateConflict, true);
+  assert.deepEqual(result.duplicateSummary.conflictingIds, ['231590']);
 });
