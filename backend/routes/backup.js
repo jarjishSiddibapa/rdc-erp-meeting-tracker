@@ -4,6 +4,7 @@ const path = require('path');
 const { pool } = require('../db/pool');
 const { authenticate, requireRole } = require('../middleware/auth');
 const { runBackup, getSettings, rescheduleBackups, BACKUP_DIR } = require('../services/backup');
+const { parseEmailList } = require('../utils/validation');
 
 const router = express.Router();
 router.use(authenticate);
@@ -21,21 +22,33 @@ router.get('/settings', async (req, res, next) => {
 
 router.put('/settings', async (req, res, next) => {
   try {
-    const { enabled, hour, minute } = req.body;
+    const { enabled, hour, minute, email_enabled, email_recipients } = req.body;
     const h = Number(hour), m = Number(minute);
     if (!Number.isInteger(h) || h < 0 || h > 23) return res.status(400).json({ message: 'Hour must be 0-23' });
     if (!Number.isInteger(m) || m < 0 || m > 59) return res.status(400).json({ message: 'Minute must be 0-59' });
 
+    // Normalize to a clean "a@b.com, c@d.com" string regardless of how the admin typed it
+    // (extra spaces, trailing commas, duplicates) so what's stored is always what will
+    // actually be used as the send list.
+    const { valid, invalid } = parseEmailList(email_recipients);
+    if (email_enabled && valid.length === 0) {
+      return res.status(400).json({ message: 'Add at least one valid email address to enable emailed backups.' });
+    }
+    if (invalid.length > 0) {
+      return res.status(400).json({ message: `Not a valid email address: ${invalid.join(', ')}` });
+    }
+    const normalizedRecipients = valid.length > 0 ? valid.join(', ') : null;
+
     const current = await getSettings();
     if (current.id) {
       await pool.execute(
-        'UPDATE backup_settings SET enabled = ?, hour = ?, minute = ?, updated_by = ? WHERE id = ?',
-        [enabled ? 1 : 0, h, m, req.user.id, current.id]
+        'UPDATE backup_settings SET enabled = ?, hour = ?, minute = ?, email_enabled = ?, email_recipients = ?, updated_by = ? WHERE id = ?',
+        [enabled ? 1 : 0, h, m, email_enabled ? 1 : 0, normalizedRecipients, req.user.id, current.id]
       );
     } else {
       await pool.execute(
-        'INSERT INTO backup_settings (enabled, hour, minute, updated_by) VALUES (?, ?, ?, ?)',
-        [enabled ? 1 : 0, h, m, req.user.id]
+        'INSERT INTO backup_settings (enabled, hour, minute, email_enabled, email_recipients, updated_by) VALUES (?, ?, ?, ?, ?, ?)',
+        [enabled ? 1 : 0, h, m, email_enabled ? 1 : 0, normalizedRecipients, req.user.id]
       );
     }
 

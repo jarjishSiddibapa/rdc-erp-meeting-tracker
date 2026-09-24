@@ -130,6 +130,8 @@ async function createTables() {
       enabled TINYINT(1) NOT NULL DEFAULT 1,
       hour TINYINT NOT NULL DEFAULT 2,
       minute TINYINT NOT NULL DEFAULT 0,
+      email_enabled TINYINT(1) NOT NULL DEFAULT 0,
+      email_recipients VARCHAR(1000) NULL,
       is_deleted TINYINT(1) NOT NULL DEFAULT 0,
       updated_by INT NULL,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -143,6 +145,8 @@ async function createTables() {
       size_bytes BIGINT NULL,
       status VARCHAR(20) NOT NULL,
       message TEXT NULL,
+      email_status VARCHAR(20) NULL,
+      email_message TEXT NULL,
       triggered_by VARCHAR(20) NOT NULL DEFAULT 'schedule',
       is_deleted TINYINT(1) NOT NULL DEFAULT 0,
       started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -362,6 +366,41 @@ async function migrateUsersCanEditDigitization() {
   }
 }
 
+// Lets an admin have each completed backup emailed out as an offsite copy — added after
+// backup_settings/backup_runs already existed on production, same CREATE TABLE IF NOT
+// EXISTS limitation as srs.assigned_to above.
+async function migrateBackupEmailColumns() {
+  const [settingsCols] = await pool.query(
+    `SELECT COLUMN_NAME FROM information_schema.columns
+     WHERE table_schema = ? AND table_name = 'backup_settings'`,
+    [DB_NAME]
+  );
+  const existingSettingsCols = new Set(settingsCols.map(c => c.COLUMN_NAME));
+  if (!existingSettingsCols.has('email_enabled')) {
+    await pool.query('ALTER TABLE backup_settings ADD COLUMN email_enabled TINYINT(1) NOT NULL DEFAULT 0 AFTER minute');
+    console.log('Migrated: added backup_settings.email_enabled column.');
+  }
+  if (!existingSettingsCols.has('email_recipients')) {
+    await pool.query('ALTER TABLE backup_settings ADD COLUMN email_recipients VARCHAR(1000) NULL AFTER email_enabled');
+    console.log('Migrated: added backup_settings.email_recipients column.');
+  }
+
+  const [runsCols] = await pool.query(
+    `SELECT COLUMN_NAME FROM information_schema.columns
+     WHERE table_schema = ? AND table_name = 'backup_runs'`,
+    [DB_NAME]
+  );
+  const existingRunsCols = new Set(runsCols.map(c => c.COLUMN_NAME));
+  if (!existingRunsCols.has('email_status')) {
+    await pool.query('ALTER TABLE backup_runs ADD COLUMN email_status VARCHAR(20) NULL AFTER message');
+    console.log('Migrated: added backup_runs.email_status column.');
+  }
+  if (!existingRunsCols.has('email_message')) {
+    await pool.query('ALTER TABLE backup_runs ADD COLUMN email_message TEXT NULL AFTER email_status');
+    console.log('Migrated: added backup_runs.email_message column.');
+  }
+}
+
 async function seedDefaults() {
   const [settingsRows] = await pool.query('SELECT id FROM backup_settings LIMIT 1');
   if (settingsRows.length === 0) {
@@ -389,6 +428,7 @@ async function initDb() {
   await migrateSRsTable();
   await migrateUniqueActiveSrNumbers();
   await migrateManageEngineSyncRuns();
+  await migrateBackupEmailColumns();
   await seedDefaults();
 }
 

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
-  Card, Switch, TimePicker, Button, Table, Tag, Space, Typography,
+  Card, Switch, TimePicker, Input, Button, Table, Tag, Space, Typography,
   message, Popconfirm, Tooltip, Statistic, Row, Col
 } from 'antd';
 import {
   CloudServerOutlined, PlayCircleOutlined, DownloadOutlined,
   DeleteOutlined, CheckCircleFilled, CloseCircleFilled, SyncOutlined,
+  MailOutlined, InfoCircleOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { backupAPI } from '../services/api';
@@ -30,6 +31,17 @@ const STATUS_TAG = {
   running: <Tag icon={<SyncOutlined spin />} color="processing">Running</Tag>,
 };
 
+const EMAIL_STATUS_TAG = {
+  sent: <Tag icon={<CheckCircleFilled />} color="success">Sent</Tag>,
+  failed: <Tag icon={<CloseCircleFilled />} color="error">Failed</Tag>,
+};
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+function invalidRecipients(raw) {
+  return String(raw || '').split(',').map(s => s.trim()).filter(Boolean).filter(e => !EMAIL_REGEX.test(e));
+}
+
 export default function BackupSettings() {
   const [settings, setSettings] = useState(null);
   const [history, setHistory] = useState([]);
@@ -53,6 +65,12 @@ export default function BackupSettings() {
   useEffect(() => { fetchAll(); }, []);
 
   async function handleSave() {
+    if (settings.email_enabled) {
+      const bad = invalidRecipients(settings.email_recipients);
+      const hasAny = String(settings.email_recipients || '').trim().length > 0;
+      if (!hasAny) return message.error('Add at least one email address to enable emailed backups.');
+      if (bad.length > 0) return message.error(`Not a valid email address: ${bad.join(', ')}`);
+    }
     setSaving(true);
     try {
       const res = await backupAPI.updateSettings(settings);
@@ -101,6 +119,12 @@ export default function BackupSettings() {
     { title: 'Status', dataIndex: 'status', width: 110, render: v => STATUS_TAG[v] || v },
     { title: 'Size', dataIndex: 'size_bytes', width: 100, render: formatBytes },
     { title: 'Triggered', dataIndex: 'triggered_by', width: 100, render: v => <Tag>{v}</Tag> },
+    {
+      title: 'Emailed', dataIndex: 'email_status', width: 100,
+      render: (v, row) => v ? (
+        <Tooltip title={row.email_message}>{EMAIL_STATUS_TAG[v] || v}</Tooltip>
+      ) : <Text type="secondary">—</Text>,
+    },
     { title: 'Started', dataIndex: 'started_at', width: 190, render: v => dayjs(v).format('DD-MMM-YYYY hh:mm:ss A') },
     {
       title: 'Actions', width: 110, render: (_, row) => (
@@ -154,6 +178,32 @@ export default function BackupSettings() {
                         disabled={!settings.enabled}
                       />
                     </Space>
+
+                    <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 16, width: '100%' }}>
+                      <Space align="center" size={16}>
+                        <Switch
+                          checked={!!settings.email_enabled}
+                          onChange={v => setSettings({ ...settings, email_enabled: v })}
+                        />
+                        <Text>
+                          <MailOutlined style={{ marginRight: 6 }} />
+                          Email each backup automatically
+                        </Text>
+                      </Space>
+                      <div style={{ marginTop: 12 }}>
+                        <Input
+                          prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
+                          placeholder="e.g. admin@rdc.in, jarjish@rdc.in"
+                          value={settings.email_recipients || ''}
+                          onChange={e => setSettings({ ...settings, email_recipients: e.target.value })}
+                          disabled={!settings.email_enabled}
+                        />
+                        <Text type="secondary" style={{ fontSize: 12, display: 'block', marginTop: 6 }}>
+                          <InfoCircleOutlined style={{ marginRight: 4 }} />
+                          Separate multiple addresses with commas. Sent as an attachment after every backup — scheduled or manual — so a copy always exists off this server.
+                        </Text>
+                      </div>
+                    </div>
 
                     <BrandButton loading={saving} onClick={handleSave}>Save Schedule</BrandButton>
                   </Space>

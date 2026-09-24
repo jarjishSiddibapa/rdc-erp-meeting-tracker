@@ -78,4 +78,41 @@ async function sendWelcomeEmail({ to, fullName, tempPassword, resetUrl }) {
   });
 }
 
-module.exports = { transporter, verifyMailer, sendPasswordResetEmail, sendWelcomeEmail };
+function formatBytes(bytes) {
+  if (!bytes) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let i = 0, n = bytes;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  return `${n.toFixed(1)} ${units[i]}`;
+}
+
+const TRIGGERED_BY_LABEL = { schedule: 'the daily automatic schedule', manual: 'a manual "Run Backup Now"' };
+
+// `to` is the raw comma-separated recipients string from backup_settings.email_recipients —
+// nodemailer accepts that directly, no need to split it into an array first.
+async function sendBackupEmail({ to, filename, filepath, sizeBytes, triggeredBy }) {
+  const brand = '#00B51A';
+  await transporter.sendMail({
+    from: `"RDC Digitization Review" <${process.env.SMTP_USER}>`,
+    to,
+    subject: `Database backup — ${filename}`,
+    html: `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #111827;">
+        <div style="background: ${brand}; padding: 20px 24px; border-radius: 8px 8px 0 0;">
+          <h2 style="color: #fff; margin: 0; font-size: 18px;">RDC Digitization Review</h2>
+        </div>
+        <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
+          <p>A fresh database backup was just taken by ${TRIGGERED_BY_LABEL[triggeredBy] || triggeredBy} and is attached to this email as an offsite copy.</p>
+          <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+            <tr><td style="padding: 6px 0; color: #6b7280; font-size: 13px;">File</td><td style="padding: 6px 0; font-weight: 600; font-family: monospace;">${filename}</td></tr>
+            <tr><td style="padding: 6px 0; color: #6b7280; font-size: 13px;">Size</td><td style="padding: 6px 0; font-weight: 600;">${formatBytes(sizeBytes)}</td></tr>
+          </table>
+          <p style="font-size: 13px; color: #6b7280;">This is a full MySQL dump — restore with <code>mysql -u root -p &lt; ${filename}</code> on any MySQL server. This address is managed under Backup Settings in the admin panel.</p>
+        </div>
+      </div>
+    `,
+    attachments: [{ filename, path: filepath }],
+  });
+}
+
+module.exports = { transporter, verifyMailer, sendPasswordResetEmail, sendWelcomeEmail, sendBackupEmail };

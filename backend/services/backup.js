@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
 const { pool, DB_NAME } = require('../db/pool');
+const { sendBackupEmail } = require('./mailer');
+const { parseEmailList } = require('../utils/validation');
 
 const BACKUP_DIR = path.join(__dirname, '..', 'db-backup');
 if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
@@ -105,7 +107,18 @@ async function runBackup(triggeredBy = 'schedule') {
       'UPDATE backup_runs SET status = ?, size_bytes = ?, finished_at = NOW() WHERE id = ?',
       ['success', size, runId]
     );
-    return { success: true, filename, size };
+
+    // Emailing is best-effort and never affects the backup's own success/failure — a mail
+    // server hiccup shouldn't make a perfectly good backup look like it failed.
+    const emailResult = await emailBackupIfEnabled({ filename, filepath, size, triggeredBy });
+    if (emailResult) {
+      await pool.execute(
+        'UPDATE backup_runs SET email_status = ?, email_message = ? WHERE id = ?',
+        [emailResult.status, emailResult.message || null, runId]
+      );
+    }
+
+    return { success: true, filename, size, email: emailResult };
   } catch (e) {
     await pool.execute(
       'UPDATE backup_runs SET status = ?, message = ?, finished_at = NOW() WHERE id = ?',
@@ -118,7 +131,29 @@ async function runBackup(triggeredBy = 'schedule') {
 
 async function getSettings() {
   const [rows] = await pool.query('SELECT * FROM backup_settings WHERE is_deleted = 0 ORDER BY id DESC LIMIT 1');
-  return rows[0] || { enabled: 1, hour: 2, minute: 0 };
+  return rows[0] || { enabled: 1, hour: 2, minute: 0, email_enabled: 0, email_recipients: null };
+}
+
+// Runs after every successful backup, scheduled or manual — an admin clicking "Run Backup
+// Now" is exactly the moment they'd want to confirm the email pipeline actually works, and
+// keeping the send path in one place (rather than only wiring it into the cron branch) means
+// there's only ever one way this can silently drift out of sync with the toggle.
+async function emailBackupIfEnabled({ filename, filepath, size, triggeredBy }) {
+  const settings = await getSettings();
+  if (!settings.email_enabled) return null;
+
+  const { valid } = parseEmailList(settings.email_recipients);
+  if (valid.length === 0) {
+    return { status: 'failed', message: 'Email is enabled but no valid recipient addresses are configured.' };
+  }
+
+  try {
+    await sendBackupEmail({ to: valid.join(', '), filename, filepath, sizeBytes: size, triggeredBy });
+    return { status: 'sent', message: `Sent to ${valid.join(', ')}` };
+  } catch (e) {
+    console.error('Backup email failed:', e.message);
+    return { status: 'failed', message: e.message };
+  }
 }
 
 function scheduleFromSettings(settings) {
