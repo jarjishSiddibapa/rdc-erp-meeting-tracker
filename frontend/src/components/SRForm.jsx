@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, AutoComplete, DatePicker, Button, Row, Col, Grid } from 'antd';
 import dayjs from 'dayjs';
 import { useAuth } from '../context/AuthContext';
-import { srAPI } from '../services/api';
+import { srAPI, contactsAPI } from '../services/api';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -35,6 +35,22 @@ function filterOption(inputValue, option) {
   return option.value.toLowerCase().includes(inputValue.toLowerCase());
 }
 
+// Pending With can now name more than one person — options come from the shared Contacts
+// directory (Update Tasks > Pending-With Contacts) rather than raw historical text, since
+// that's also where a reminder email will look up who to actually send to. Select mode="tags"
+// still lets someone type a brand-new name that isn't in Contacts yet; it just won't have an
+// email until an admin adds one.
+function useContactOptions(open) {
+  const [options, setOptions] = useState([]);
+  useEffect(() => {
+    if (!open) return;
+    contactsAPI.list()
+      .then(res => setOptions(res.data.map(c => ({ value: c.name, label: c.name }))))
+      .catch(() => setOptions([]));
+  }, [open]);
+  return options;
+}
+
 export default function SRForm({ open, onClose, onSubmit, initialValues, category, loading }) {
   const [form] = Form.useForm();
   const { user } = useAuth();
@@ -44,7 +60,7 @@ export default function SRForm({ open, onClose, onSubmit, initialValues, categor
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.sm;
 
-  const pendingWithOptions = useDistinctOptions(category, 'pendingWith', open);
+  const pendingWithOptions = useContactOptions(open);
   const assignedToOptions = useDistinctOptions(category, 'assignedTo', open && !isDigitization);
   const createdByOptions = useDistinctOptions(category, 'createdByName', open && !isDigitization);
   const processOwnerOptions = useDistinctOptions(category, 'processOwner', open && isDigitization);
@@ -57,10 +73,13 @@ export default function SRForm({ open, onClose, onSubmit, initialValues, categor
         creation_date: dateVal(initialValues.creation_date),
         expected_closure_date: dateVal(initialValues.expected_closure_date),
         target_date: dateVal(initialValues.target_date),
+        pending_with: initialValues.pending_with
+          ? initialValues.pending_with.split(',').map(s => s.trim()).filter(Boolean)
+          : [],
       });
     } else {
       form.resetFields();
-      form.setFieldsValue({ category, status: 'Open', creation_date: dayjs() });
+      form.setFieldsValue({ category, status: 'Open', creation_date: dayjs(), pending_with: [] });
     }
   }, [open, initialValues, category]);
 
@@ -162,10 +181,12 @@ export default function SRForm({ open, onClose, onSubmit, initialValues, categor
               </Col>
               <Col xs={24} sm={12}>
                 <Form.Item name="pending_with" label="Pending With">
-                  <AutoComplete
+                  <Select
+                    mode="tags"
                     options={pendingWithOptions}
                     filterOption={filterOption}
-                    placeholder="Team or person it's pending with"
+                    placeholder="Team or person(s) it's pending with"
+                    tokenSeparators={[',']}
                   />
                 </Form.Item>
               </Col>
@@ -209,10 +230,12 @@ export default function SRForm({ open, onClose, onSubmit, initialValues, categor
               </Col>
               <Col xs={24} sm={12}>
                 <Form.Item name="pending_with" label="Pending With">
-                  <AutoComplete
+                  <Select
+                    mode="tags"
                     options={pendingWithOptions}
                     filterOption={filterOption}
-                    placeholder="Team or person it's pending with"
+                    placeholder="Team or person(s) it's pending with"
+                    tokenSeparators={[',']}
                   />
                 </Form.Item>
               </Col>

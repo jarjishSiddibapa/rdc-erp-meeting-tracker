@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import {
   Card, Button, Table, Alert, Space, Typography,
-  Row, Col, Result, Upload, Tabs, Tag, Collapse, Select, Popconfirm, message
+  Row, Col, Result, Upload, Tabs, Tag, Collapse, Select, Popconfirm, message,
+  Modal, Form, Input
 } from 'antd';
 import {
-  FileExcelOutlined, DownloadOutlined, UploadOutlined, FilePdfOutlined, SyncOutlined, StopOutlined
+  FileExcelOutlined, DownloadOutlined, UploadOutlined, FilePdfOutlined, SyncOutlined, StopOutlined,
+  PlusOutlined, MailOutlined, ContactsOutlined
 } from '@ant-design/icons';
-import { srAPI, csvImportAPI, deloitteImportAPI, manageEngineImportAPI } from '../services/api';
+import { srAPI, csvImportAPI, deloitteImportAPI, manageEngineImportAPI, contactsAPI, pendingRemindersAPI } from '../services/api';
 import { Reveal } from '../components/ui/Reveal';
 import BrandButton from '../components/ui/BrandButton';
 import SRDetail from '../components/SRDetail';
@@ -603,6 +605,13 @@ function UpdateFromManageEngine() {
     } catch (e) { message.error(e.response?.data?.message || 'Delete failed'); }
   }
 
+  async function handleDetailSetOnHold(sr) {
+    try {
+      await srAPI.update(sr.id, { status: 'On Hold' });
+      message.success(`${sr.sr_number} put on hold`);
+    } catch (e) { message.error(e.response?.data?.message || 'Failed to update status'); }
+  }
+
   async function handleUpload(file) {
     if (!assignedTo) { setError('Select a technician (Assigned To) before uploading.'); return false; }
     setParsing(true); setError(''); setResult(null); setParsed(null); setFileName(file.name);
@@ -837,8 +846,454 @@ function UpdateFromManageEngine() {
         onUpdated={updated => setDetailSR(updated)}
         onCloseSR={handleDetailClose}
         onReopenSR={handleDetailReopen}
+        onSetOnHold={handleDetailSetOnHold}
         onDelete={handleDetailDelete}
       />
+    </div>
+  );
+}
+
+// ── Pending-With Contacts (name → email directory) ──
+// The name-to-email directory backing the SR form's multi-person Pending With picker and the
+// reminder-email feature below. Deliberately separate from User Management: most of these
+// names never log into the app at all (Deloitte-side staff, external contacts).
+function ContactsManager() {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [form] = Form.useForm();
+
+  async function fetchContacts() {
+    setLoading(true);
+    try {
+      const res = await contactsAPI.listAll();
+      setContacts(res.data);
+    } catch { message.error('Failed to load contacts'); }
+    finally { setLoading(false); }
+  }
+
+  useEffect(() => { fetchContacts(); }, []);
+
+  function openAdd() { setEditing(null); form.resetFields(); setModalOpen(true); }
+  function openEdit(row) { setEditing(row); form.setFieldsValue(row); setModalOpen(true); }
+
+  async function handleSave() {
+    const values = await form.validateFields();
+    setSaving(true);
+    try {
+      if (editing) {
+        const res = await contactsAPI.update(editing.id, values);
+        // A rename cascades into every currently-active SR that used the old name (see
+        // cascadeContactRename in routes/contacts.js) - confirm that actually happened rather
+        // than leaving the admin to wonder whether existing SRs still show the old spelling.
+        message.success(
+          res.data.srsUpdated > 0
+            ? `Contact saved - updated ${res.data.srsUpdated} existing SR${res.data.srsUpdated === 1 ? '' : 's'} to match`
+            : 'Contact saved'
+        );
+      } else {
+        await contactsAPI.create(values);
+        message.success('Contact saved');
+      }
+      setModalOpen(false);
+      fetchContacts();
+    } catch (e) {
+      message.error(e.response?.data?.message || 'Failed to save contact');
+    } finally { setSaving(false); }
+  }
+
+  async function handleDelete(id) {
+    try {
+      await contactsAPI.delete(id);
+      message.success('Contact moved to Inactive');
+      fetchContacts();
+    } catch (e) { message.error(e.response?.data?.message || 'Failed to remove contact'); }
+  }
+
+  async function handleSetIgnored(row, ignored) {
+    try {
+      await contactsAPI.update(row.id, { is_ignored: ignored });
+      message.success(ignored ? `${row.name} will be skipped for reminders` : `${row.name} will receive reminders again`);
+      fetchContacts();
+    } catch (e) { message.error(e.response?.data?.message || 'Failed to update contact'); }
+  }
+
+  async function handleRestore(row) {
+    try {
+      await contactsAPI.update(row.id, { is_deleted: false });
+      message.success(`${row.name} restored`);
+      fetchContacts();
+    } catch (e) { message.error(e.response?.data?.message || 'Failed to restore contact'); }
+  }
+
+  const active   = contacts.filter(c => !c.is_deleted && !c.is_ignored);
+  const ignored  = contacts.filter(c => !c.is_deleted && c.is_ignored);
+  const inactive = contacts.filter(c => c.is_deleted);
+
+  // A filter (not just a visual cue) on the Email column, so an admin working through the
+  // directory can isolate exactly the entries still missing one and fill them in one after
+  // another, instead of scanning the whole alphabetical list by eye.
+  const baseColumns = [
+    { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
+    {
+      title: 'Email', dataIndex: 'email',
+      render: v => v || <Text type="secondary">No email on file</Text>,
+      filters: [
+        { text: 'Missing email', value: 'missing' },
+        { text: 'Has email', value: 'has' },
+      ],
+      onFilter: (value, row) => value === 'missing' ? !row.email : !!row.email,
+      sorter: (a, b) => (a.email ? 1 : 0) - (b.email ? 1 : 0),
+    },
+  ];
+
+  const activeColumns = [
+    ...baseColumns,
+    {
+      title: 'Actions', width: 220,
+      render: (_, row) => (
+        <Space size={8}>
+          <Button size="small" onClick={() => openEdit(row)}>Edit</Button>
+          <Popconfirm title={`Never send ${row.name} reminder emails?`} onConfirm={() => handleSetIgnored(row, true)}>
+            <Button size="small">Ignore</Button>
+          </Popconfirm>
+          <Popconfirm title={`Move ${row.name} to Inactive?`} onConfirm={() => handleDelete(row.id)}>
+            <Button size="small" danger>Delete</Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  const ignoredColumns = [
+    ...baseColumns,
+    {
+      title: 'Actions', width: 220,
+      render: (_, row) => (
+        <Space size={8}>
+          <Button size="small" onClick={() => openEdit(row)}>Edit</Button>
+          <Button size="small" type="primary" onClick={() => handleSetIgnored(row, false)}>Unignore</Button>
+          <Popconfirm title={`Move ${row.name} to Inactive?`} onConfirm={() => handleDelete(row.id)}>
+            <Button size="small" danger>Delete</Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  const inactiveColumns = [
+    ...baseColumns,
+    {
+      title: 'Actions', width: 140,
+      render: (_, row) => <Button size="small" type="primary" onClick={() => handleRestore(row)}>Restore</Button>,
+    },
+  ];
+
+  function contactsTable(data, columns) {
+    return (
+      <Table
+        rowKey="id" size="small" columns={columns} dataSource={data} loading={loading}
+        pagination={data.length > 10 ? compactPaginationConfig('contacts', { defaultPageSize: 10 }) : false}
+        locale={{ emptyText: 'Nothing here' }}
+      />
+    );
+  }
+
+  return (
+    <div>
+      <Paragraph type="secondary" style={{ marginBottom: 20 }}>
+        The name-to-email directory used for Pending With on the SR form (which now accepts more
+        than one person per SR) and for sending pending-work reminder emails below. Seeded once
+        from names already in use; add or fix entries here as needed. Ignored people stay valid
+        Pending With names but are permanently skipped when sending reminders.
+      </Paragraph>
+      <div style={{ marginBottom: 12 }}>
+        <BrandButton icon={<PlusOutlined />} onClick={openAdd}>Add Contact</BrandButton>
+      </div>
+      <Card>
+        <Tabs
+          defaultActiveKey="active"
+          items={[
+            { key: 'active', label: `Active (${active.length})`, children: contactsTable(active, activeColumns) },
+            { key: 'ignored', label: `Ignored (${ignored.length})`, children: contactsTable(ignored, ignoredColumns) },
+            { key: 'inactive', label: `Inactive (${inactive.length})`, children: contactsTable(inactive, inactiveColumns) },
+          ]}
+        />
+      </Card>
+      <Modal
+        title={editing ? `Edit ${editing.name}` : 'Add Contact'}
+        open={modalOpen} onCancel={() => setModalOpen(false)}
+        onOk={handleSave} confirmLoading={saving} destroyOnClose
+      >
+        <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Name is required' }]}>
+            <Input placeholder="e.g. Atish Kshirsagar" />
+          </Form.Item>
+          <Form.Item name="email" label="Email" rules={[{ type: 'email', message: 'Not a valid email address' }]}>
+            <Input placeholder="e.g. atish.kshirsagar@rdc.in" />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+}
+
+// ── Send Pending Reminders (manual, admin-triggered) ──
+// One email per person (except Deloitte, tracked separately via the weekly PDF) listing
+// everything currently pending with them — fired by hand, e.g. the day before a meeting.
+function SendPendingReminders() {
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState(null);
+  const [editingEmailFor, setEditingEmailFor] = useState(null);
+  const [emailDraft, setEmailDraft] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [resolveModalOpen, setResolveModalOpen] = useState(false);
+  const [resolveDrafts, setResolveDrafts] = useState({});
+  const [resolvingKey, setResolvingKey] = useState(null);
+
+  const unresolvedGroups = (preview?.groups || []).filter(g => !g.email);
+
+  async function fetchPreview() {
+    setLoading(true);
+    try {
+      const res = await pendingRemindersAPI.preview();
+      setPreview(res.data);
+      // Only someone with a known email can actually be sent to - pre-select exactly that set
+      // so "Send Reminders" does the right thing with zero extra clicks in the common case.
+      // Groups are keyed by resolved email (not name) so two name-variants sharing one contact
+      // merge into a single send instead of emailing the same person twice.
+      setSelectedKeys(res.data.groups.filter(g => g.email).map(g => g.key));
+    } catch { message.error('Failed to load pending reminders'); }
+    finally { setLoading(false); }
+  }
+
+  async function fetchHistory() {
+    try {
+      const res = await pendingRemindersAPI.history();
+      setHistory(res.data);
+    } catch { /* history is a nice-to-have, not worth surfacing an error for */ }
+  }
+
+  useEffect(() => { fetchPreview(); fetchHistory(); }, []);
+
+  async function handleSaveEmail(group) {
+    const email = emailDraft.trim();
+    if (!email) return;
+    setSavingEmail(true);
+    try {
+      if (group.contactId) await contactsAPI.update(group.contactId, { email });
+      else await contactsAPI.create({ name: group.name, email });
+      message.success(`Email saved for ${group.name}`);
+      setEditingEmailFor(null);
+      await fetchPreview();
+    } catch (e) {
+      message.error(e.response?.data?.message || 'Failed to save email');
+    } finally { setSavingEmail(false); }
+  }
+
+  async function handleSend() {
+    setSending(true);
+    setResult(null);
+    try {
+      const res = await pendingRemindersAPI.send(selectedKeys);
+      setResult(res.data);
+      message.success(`Sent to ${res.data.sent.length} of ${selectedKeys.length}`);
+      await fetchPreview();
+      await fetchHistory();
+    } catch (e) {
+      message.error(e.response?.data?.message || 'Failed to send reminders');
+    } finally { setSending(false); }
+  }
+
+  // Clicking Send doesn't just skip anyone missing an email - it surfaces them right there so
+  // the admin can fix or explicitly ignore each one before (or instead of) sending.
+  function handleSendClick() {
+    if (unresolvedGroups.length > 0) {
+      setResolveDrafts({});
+      setResolveModalOpen(true);
+      return;
+    }
+    handleSend();
+  }
+
+  async function resolveWithEmail(group) {
+    const email = (resolveDrafts[group.key] || '').trim();
+    if (!email) return;
+    setResolvingKey(group.key);
+    try {
+      if (group.contactId) await contactsAPI.update(group.contactId, { email });
+      else await contactsAPI.create({ name: group.name, email });
+      message.success(`Email saved for ${group.name}`);
+      await fetchPreview();
+    } catch (e) {
+      message.error(e.response?.data?.message || 'Failed to save email');
+    } finally { setResolvingKey(null); }
+  }
+
+  async function resolveIgnore(group) {
+    setResolvingKey(group.key);
+    try {
+      if (group.contactId) await contactsAPI.update(group.contactId, { is_ignored: true });
+      else await contactsAPI.create({ name: group.name, is_ignored: true });
+      message.success(`${group.name} will be skipped from reminders going forward`);
+      await fetchPreview();
+    } catch (e) {
+      message.error(e.response?.data?.message || 'Failed to update contact');
+    } finally { setResolvingKey(null); }
+  }
+
+  const columns = [
+    { title: 'Name', dataIndex: 'name', width: 180 },
+    {
+      title: 'Email', dataIndex: 'email', width: 280,
+      render: (v, row) => {
+        if (editingEmailFor === row.key) {
+          return (
+            <Space.Compact style={{ width: '100%' }}>
+              <Input
+                size="small" value={emailDraft} autoFocus
+                placeholder="name@rdc.in"
+                onChange={e => setEmailDraft(e.target.value)}
+                onPressEnter={() => handleSaveEmail(row)}
+              />
+              <Button size="small" type="primary" loading={savingEmail} onClick={() => handleSaveEmail(row)}>Save</Button>
+              <Button size="small" onClick={() => setEditingEmailFor(null)}>Cancel</Button>
+            </Space.Compact>
+          );
+        }
+        return v ? v : (
+          <Button size="small" danger onClick={() => { setEditingEmailFor(row.key); setEmailDraft(''); }}>
+            + Add email
+          </Button>
+        );
+      },
+    },
+    { title: 'Pending SRs', dataIndex: 'srCount', width: 110, render: v => <Tag color="blue">{v}</Tag> },
+  ];
+
+  const srColumns = [
+    { title: 'SR No', dataIndex: 'sr_number', width: 100 },
+    { title: 'Description', dataIndex: 'description', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
+    { title: 'Status', dataIndex: 'status', width: 130, render: v => <Tag>{v}</Tag> },
+    { title: 'Pending', dataIndex: 'pending_since_days', width: 90, render: v => `${v}d` },
+  ];
+
+  const historyColumns = [
+    { title: 'Recipient', dataIndex: 'recipient_name', width: 160 },
+    { title: 'Email', dataIndex: 'recipient_email', render: v => v || <Text type="secondary">-</Text> },
+    { title: 'SRs', dataIndex: 'sr_count', width: 70 },
+    { title: 'Status', dataIndex: 'status', width: 100, render: v => v === 'sent' ? <Tag color="green">Sent</Tag> : <Tag color="red">Failed</Tag> },
+    { title: 'Sent By', dataIndex: 'sent_by_name', width: 140, render: v => v || <Text type="secondary">System</Text> },
+    { title: 'Sent At', dataIndex: 'sent_at', width: 170, render: v => dayjs(v).format('DD-MMM-YYYY hh:mm A') },
+  ];
+
+  return (
+    <div>
+      <Paragraph type="secondary" style={{ marginBottom: 20 }}>
+        Everyone except Deloitte currently named in Pending With on an open SR, with everything
+        that's pending against them. Fire this manually - e.g. the day before a meeting - so each
+        person gets an email listing exactly what's pending with them. Missing an email? Add one
+        inline below; it's saved to Pending-With Contacts for next time too.
+      </Paragraph>
+
+      {preview?.unresolvedCount > 0 && (
+        <Alert
+          type="warning" showIcon style={{ marginBottom: 16 }}
+          message={`${preview.unresolvedCount} ${preview.unresolvedCount === 1 ? 'person has' : 'people have'} no email on file - add one below to include them.`}
+        />
+      )}
+
+      <Card size="small" style={{ marginBottom: 16 }}>
+        <Table
+          rowKey="key" size="small" loading={loading} columns={columns} dataSource={preview?.groups || []}
+          expandable={{ expandedRowRender: row => <Table rowKey="sr_number" size="small" columns={srColumns} dataSource={row.srs} pagination={false} /> }}
+          rowSelection={{
+            selectedRowKeys: selectedKeys,
+            onChange: setSelectedKeys,
+            getCheckboxProps: row => ({ disabled: !row.email }),
+          }}
+          pagination={false}
+          locale={{ emptyText: 'Nothing pending with anyone right now' }}
+        />
+      </Card>
+
+      <BrandButton icon={<MailOutlined />} loading={sending} disabled={selectedKeys.length === 0} onClick={handleSendClick}>
+        Send Reminders ({selectedKeys.length})
+      </BrandButton>
+
+      <Modal
+        title={`${unresolvedGroups.length} ${unresolvedGroups.length === 1 ? 'person is' : 'people are'} missing an email`}
+        open={resolveModalOpen}
+        onCancel={() => setResolveModalOpen(false)}
+        width={640}
+        footer={[
+          <Button key="close" onClick={() => setResolveModalOpen(false)}>Close</Button>,
+          <Button key="continue" type="primary" onClick={() => { setResolveModalOpen(false); handleSend(); }}>
+            Continue to Send ({selectedKeys.length})
+          </Button>,
+        ]}
+      >
+        <Paragraph type="secondary">
+          Add an email so they're included in this send, or Ignore to permanently exclude them
+          from reminders. Anyone left unresolved is simply skipped when you continue.
+        </Paragraph>
+        <Table
+          rowKey="key" size="small" pagination={false}
+          dataSource={unresolvedGroups}
+          locale={{ emptyText: 'Everyone now has an email on file' }}
+          columns={[
+            { title: 'Name', dataIndex: 'name' },
+            { title: 'Pending SRs', dataIndex: 'srCount', width: 90, render: v => <Tag color="blue">{v}</Tag> },
+            {
+              title: 'Resolve', width: 320,
+              render: (_, row) => (
+                <Space.Compact style={{ width: '100%' }}>
+                  <Input
+                    size="small" placeholder="name@rdc.in"
+                    value={resolveDrafts[row.key] || ''}
+                    onChange={e => setResolveDrafts(d => ({ ...d, [row.key]: e.target.value }))}
+                    onPressEnter={() => resolveWithEmail(row)}
+                  />
+                  <Button size="small" type="primary" loading={resolvingKey === row.key} onClick={() => resolveWithEmail(row)}>Save</Button>
+                  <Button size="small" danger loading={resolvingKey === row.key} onClick={() => resolveIgnore(row)}>Ignore</Button>
+                </Space.Compact>
+              ),
+            },
+          ]}
+        />
+      </Modal>
+
+      {result && (
+        <Alert
+          style={{ marginTop: 16 }}
+          type={result.failed.length > 0 ? 'warning' : 'success'}
+          showIcon
+          message={`Sent to ${result.sent.length}${result.failed.length ? `; ${result.failed.length} failed` : ''}`}
+          description={result.failed.length > 0 ? result.failed.map(f => `${f.name}: ${f.message}`).join(' | ') : undefined}
+        />
+      )}
+
+      {history.length > 0 && (
+        <Collapse
+          style={{ marginTop: 20 }} size="small"
+          items={[{
+            key: 'history',
+            label: `Recent sends (${history.length})`,
+            children: (
+              <Table
+                rowKey="id" size="small" dataSource={history} columns={historyColumns}
+                pagination={history.length > 10 ? compactPaginationConfig('sends', { defaultPageSize: 10 }) : false}
+              />
+            ),
+          }]}
+        />
+      )}
     </div>
   );
 }
@@ -854,6 +1309,8 @@ export default function UpdateTasks() {
             { key: 'data', label: <Space><UploadOutlined />Update Task Data</Space>, children: <UpdateTaskData /> },
             { key: 'deloitte', label: <Space><FilePdfOutlined />Upload Deloitte PDF</Space>, children: <UploadDeloittePdf /> },
             { key: 'manageengine', label: <Space><SyncOutlined />Update from ManageEngine</Space>, children: <UpdateFromManageEngine /> },
+            { key: 'contacts', label: <Space><ContactsOutlined />Pending-With Contacts</Space>, children: <ContactsManager /> },
+            { key: 'reminders', label: <Space><MailOutlined />Send Pending Reminders</Space>, children: <SendPendingReminders /> },
           ]}
         />
       </div>

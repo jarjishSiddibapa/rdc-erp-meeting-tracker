@@ -115,4 +115,55 @@ async function sendBackupEmail({ to, filename, filepath, sizeBytes, triggeredBy 
   });
 }
 
-module.exports = { transporter, verifyMailer, sendPasswordResetEmail, sendWelcomeEmail, sendBackupEmail };
+// The reminder email is the first one that interpolates arbitrary free-text DB content (SR
+// descriptions, contact names) rather than fixed server-generated strings — escape it so a
+// description containing "<" or "&" can't break the layout or masquerade as markup.
+function escapeHtml(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// One email per person, listing everything currently pending with them (except Deloitte,
+// filtered out by the caller) so they walk into the next meeting already knowing what's on
+// their plate — this is fired manually by an admin, never on a schedule.
+async function sendPendingReminderEmail({ to, name, srs }) {
+  const brand = '#00B51A';
+  const rows = srs.map(sr => `
+    <tr>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-family: monospace; font-size: 13px;">${escapeHtml(sr.sr_number)}</td>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${escapeHtml(sr.description || '—')}</td>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${escapeHtml(sr.status)}</td>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px; text-align: right;">${sr.pending_since_days}d</td>
+    </tr>
+  `).join('');
+
+  await transporter.sendMail({
+    from: `"RDC Digitization Review" <${process.env.SMTP_USER}>`,
+    to,
+    subject: `Reminder: ${srs.length} Service Request${srs.length === 1 ? '' : 's'} pending with you`,
+    html: `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827;">
+        <div style="background: ${brand}; padding: 20px 24px; border-radius: 8px 8px 0 0;">
+          <h2 style="color: #fff; margin: 0; font-size: 18px;">RDC Digitization Review</h2>
+        </div>
+        <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
+          <p>Hi ${escapeHtml(name)},</p>
+          <p>The following Service Request${srs.length === 1 ? ' is' : 's are'} currently pending with you. A quick note ahead of the next meeting so nothing gets missed:</p>
+          <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+            <thead>
+              <tr style="text-align: left; font-size: 12px; color: #6b7280;">
+                <th style="padding: 0 6px 6px;">SR No.</th>
+                <th style="padding: 0 6px 6px;">Description</th>
+                <th style="padding: 0 6px 6px;">Status</th>
+                <th style="padding: 0 6px 6px; text-align: right;">Pending Since</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <p style="font-size: 13px; color: #6b7280;">"Pending" above is how long it's been sitting with you specifically, not how old the SR is overall.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+module.exports = { transporter, verifyMailer, sendPasswordResetEmail, sendWelcomeEmail, sendBackupEmail, sendPendingReminderEmail };

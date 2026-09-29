@@ -169,6 +169,20 @@ export const manageEngineImportAPI = {
   syncNow: () => api.post('/manageengine-import/sync-now'),
 };
 
+export const contactsAPI = {
+  list: () => api.get('/contacts', { cacheMs: 30_000 }),
+  listAll: () => api.get('/contacts', { params: { all: 'true' } }),
+  create: (data) => api.post('/contacts', data),
+  update: (id, data) => api.put(`/contacts/${id}`, data),
+  delete: (id) => api.delete(`/contacts/${id}`),
+};
+
+export const pendingRemindersAPI = {
+  preview: () => api.get('/pending-reminders/preview'),
+  send: (keys) => api.post('/pending-reminders/send', { keys }),
+  history: () => api.get('/pending-reminders/history'),
+};
+
 export const userAPI = {
   list: () => api.get('/users'),
   create: (data) => api.post('/users', data),

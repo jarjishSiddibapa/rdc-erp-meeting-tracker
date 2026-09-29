@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 const { pool, DB_NAME } = require('./pool');
+const { splitPendingWith, isRealPersonName } = require('../utils/pendingWith');
 
 const DEFAULT_ADMIN = {
   full_name: process.env.DEFAULT_ADMIN_NAME || 'System Administrator',
@@ -55,6 +56,7 @@ async function createTables() {
       scope VARCHAR(20) NULL CHECK (scope IN ('Internal', 'External')),
       status VARCHAR(20) NOT NULL DEFAULT 'Open',
       pending_with VARCHAR(255),
+      pending_since_date DATE,
       assigned_to VARCHAR(255),
       closed_date DATE,
 
@@ -171,6 +173,43 @@ async function createTables() {
       started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       finished_at DATETIME NULL,
       INDEX idx_manageengine_sync_runs_started (started_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  // Name -> email directory for "Pending With" people. Deliberately separate from `users`:
+  // most pending_with names (Deloitte-side staff, external contacts) never log into this app
+  // at all, and the ones who do often don't match a login account's full_name exactly (e.g.
+  // "Atish" vs "Atish Kshirsagar"). email is nullable — a contact can exist (so it's pickable
+  // in the SR form and shows up as a name needing follow-up) before anyone has filled in an
+  // address for it.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS contacts (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NULL,
+      is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+      is_ignored TINYINT(1) NOT NULL DEFAULT 0,
+      updated_by INT NULL,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      CONSTRAINT fk_contacts_user FOREIGN KEY (updated_by) REFERENCES users(id),
+      UNIQUE KEY uniq_contacts_name (name)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS pending_reminder_log (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      recipient_name VARCHAR(255) NOT NULL,
+      recipient_email VARCHAR(255) NULL,
+      sr_count INT NOT NULL DEFAULT 0,
+      sr_numbers TEXT NULL,
+      status VARCHAR(20) NOT NULL,
+      message TEXT NULL,
+      sent_by INT NULL,
+      sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT fk_reminder_log_user FOREIGN KEY (sent_by) REFERENCES users(id),
+      INDEX idx_reminder_log_sent_at (sent_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
 }
@@ -339,6 +378,33 @@ async function migrateUniqueActiveSrNumbers() {
   }
 }
 
+// Added after contacts already existed on production - lets an admin mark a contact as
+// "ignored" (still a valid Pending With person, just excluded from reminder emails
+// specifically) without deleting them.
+async function migrateContactsIgnored() {
+  const [cols] = await pool.query(
+    `SELECT COLUMN_NAME FROM information_schema.columns
+     WHERE table_schema = ? AND table_name = 'contacts' AND COLUMN_NAME = 'is_ignored'`,
+    [DB_NAME]
+  );
+  if (cols.length === 0) {
+    await pool.query('ALTER TABLE contacts ADD COLUMN is_ignored TINYINT(1) NOT NULL DEFAULT 0 AFTER is_deleted');
+    console.log('Migrated: added contacts.is_ignored column.');
+  }
+}
+
+async function migratePendingSinceDate() {
+  const [cols] = await pool.query(
+    `SELECT COLUMN_NAME FROM information_schema.columns
+     WHERE table_schema = ? AND table_name = 'srs' AND COLUMN_NAME = 'pending_since_date'`,
+    [DB_NAME]
+  );
+  if (cols.length === 0) {
+    await pool.query('ALTER TABLE srs ADD COLUMN pending_since_date DATE AFTER pending_with');
+    console.log('Migrated: added srs.pending_since_date column.');
+  }
+}
+
 async function migrateManageEngineSyncRuns() {
   const [cols] = await pool.query(
     `SELECT COLUMN_NAME FROM information_schema.columns
@@ -401,6 +467,37 @@ async function migrateBackupEmailColumns() {
   }
 }
 
+// One-time (per name), idempotent: gives the admin a ready-made contacts worklist instead of
+// typing every "Pending With" name from scratch, by pulling every distinct name already in
+// use across existing SRs (splitting any that already hold multiple people). Where a name
+// matches an existing login account's full_name exactly, that account's email is prefilled —
+// exact match only, never fuzzy, since a wrong guess here means a reminder email goes to the
+// wrong person.
+async function seedContactsFromPendingWith() {
+  const [pwRows] = await pool.query(
+    "SELECT DISTINCT pending_with FROM srs WHERE is_deleted = 0 AND pending_with IS NOT NULL AND pending_with != ''"
+  );
+  const names = new Set();
+  pwRows.forEach(r => splitPendingWith(r.pending_with).filter(isRealPersonName).forEach(n => names.add(n)));
+  if (names.size === 0) return;
+
+  const [existingContacts] = await pool.query('SELECT name FROM contacts');
+  const existingLower = new Set(existingContacts.map(r => r.name.toLowerCase()));
+  const toInsert = [...names].filter(n => !existingLower.has(n.toLowerCase()));
+  if (toInsert.length === 0) return;
+
+  const [users] = await pool.query('SELECT full_name, email FROM users');
+  const emailByLowerName = new Map(users.map(u => [u.full_name.toLowerCase(), u.email]));
+
+  let matched = 0;
+  for (const name of toInsert) {
+    const email = emailByLowerName.get(name.toLowerCase()) || null;
+    if (email) matched++;
+    await pool.query('INSERT IGNORE INTO contacts (name, email) VALUES (?, ?)', [name, email]);
+  }
+  console.log(`Seeded ${toInsert.length} contact(s) from existing Pending With names (${matched} matched an existing user's email automatically — review the rest under Update Tasks > Pending-With Contacts).`);
+}
+
 async function seedDefaults() {
   const [settingsRows] = await pool.query('SELECT id FROM backup_settings LIMIT 1');
   if (settingsRows.length === 0) {
@@ -427,9 +524,12 @@ async function initDb() {
   await migrateUsersCanEditDigitization();
   await migrateSRsTable();
   await migrateUniqueActiveSrNumbers();
+  await migratePendingSinceDate();
   await migrateManageEngineSyncRuns();
   await migrateBackupEmailColumns();
+  await migrateContactsIgnored();
   await seedDefaults();
+  await seedContactsFromPendingWith();
 }
 
 module.exports = {

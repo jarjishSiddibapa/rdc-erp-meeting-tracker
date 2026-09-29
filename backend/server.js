@@ -16,6 +16,8 @@ const backupRoutes = require('./routes/backup');
 const reportsRoutes = require('./routes/reports');
 const deloitteImportRoutes = require('./routes/deloitte-import');
 const manageEngineImportRoutes = require('./routes/manageengine-import');
+const contactsRoutes = require('./routes/contacts');
+const pendingRemindersRoutes = require('./routes/pending-reminders');
 
 const { initDb, pool } = require('./db/database');
 const { verifyMailer } = require('./services/mailer');
@@ -96,6 +98,8 @@ app.use('/api/backup', backupRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/deloitte-import', deloitteImportRoutes);
 app.use('/api/manageengine-import', manageEngineImportRoutes);
+app.use('/api/contacts', contactsRoutes);
+app.use('/api/pending-reminders', pendingRemindersRoutes);
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 

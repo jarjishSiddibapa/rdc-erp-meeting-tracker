@@ -426,7 +426,15 @@ const DELOITTE_FIELDS = ['assigned_to', 'pending_with'];
 async function ensureFieldValue(conn, srId, field, currentValue, newValue, userId) {
   if (!DELOITTE_FIELDS.includes(field)) throw new Error(`Unexpected field: ${field}`);
   if (currentValue === newValue) return false;
-  await conn.execute(`UPDATE srs SET ${field} = ?, updated_by = ? WHERE id = ?`, [newValue, userId, srId]);
+  // A pending_with change here means the ticket just started (or continued) sitting with
+  // Deloitte per this week's PDF — same "hand-off happened today" convention as the manual
+  // edit route and the bulk Excel import.
+  if (field === 'pending_with') {
+    const today = new Date().toISOString().split('T')[0];
+    await conn.execute('UPDATE srs SET pending_with = ?, pending_since_date = ?, updated_by = ? WHERE id = ?', [newValue, today, userId, srId]);
+  } else {
+    await conn.execute(`UPDATE srs SET ${field} = ?, updated_by = ? WHERE id = ?`, [newValue, userId, srId]);
+  }
   await conn.execute(
     'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by) VALUES (?, ?, ?, ?, ?)',
     [srId, field, currentValue, newValue, userId]
@@ -434,17 +442,23 @@ async function ensureFieldValue(conn, srId, field, currentValue, newValue, userI
   return true;
 }
 
+// The single canonical name for the external Deloitte support team — matches
+// manageengine-sync.js's MANAGEENGINE_EXTERNAL_TECHNICIAN default and the naming
+// standardization already applied across pending_with/assigned_to/contacts. Writing the old
+// bare "Deloitte" here would silently reintroduce that inconsistency every weekly import.
+const DELOITTE_NAME = 'Deloitte ERP Support';
+
 // Any SR that shows up in the weekly PDF — whether it already existed or was just created —
-// is, by definition, one Deloitte is tracking, so its Assigned To gets set/kept as "Deloitte" too.
+// is, by definition, one Deloitte is tracking, so its Assigned To gets set/kept accordingly.
 const ensureAssignedToDeloitte = (conn, srId, currentAssignedTo, userId) =>
-  ensureFieldValue(conn, srId, 'assigned_to', currentAssignedTo, 'Deloitte', userId);
+  ensureFieldValue(conn, srId, 'assigned_to', currentAssignedTo, DELOITTE_NAME, userId);
 
 // A "Work in Progress" row means the ticket is sitting with Deloitte awaiting their action —
-// that's what Pending With is for, so it gets set/kept as "Deloitte" too. Deliberately NOT
-// applied to "Pending with User" rows: those are waiting on the RDC user to respond, not on
-// Deloitte, so their existing Pending With value (the actual person) is left alone.
+// that's what Pending With is for, so it gets set/kept accordingly. Deliberately NOT applied
+// to "Pending with User" rows: those are waiting on the RDC user to respond, not on Deloitte,
+// so their existing Pending With value (the actual person) is left alone.
 const ensurePendingWithDeloitte = (conn, srId, currentPendingWith, userId) =>
-  ensureFieldValue(conn, srId, 'pending_with', currentPendingWith, 'Deloitte', userId);
+  ensureFieldValue(conn, srId, 'pending_with', currentPendingWith, DELOITTE_NAME, userId);
 
 // POST /api/deloitte-import/parse — multipart, field "pdf". Read-only: matches each parsed
 // row against the live SRs table but writes nothing, so a bad/garbled PDF costs nothing to

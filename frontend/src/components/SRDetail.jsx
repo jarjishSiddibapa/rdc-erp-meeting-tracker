@@ -7,7 +7,7 @@ import {
 import {
   SendOutlined, UserOutlined, HistoryOutlined, CommentOutlined,
   EditOutlined, StopOutlined, DeleteOutlined, SaveOutlined, CloseOutlined,
-  UndoOutlined, CalendarOutlined
+  UndoOutlined, CalendarOutlined, PauseCircleOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { srAPI } from '../services/api';
@@ -31,11 +31,20 @@ function fmtDT(dt)   { return dt   ? dayjs(dt).format('DD-MMM-YYYY hh:mm A') : '
 function toDay(v)    { return v ? dayjs(v) : null; }
 function fromDay(v)  { return v ? v.format('YYYY-MM-DD') : null; }
 
+// Same thresholds as SRPage.jsx's PendingSinceCell, so the "since" figure reads consistently
+// whether seen in the table column or here in the detail modal.
+function pendingSinceColor(days) {
+  if (days > 60) return '#ff4d4f';
+  if (days > 30) return '#fa8c16';
+  if (days > 14) return '#faad14';
+  return '#52c41a';
+}
+
 function filterOption(inputValue, option) {
   return option.value.toLowerCase().includes(inputValue.toLowerCase());
 }
 
-export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCloseSR, onReopenSR, onDelete }) {
+export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCloseSR, onReopenSR, onSetOnHold, onDelete }) {
   const { user } = useAuth();
   const isAdmin   = user?.role === 'admin';
   // A viewer flagged can_edit_digitization by an admin may edit/comment on Digitization
@@ -70,7 +79,7 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
   useEffect(() => {
     if (!editMode || !sr) return;
     const isDig = sr.category === 'Digitization';
-    srAPI.distinctValues(sr.category, 'pendingWith').then(res => setPendingWithOptions(res.data.map(v => ({ value: v })))).catch(() => {});
+    srAPI.distinctValues(sr.category, 'pendingWith').then(res => setPendingWithOptions(res.data.map(v => ({ value: v, label: v })))).catch(() => {});
     if (!isDig) {
       srAPI.distinctValues(sr.category, 'assignedTo').then(res => setAssignedToOptions(res.data.map(v => ({ value: v })))).catch(() => {});
     }
@@ -90,7 +99,7 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
         creation_date:         toDay(sr.creation_date),
         status:                sr.status,
         created_by_name:       sr.created_by_name || '',
-        pending_with:          sr.pending_with || '',
+        pending_with:          sr.pending_with ? sr.pending_with.split(',').map(s => s.trim()).filter(Boolean) : [],
         assigned_to:           sr.assigned_to || '',
         expected_closure_date: toDay(sr.expected_closure_date),
         project_name:          sr.project_name || '',
@@ -134,6 +143,15 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
     } finally {
       setSaving(false);
     }
+  }
+
+  /* ── Quick status change: On Hold (a normal editable status, not an admin-only
+     transition like Close/Reopen/Delete - available to anyone who can edit this SR) ── */
+  async function handleSetOnHold() {
+    await onSetOnHold?.(sr);
+    const res = await srAPI.get(sr.id);
+    setSR(res.data);
+    if (onUpdated) onUpdated(res.data);
   }
 
   /* ── Add comment ── */
@@ -187,10 +205,34 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
     )
   }));
 
+  // Who it's currently pending with / assigned to is exactly the kind of thing an admin needs
+  // a full trail for ("since how long has this actually been with them"), same reasoning as
+  // the Closure Date trail above — a dedicated, chronological view rather than having to pick
+  // these two fields out of the generic Field Change History below.
+  const ownershipChanges = (sr.history || [])
+    .filter(h => h.field_changed === 'pending_with' || h.field_changed === 'assigned_to')
+    .sort((a, b) => new Date(b.changed_at) - new Date(a.changed_at));
+  const ownershipTimelineItems = ownershipChanges.map((h, i) => ({
+    dot: <UserOutlined style={{ fontSize: 12 }} />,
+    color: i === 0 ? 'blue' : 'gray',
+    children: (
+      <div style={{ fontSize: 12 }}>
+        <Text strong>{h.field_changed === 'pending_with' ? 'Pending With' : 'Assigned To'}: </Text>
+        <Text delete type="secondary">{h.old_value || '(empty)'}</Text>
+        {' → '}
+        <Text type={i === 0 ? 'success' : undefined} strong={i === 0}>{h.new_value || '(empty)'}</Text><br />
+        <Text type="secondary">{h.changed_by_name} · {fmtDT(h.changed_at)}</Text>
+      </div>
+    )
+  }));
+
   /* ── Footer ── */
   const footer = (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between', alignItems: 'center' }}>
       <Space wrap>
+        {canEdit && !editMode && sr.status !== 'On Hold' && sr.status !== 'Closed' && (
+          <Button icon={<PauseCircleOutlined />} onClick={handleSetOnHold}>Put On Hold</Button>
+        )}
         {isAdmin && sr.status !== 'Closed' && !editMode && (
           <Popconfirm
             title="Close this SR?" description="Only admin can reopen it after closing."
@@ -269,7 +311,16 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
           <Descriptions.Item label="SR Number">{sr.sr_number}</Descriptions.Item>
           <Descriptions.Item label="Category"><Tag>{sr.category}</Tag></Descriptions.Item>
           <Descriptions.Item label="Status"><Tag color={STATUS_COLORS[sr.status]}>{sr.status}</Tag></Descriptions.Item>
-          <Descriptions.Item label="Pending With">{sr.pending_with || '-'}</Descriptions.Item>
+          <Descriptions.Item label="Pending With">
+            {sr.pending_with ? sr.pending_with.split(',').map(s => s.trim()).filter(Boolean).join(', ') : '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Pending Since">
+            {sr.pending_since_days === null || sr.pending_since_days === undefined ? '-' : (
+              <span style={{ fontWeight: 600, color: sr.status === 'Closed' ? '#9ca3af' : pendingSinceColor(sr.pending_since_days) }}>
+                {sr.pending_since_days}d
+              </span>
+            )}
+          </Descriptions.Item>
 
           {!isDigitization && (
             <>
@@ -329,7 +380,7 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item name="pending_with" label="Pending With">
-                <AutoComplete options={pendingWithOptions} filterOption={filterOption} />
+                <Select mode="tags" options={pendingWithOptions} filterOption={filterOption} tokenSeparators={[',']} />
               </Form.Item>
             </Col>
           </Row>
@@ -392,7 +443,7 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
                 </Col>
                 <Col xs={24} sm={12}>
                   <Form.Item name="pending_with" label="Pending With">
-                    <AutoComplete options={pendingWithOptions} filterOption={filterOption} />
+                    <Select mode="tags" options={pendingWithOptions} filterOption={filterOption} tokenSeparators={[',']} />
                   </Form.Item>
                 </Col>
               </Row>
@@ -476,6 +527,22 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
         </Text>
       ) : (
         <Timeline items={closureTimelineItems} />
+      )}
+
+      {/* ── Pending With / Assigned To trail ── */}
+      <Divider orientation="left" style={{ margin: '16px 0 12px' }}>
+        <Space>
+          <UserOutlined />
+          Pending With / Assigned To Trail
+          <Badge count={ownershipChanges.length} showZero color={ownershipChanges.length ? '#00B51A' : '#d9d9d9'} />
+        </Space>
+      </Divider>
+      {ownershipTimelineItems.length === 0 ? (
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          Never changed since Pending With was set to {sr.pending_with || '(empty)'}.
+        </Text>
+      ) : (
+        <Timeline items={ownershipTimelineItems} />
       )}
 
       {/* ── Change History ── */}

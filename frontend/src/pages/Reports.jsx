@@ -77,6 +77,14 @@ function AssignedToEcdReport() {
     } catch (e) { message.error(e.response?.data?.message || 'Delete failed'); }
   }
 
+  async function handleSetOnHoldSR(sr) {
+    try {
+      await srAPI.update(sr.id, { status: 'On Hold' });
+      message.success(`${sr.sr_number} put on hold`);
+      fetchReport();
+    } catch (e) { message.error(e.response?.data?.message || 'Failed to update status'); }
+  }
+
   // Column count follows the longest sequence actually present in the data — the backend's
   // change_count counts raw history rows, which can outnumber the real sequence when a
   // change's new_value was blank (filtered out), so basing it on max_changes alone left a
@@ -194,6 +202,7 @@ function AssignedToEcdReport() {
         onUpdated={updated => { setDetailSR(updated); fetchReport(); }}
         onCloseSR={handleCloseSR}
         onReopenSR={handleReopenSR}
+        onSetOnHold={handleSetOnHoldSR}
         onDelete={handleDeleteSR}
       />
     </div>

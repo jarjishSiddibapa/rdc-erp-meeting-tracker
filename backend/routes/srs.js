@@ -1,6 +1,7 @@
 const express = require('express');
 const { pool } = require('../db/pool');
 const { authenticate, requireRole } = require('../middleware/auth');
+const { splitPendingWith, normalizePendingWith, buildPendingWithClause } = require('../utils/pendingWith');
 
 const router = express.Router();
 router.use(authenticate);
@@ -22,12 +23,20 @@ function canWriteCategory(user, category) {
 // a field like pending_with — invisible in the UI but enough to make that value silently stop
 // matching the same, trimmed value used elsewhere (Dashboard tiles, distinct-value dropdowns,
 // Deloitte-import matching). Applied to every genuinely free-typed text field below.
-const TRIMMABLE_FIELDS = ['description', 'type', 'created_by_name', 'pending_with', 'assigned_to', 'project_name', 'process_owner'];
 function trimOrNull(v) {
   if (v === undefined || v === null) return null;
   const t = String(v).trim();
   return t === '' ? null : t;
 }
+
+// pending_with gets its own transform (normalizePendingWith) rather than a plain trim — it
+// can hold multiple comma-separated names now, and needs the comma-no-space normalization
+// FIND_IN_SET-based filtering (see utils/pendingWith.js) depends on.
+const FIELD_TRANSFORMS = {
+  description: trimOrNull, type: trimOrNull, created_by_name: trimOrNull,
+  pending_with: normalizePendingWith, assigned_to: trimOrNull,
+  project_name: trimOrNull, process_owner: trimOrNull,
+};
 
 // Columns that may be sorted on, mapped to their SQL expression (whitelisted to prevent injection)
 const SORTABLE_FIELDS = {
@@ -45,6 +54,7 @@ const SORTABLE_FIELDS = {
   process_owner: 's.process_owner',
   target_date: 's.target_date',
   pending_since_days: 'pending_since_days',
+  days_since_raised: 'days_since_raised',
   last_comment_at: 'last_comment_at',
 };
 
@@ -71,12 +81,16 @@ router.get('/', async (req, res, next) => {
       params.push(...values);
     }
 
+    // pending_with can hold multiple people — matching needs FIND_IN_SET, not a plain IN(),
+    // so a filter/click on one name still finds an SR that's shared with someone else too.
     // "(Unassigned)" is a display-only label the Dashboard's Pending With breakdown uses for
-    // blank/null pending_with (see stats.js's pendingByPerson) — it's never actually stored,
-    // so clicking through to it needs to match "blank" rather than the literal string.
+    // a blank/null field (see stats.js's pendingByPerson) — it's never actually stored, so
+    // clicking through to it needs to match "blank" rather than the literal string.
     function addPendingWithFilter(column, value) {
-      if (value === '(Unassigned)') { where += ` AND (${column} IS NULL OR TRIM(${column}) = '')`; return; }
-      addInFilter(column, value);
+      const clause = buildPendingWithClause(column, value);
+      if (!clause) return;
+      where += ` AND ${clause.sql}`;
+      params.push(...clause.params);
     }
 
     if (category) { where += ' AND s.category = ?'; params.push(category); }
@@ -118,7 +132,18 @@ router.get('/', async (req, res, next) => {
           lc.comment as last_comment,
           lc.commented_at as last_comment_at,
           cu.full_name as last_comment_by,
-          DATEDIFF(CURDATE(), CASE WHEN s.creation_date IS NOT NULL THEN s.creation_date ELSE DATE(s.created_at) END) as pending_since_days
+          DATEDIFF(CURDATE(), CASE WHEN s.creation_date IS NOT NULL THEN s.creation_date ELSE DATE(s.created_at) END) as days_since_raised,
+          -- Days since Pending With was last set to whoever it's CURRENTLY with — not the SR's
+          -- total age. s.pending_since_date is set directly from the real ManageEngine message
+          -- timestamp (see manageengine-sync.js's resolvePendingWithName) or, on a manual edit,
+          -- the edit date — either way the actual date the ball changed hands, not whenever a
+          -- 30-minute sync happened to notice. Falls back to the older sr_history-diff-based
+          -- date (pre-dates this column) and finally the raise date if it has never changed hands.
+          DATEDIFF(CURDATE(), COALESCE(
+            s.pending_since_date,
+            (SELECT MAX(DATE(h.changed_at)) FROM sr_history h WHERE h.sr_id = s.id AND h.field_changed = 'pending_with' AND h.is_deleted = 0),
+            CASE WHEN s.creation_date IS NOT NULL THEN s.creation_date ELSE DATE(s.created_at) END
+          )) as pending_since_days
         FROM srs s
         LEFT JOIN users u1 ON s.created_by = u1.id
         LEFT JOIN users u2 ON s.updated_by = u2.id
@@ -142,7 +167,14 @@ router.get('/:id', async (req, res, next) => {
     // don't need to be awaited one after another.
     const [[srRows], [comments], [history]] = await Promise.all([
       pool.execute(`
-        SELECT s.*, u1.full_name as added_by_name, u2.full_name as updated_by_name
+        SELECT s.*, u1.full_name as added_by_name, u2.full_name as updated_by_name,
+          -- Same anchor as the list view's pending_since_days (see GET / above) — the detail
+          -- modal needs this too so "Pending Since" isn't only visible from the table column.
+          DATEDIFF(CURDATE(), COALESCE(
+            s.pending_since_date,
+            (SELECT MAX(DATE(h.changed_at)) FROM sr_history h WHERE h.sr_id = s.id AND h.field_changed = 'pending_with' AND h.is_deleted = 0),
+            CASE WHEN s.creation_date IS NOT NULL THEN s.creation_date ELSE DATE(s.created_at) END
+          )) as pending_since_days
         FROM srs s LEFT JOIN users u1 ON s.created_by = u1.id LEFT JOIN users u2 ON s.updated_by = u2.id
         WHERE s.id = ? AND s.is_deleted = 0
       `, [req.params.id]),
@@ -195,7 +227,7 @@ router.post('/', async (req, res, next) => {
     const description = trimOrNull(req.body.description);
     const type = trimOrNull(req.body.type);
     const created_by_name = trimOrNull(req.body.created_by_name);
-    const pending_with = trimOrNull(req.body.pending_with);
+    const pending_with = normalizePendingWith(req.body.pending_with);
     const assigned_to = trimOrNull(req.body.assigned_to);
     const project_name = trimOrNull(req.body.project_name);
     const process_owner = trimOrNull(req.body.process_owner);
@@ -252,15 +284,24 @@ router.put('/:id', async (req, res, next) => {
 
     editableFields.forEach(f => {
       if (req.body[f] === undefined) return;
-      // Trim free-text fields before comparing/storing (see TRIMMABLE_FIELDS above) — also
-      // means a re-save that only added/removed whitespace correctly logs as a no-op instead
-      // of a spurious history entry. Log the SAME coerced value that's actually written,
-      // not the raw request body, so the audit trail matches real DB state.
-      const value = TRIMMABLE_FIELDS.includes(f) ? trimOrNull(req.body[f]) : (req.body[f] || null);
+      // Trim/normalize free-text fields before comparing/storing (see FIELD_TRANSFORMS above)
+      // — also means a re-save that only added/removed whitespace correctly logs as a no-op
+      // instead of a spurious history entry. Log the SAME coerced value that's actually
+      // written, not the raw request body, so the audit trail matches real DB state.
+      const value = FIELD_TRANSFORMS[f] ? FIELD_TRANSFORMS[f](req.body[f]) : (req.body[f] || null);
       if (String(value ?? '') !== String(sr[f] ?? '')) {
         updates.push(`${f} = ?`);
         params.push(value);
         historyEntries.push({ field: f, old: sr[f], new: value });
+        // A human changing who it's pending with right now IS the hand-off event — record
+        // today as pending_since_date directly, same as the ManageEngine sync does from the
+        // real message timestamp, so "pending since" doesn't fall back to a stale sr_history
+        // diff date.
+        if (f === 'pending_with') {
+          const today = new Date().toISOString().split('T')[0];
+          updates.push('pending_since_date = ?');
+          params.push(today);
+        }
       }
     });
 
@@ -390,8 +431,10 @@ router.get('/meta/options', async (req, res, next) => {
       FROM srs
       WHERE category = ? AND is_deleted = 0
     `, [category]);
+    // pending_with can hold multiple people — offer each one as its own option, not the raw
+    // "Atish Kshirsagar,Nagesh Tiwari" combined string.
     const unique = field => [...new Set(rows
-      .map(row => String(row[field] || '').trim())
+      .flatMap(row => field === 'pending_with' ? splitPendingWith(row[field]) : [String(row[field] || '').trim()])
       .filter(Boolean))].sort((a, b) => a.localeCompare(b));
     res.json({
       types: category === 'Digitization' ? [] : unique('type'),
@@ -406,6 +449,20 @@ router.get('/meta/distinct', async (req, res, next) => {
     const { category, field } = req.query;
     const column = DISTINCT_FIELDS[field];
     if (!column) return res.status(400).json({ message: 'Invalid field' });
+
+    // pending_with can hold multiple names in one field, so a plain SQL DISTINCT would return
+    // combined strings like "Atish Kshirsagar,Nagesh Tiwari" as one option instead of two —
+    // fan it out in JS instead.
+    if (column === 'pending_with') {
+      const [rows] = await pool.execute(
+        "SELECT pending_with FROM srs WHERE category = ? AND is_deleted = 0 AND pending_with IS NOT NULL AND pending_with != ''",
+        [category || 'SR']
+      );
+      const names = new Set();
+      rows.forEach(r => splitPendingWith(r.pending_with).forEach(n => names.add(n)));
+      return res.json([...names].sort((a, b) => a.localeCompare(b)));
+    }
+
     const [rows] = await pool.execute(`
       SELECT DISTINCT ${column} as v FROM srs
       WHERE category = ? AND is_deleted = 0 AND ${column} IS NOT NULL AND TRIM(${column}) != ''
@@ -458,8 +515,10 @@ router.get('/stats/summary', async (req, res, next) => {
       params.push(...values);
     }
     function addPendingWithFilter(column, value) {
-      if (value === '(Unassigned)') { where += ` AND (${column} IS NULL OR TRIM(${column}) = '')`; return; }
-      addInFilter(column, value);
+      const clause = buildPendingWithClause(column, value);
+      if (!clause) return;
+      where += ` AND ${clause.sql}`;
+      params.push(...clause.params);
     }
     addInFilter('scope', scope);
     addInFilter('type', type);

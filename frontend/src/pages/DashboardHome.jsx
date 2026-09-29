@@ -140,7 +140,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
       // "(Unassigned)" is clickable too. It means real pending SRs with a blank Pending
       // With field, and someone needs to be able to click through to actually go fill that
       // in, not just see a dead label with no way to act on it.
-      render: (value, row) => Number(row.pending_now) > 0 ? (
+      render: (value, row) => (Number(row.pending_now) > 0 || Number(row.on_hold) > 0) ? (
         <Button type="link" style={{ padding: 0, height: 'auto', fontWeight: 600 }}
           onClick={() => onNavigate(category, value)}>
           {value}
@@ -150,7 +150,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
     {
       title: (
         <ColHeader bold label="Pending Now"
-          formula="Status is not Closed. Grouped by the current Pending With value." />
+          formula="Status is not Closed and not On Hold. Grouped by the current Pending With value." />
       ),
       dataIndex: 'pending_now',
       width: 120,
@@ -159,7 +159,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
     {
       title: (
         <ColHeader label="On Hold"
-          formula="Status = On Hold. This is already included in Pending Now." />
+          formula="Status = On Hold. A separate bucket from Pending Now, not a subset of it." />
       ),
       dataIndex: 'on_hold',
       width: 100,

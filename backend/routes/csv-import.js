@@ -1,6 +1,7 @@
 const express = require('express');
 const { pool } = require('../db/pool');
 const { authenticate, requireRole } = require('../middleware/auth');
+const { normalizePendingWith } = require('../utils/pendingWith');
 
 const router = express.Router();
 router.use(authenticate);
@@ -121,7 +122,7 @@ router.post('/execute', async (req, res, next) => {
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `, [
             srNum, category, category === 'SR' ? normalizeScope(row.scope) : null, status,
-            row.pending_with?.trim() || null,
+            normalizePendingWith(row.pending_with),
             row.assigned_to?.trim() || null,
             row.description?.trim() || null,
             row.type?.trim() || null,
@@ -145,7 +146,7 @@ router.post('/execute', async (req, res, next) => {
         // Existing SR — overwrite only the fields this row actually provides a value for.
         const candidates = {
           scope: category === 'SR' ? normalizeScope(row.scope) : null,
-          pending_with: row.pending_with?.trim() || null,
+          pending_with: normalizePendingWith(row.pending_with),
           assigned_to: row.assigned_to?.trim() || null,
           description: row.description?.trim() || null,
           type: row.type?.trim() || null,
@@ -166,6 +167,12 @@ router.post('/execute', async (req, res, next) => {
             setClauses.push(`${field} = ?`);
             params.push(value);
             historyEntries.push({ field, old: existing[field], new: value });
+            // Same convention as the manual SR-edit route: a bulk update that actually changes
+            // who it's pending with counts as the hand-off happening today.
+            if (field === 'pending_with') {
+              setClauses.push('pending_since_date = ?');
+              params.push(new Date().toISOString().split('T')[0]);
+            }
           }
         });
 

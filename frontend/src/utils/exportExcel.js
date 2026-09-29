@@ -13,6 +13,7 @@ const DIGITIZATION_COLUMNS = [
   { header: 'Creation Date', get: r => fmtDate(r.creation_date) },
   { header: 'Target Date', get: r => fmtDate(r.target_date) },
   { header: 'Pending Since (Days)', get: r => r.pending_since_days ?? '' },
+  { header: 'Days Since Raised', get: r => r.days_since_raised ?? '' },
   { header: 'Last Comment', get: r => r.last_comment || '' },
   { header: 'Last Comment At', get: r => fmtDateTime(r.last_comment_at) },
 ];
@@ -29,6 +30,7 @@ const SR_COLUMNS = [
   { header: 'Assigned To', get: r => r.assigned_to || '' },
   { header: 'Exp. Closure', get: r => fmtDate(r.expected_closure_date) },
   { header: 'Pending Since (Days)', get: r => r.pending_since_days ?? '' },
+  { header: 'Days Since Raised', get: r => r.days_since_raised ?? '' },
   { header: 'Last Comment', get: r => r.last_comment || '' },
   { header: 'Last Comment At', get: r => fmtDateTime(r.last_comment_at) },
 ];

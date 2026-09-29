@@ -11,6 +11,7 @@ import SRForm from '../components/SRForm';
 import SRDetail from '../components/SRDetail';
 import ClosureDateCell from '../components/ClosureDateCell';
 import CommentCell from '../components/CommentCell';
+import PendingWithCell from '../components/PendingWithCell';
 import { Reveal } from '../components/ui/Reveal';
 import BrandButton from '../components/ui/BrandButton';
 import ResizableTitle from '../components/ui/ResizableTitle';
@@ -108,6 +109,9 @@ function buildColumns({ category, onView, filters, typeOptions, pendingWithOptio
     { title: 'Status', dataIndex: 'status', width: 105, render: v => <Tag color={STATUS_COLORS[v]}>{v}</Tag> }
   ), STATUS_VALUES, 'status');
 
+  // How long it's sat with whoever it's CURRENTLY pending with — resets every time Pending
+  // With changes hands (see backend/routes/srs.js). Distinct from SR Raised below,
+  // which is the SR's total age and never resets.
   const pendingSinceCol = sortable({
     title: 'Pending Since', dataIndex: 'pending_since_days', width: 95,
     render: (_, row) => (
@@ -118,8 +122,18 @@ function buildColumns({ category, onView, filters, typeOptions, pendingWithOptio
     ),
   });
 
+  const daysSinceRaisedCol = sortable({
+    title: 'SR Raised', dataIndex: 'days_since_raised', width: 95,
+    render: (v) => v === null || v === undefined
+      ? <Text type="secondary">—</Text>
+      : <Text type="secondary" style={{ fontSize: 13 }}>{v}d</Text>,
+  });
+
   const pendingWithCol = withFilter(sortable(
-    { title: 'Pending With', dataIndex: 'pending_with', width: 110, render: v => v || '—' }
+    {
+      title: 'Pending With', dataIndex: 'pending_with', width: 130,
+      render: (v, row) => <PendingWithCell srId={row.id} value={v} />,
+    }
   ), pendingWithOptions, 'pendingWith');
 
   const assignedToCol = withFilter(sortable(
@@ -136,20 +150,25 @@ function buildColumns({ category, onView, filters, typeOptions, pendingWithOptio
       sortable({ title: 'Creation Date', dataIndex: 'creation_date', width: 105, render: v => fmt(v) }),
       sortable({ title: 'Target Date', dataIndex: 'target_date', width: 100, render: (v, row) => <ClosureDateCell srId={row.id} field="target_date" value={v} warnOverdue status={row.status} /> }),
       pendingSinceCol,
+      daysSinceRaisedCol,
       lastCommentCol,
     ];
   }
 
-  // SR (merged ERP + Deloitte) — ordered per explicit request: Sr No, Description, Creation
-  // Date, Comments, Exp. Closure, Pending Since, Assigned To, Status, then everything else.
+  // SR (merged ERP + Deloitte) — ordered per explicit request: Sr No, Description, Created,
+  // Comments, Pending With, Pending Since, SR Raised, Exp. Closure, Assigned To, Created By,
+  // Status, Internal/External, Type.
   return [
     srNoCol,
     sortable({ title: 'Description', dataIndex: 'description', width: 200, render: v => <div style={cellStyle}>{v || '—'}</div> }),
     sortable({ title: 'Created', dataIndex: 'creation_date', width: 145, render: (_, row) => fmtCreated(row) }),
     lastCommentCol,
-    sortable({ title: 'Exp. Closure', dataIndex: 'expected_closure_date', width: 100, render: (v, row) => <ClosureDateCell srId={row.id} field="expected_closure_date" value={v} warnOverdue status={row.status} /> }),
+    pendingWithCol,
     pendingSinceCol,
+    daysSinceRaisedCol,
+    sortable({ title: 'Exp. Closure', dataIndex: 'expected_closure_date', width: 100, render: (v, row) => <ClosureDateCell srId={row.id} field="expected_closure_date" value={v} warnOverdue status={row.status} /> }),
     assignedToCol,
+    sortable({ title: 'Created By', dataIndex: 'created_by_name', width: 100, render: v => v || '—' }),
     statusCol,
     withFilter(sortable({
       title: <>Internal/<br />External</>, dataIndex: 'scope', width: 125,
@@ -163,8 +182,6 @@ function buildColumns({ category, onView, filters, typeOptions, pendingWithOptio
         </Tag>
       ) : '—'
     }), typeOptions, 'type'),
-    sortable({ title: 'Created By', dataIndex: 'created_by_name', width: 100, render: v => v || '—' }),
-    pendingWithCol,
   ];
 }
 
@@ -340,6 +357,14 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
     } catch (e) { message.error(e.response?.data?.message || 'Failed to reopen'); }
   }
 
+  async function handleSetOnHold(sr) {
+    try {
+      await srAPI.update(sr.id, { status: 'On Hold' });
+      message.success(`${sr.sr_number} put on hold`);
+      fetchSRs(); fetchStats();
+    } catch (e) { message.error(e.response?.data?.message || 'Failed to update status'); }
+  }
+
   async function handleDelete(id) {
     try {
       await srAPI.delete(id);
@@ -432,12 +457,12 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
   }), [rawColumns, colWidths]);
 
   const isDigitization = category === 'Digitization';
-  const hasActiveFilters = !!(filters.status || filters.overdue || filters.scope || filters.type || filters.pendingWith || filters.assignedTo || filters.search);
+  const hasActiveFilters = !!(filters.status || filters.overdue || filters.scope || filters.type || filters.pendingWith || filters.assignedTo || filters.search || filters.sortField);
 
   function handleClearFilters() {
     clearTimeout(searchDebounceRef.current);
     setSearchText('');
-    setFilters(f => ({ ...f, status: '', overdue: false, scope: '', type: '', pendingWith: '', assignedTo: '', search: '' }));
+    setFilters(f => ({ ...f, status: '', overdue: false, scope: '', type: '', pendingWith: '', assignedTo: '', search: '', sortField: '', sortOrder: '' }));
   }
 
   return (
@@ -496,7 +521,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
           <Col><Button icon={<ReloadOutlined />} onClick={fetchSRs} /></Col>
           <Col>
             <Button icon={<ClearOutlined />} disabled={!hasActiveFilters} onClick={handleClearFilters}>
-              Clear Filters
+              Clear Filters & Sorting
             </Button>
           </Col>
           <Col>
@@ -578,6 +603,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
         onEdit={row => { setEditingSR(row); setFormOpen(true); }}
         onCloseSR={async (sr) => { await handleClose(sr); }}
         onReopenSR={async (sr) => { await handleReopen(sr); }}
+        onSetOnHold={async (sr) => { await handleSetOnHold(sr); }}
         onDelete={async (id) => { await handleDelete(id); }}
       />
     </div>

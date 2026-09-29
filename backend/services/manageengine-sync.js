@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const { pool } = require('../db/pool');
 const { serviceDeskApiDomainFor, trimTrailingSlash } = require('../utils/manageengine-domain');
+const { normalizePendingWith } = require('../utils/pendingWith');
 
 const ACCEPT = 'application/vnd.manageengine.sdp.v3+json';
 const CLOSED_STATUSES = new Set(['closed', 'resolved', 'cancelled', 'canceled', 'rejected', 'completed']);
@@ -10,6 +11,7 @@ const PAGE_SIZE = 100;
 
 let accessTokenCache = null;
 let cronTask = null;
+let deepSyncCronTask = null;
 let activeRun = null;
 
 function envFlag(name, fallback = false) {
@@ -34,8 +36,26 @@ function getConfig() {
     clientSecret: String(process.env.MANAGEENGINE_CLIENT_SECRET || '').trim(),
     refreshToken: String(process.env.MANAGEENGINE_REFRESH_TOKEN || '').trim(),
     externalTechnician: String(process.env.MANAGEENGINE_EXTERNAL_TECHNICIAN || 'Deloitte ERP Support').trim(),
+    // Two more outsourced-vendor domains that collapse to a single named bucket the same way
+    // Deloitte does (see vendorNameForEmail) — any @idstechnologies.co.in or @endel.digital
+    // address in a reply's recipient list resolves to these names instead of a per-person guess.
+    vendorIdsName: String(process.env.MANAGEENGINE_VENDOR_IDS_NAME || 'IDS').trim(),
+    vendorEndelName: String(process.env.MANAGEENGINE_VENDOR_ENDEL_NAME || 'Endel').trim(),
+    // The generic shared mailbox every request's description/replies are always addressed to
+    // alongside whichever specific person actually owns the ball next — never itself a "pending
+    // with" party, just noise to strip out of resolved recipient lists.
+    helpdeskEmail: String(process.env.MANAGEENGINE_HELPDESK_EMAIL || 'ithelpdesk@rdc.in').trim().toLowerCase(),
     timeZone: String(process.env.MANAGEENGINE_TIME_ZONE || 'Asia/Kolkata').trim(),
     maxPages: Math.max(1, Number.parseInt(process.env.MANAGEENGINE_SYNC_MAX_PAGES, 10) || 100),
+    // The regular 30-minute sync only scans the newest ~10,000 remote requests (see maxPages
+    // above), which is plenty to keep recently-created/recently-touched local SRs current since
+    // ManageEngine returns newest-first — but an SR raised long ago can scroll past that window
+    // as the portal's total ticket count grows, and then silently stops getting updated at all.
+    // The once-daily deep pass (see deepSyncEnabled below) scans much deeper to catch those
+    // stragglers, without paying that cost on every 30-minute run.
+    deepSyncEnabled: envFlag('MANAGEENGINE_DEEP_SYNC_ENABLED', true),
+    deepSyncMaxPages: Math.max(1, Number.parseInt(process.env.MANAGEENGINE_DEEP_SYNC_MAX_PAGES, 10) || 2000),
+    deepSyncCronPattern: String(process.env.MANAGEENGINE_DEEP_SYNC_CRON || '0 15 * * *').trim(),
   };
 }
 
@@ -97,11 +117,29 @@ function dateTimeFromApi(value, timeZone = 'Asia/Kolkata') {
   return `${byType.year}-${byType.month}-${byType.day} ${byType.hour}:${byType.minute}:${byType.second}`;
 }
 
-function normalizeRequest(request, config = getConfig()) {
+// ManageEngine's own person names (requester, technician, and conversation participants alike)
+// sometimes carry a " - Department" suffix baked in at the source (e.g. "Aniket Sawant - Credit
+// Control", "Mohd. Haseeb Khan - Technical") and one known typo'd full name ("Suresh Kumar S").
+// This has to run on every sync for every field a person's name can end up in (created_by_name,
+// assigned_to, pending_with) — not just as a one-off migration — otherwise the very next sync
+// overwrites a manually-cleaned name with the raw suffixed one straight from ManageEngine again.
+function normalizePersonName(name) {
+  if (!name) return name;
+  const idx = name.indexOf(' - ');
+  const stripped = idx === -1 ? name : name.slice(0, idx).trim();
+  return stripped === 'Suresh Kumar S' ? 'Suresh Kumar' : stripped;
+}
+
+function normalizeRequest(request, config = getConfig(), pendingOverride = null) {
   const remoteStatus = String(request?.status?.name || '').trim();
   const mappedStatus = mapStatus(remoteStatus);
-  const technician = String(request?.technician?.name || '').trim() || null;
-  const createdBy = String(request?.created_by?.name || request?.requester?.name || '').trim() || null;
+  const technician = normalizePersonName(String(request?.technician?.name || '').trim() || null);
+  // requester is who actually raised the ticket; created_by is often just "System" for
+  // email-parsed requests (ManageEngine's own ingestion actor), so it's the fallback, not
+  // the primary source — using it first was the bug that showed "System" as Created By.
+  const createdBy = normalizePersonName(String(request?.requester?.name || request?.created_by?.name || '').trim() || null);
+  // Technician vs User is decided purely by ManageEngine's own unreplied_count field (see
+  // pendingPartyFor) — the official signal, no branching on who authored the last reply.
   const pendingParty = pendingPartyFor(request);
   const status = mappedStatus === 'Closed' || mappedStatus === 'On Hold'
     ? mappedStatus
@@ -118,7 +156,21 @@ function normalizeRequest(request, config = getConfig()) {
     status,
     manageengine_status: remoteStatus || null,
     manageengine_pending_party: pendingParty,
-    pending_with: pendingParty === 'Technician' ? technician : pendingParty === 'User' ? 'Pending with User' : null,
+    // When it's the user's (RDC's) turn to reply, name the actual people the last genuine
+    // reply was addressed to (resolved separately, see resolvePendingWithName) instead of the
+    // generic "Pending with User" placeholder — falls back to the placeholder if that couldn't
+    // be resolved (e.g. the lookup call failed). Technician-side always uses the assigned
+    // technician's own name; the To: field is never consulted there.
+    pending_with: pendingParty === 'Technician'
+      ? technician
+      : pendingParty === 'User'
+        ? (pendingOverride?.pendingWith || 'Pending with User')
+        : null,
+    // The date the CURRENT party actually took the ball, from the real ManageEngine message
+    // timestamp (see resolvePendingWithName) rather than whenever our own sync happened to
+    // notice — falls back to the request's own creation date when there's no real reply yet
+    // (freshly raised, still with the technician since day one) or the lookup didn't run.
+    pending_since_date: pendingOverride?.sinceDate || (createdAt ? createdAt.slice(0, 10) : null),
     assigned_to: technician,
     scope: namesMatch(technician, config.externalTechnician)
       ? 'External'
@@ -196,6 +248,117 @@ function assertApiSuccess(payload) {
   if (!failure) return;
   const message = failure.messages?.[0]?.message || failure.message || failure.status_code || 'unknown API error';
   throw new Error(`ManageEngine API rejected the request: ${message}`);
+}
+
+function titleCaseFromEmail(email) {
+  const local = String(email || '').split('@')[0];
+  const words = local.split(/[._]+/).filter(Boolean).map(part => part.charAt(0).toUpperCase() + part.slice(1));
+  return words.length ? words.join(' ') : null;
+}
+
+// Finds who the technician's most recent reply was addressed to, so pending_with can name
+// the actual RDC people waiting to respond instead of the generic "Pending with User"
+// placeholder. Two extra API calls, only made for requests unreplied_count currently guesses
+// are pending with the user (see executeSync) — conversations list is cheap and free-form
+// (small tracked SR count), so this stays well within API budget at this app's scale.
+async function fetchConversations(config, remoteId) {
+  const token = await refreshAccessToken(config);
+  const inputData = { list_info: { row_count: 5, sort_field: 'created_time', sort_order: 'desc' } };
+  const url = new URL(`${requestsUrl(token.apiDomain, config.portal)}/${remoteId}/conversations`);
+  url.searchParams.set('input_data', JSON.stringify(inputData));
+  const response = await fetchWithRetry(url, {
+    headers: { Accept: ACCEPT, Authorization: `Zoho-oauthtoken ${token.accessToken}` },
+  });
+  const payload = await response.json();
+  assertApiSuccess(payload);
+  return Array.isArray(payload.conversations) ? payload.conversations : [];
+}
+
+async function fetchNotificationRecipients(config, remoteId, notificationId) {
+  const token = await refreshAccessToken(config);
+  const url = `${requestsUrl(token.apiDomain, config.portal)}/${remoteId}/notifications/${notificationId}`;
+  const response = await fetchWithRetry(url, {
+    headers: { Accept: ACCEPT, Authorization: `Zoho-oauthtoken ${token.accessToken}` },
+  });
+  const payload = await response.json();
+  return Array.isArray(payload?.notification?.to) ? payload.notification.to : [];
+}
+
+// A request's /conversations feed mixes genuine correspondence (real emails/notes the
+// requester can see) with ManageEngine's own automated notices ("technician intimation" mail
+// sent the moment a request is assigned, etc). Only the former carries show_to_requester: true
+// — the automated notices don't, and their author is always the synthetic "System" user. Any
+// reply-direction inference has to ignore the latter, or a freshly-raised, never-touched
+// request (two auto-notices, zero real replies) reads as if the technician had already
+// answered.
+function isGenuineCorrespondence(entry) {
+  return entry?.show_to_requester === true;
+}
+
+// The outsourced-vendor domains that collapse to one named bucket instead of a per-person
+// guess — matches how assigned_to/scope already treat Deloitte as one entity, not a roster of
+// individual analysts, now extended to the app's other two support vendors. Returns null for
+// any other domain so the caller falls through to real-name resolution.
+function vendorNameForEmail(email, config) {
+  const domain = String(email || '').toLowerCase().split('@')[1] || '';
+  if (domain === 'deloitte.com') return config.externalTechnician;
+  if (domain === 'idstechnologies.co.in') return config.vendorIdsName;
+  if (domain === 'endel.digital') return config.vendorEndelName;
+  return null;
+}
+
+// Maps a recipient email to the display name it should contribute to pending_with: a known
+// vendor domain (see vendorNameForEmail) collapses to its single named bucket, everyone else
+// resolves to their ManageEngine display name (falling back to a title-cased guess from the
+// address) via the email->name map built from the conversation thread itself.
+function displayNameForRecipient(email, emailToName, config) {
+  const lower = String(email || '').toLowerCase();
+  if (!lower) return null;
+  return vendorNameForEmail(lower, config) || normalizePersonName(emailToName.get(lower) || titleCaseFromEmail(email));
+}
+
+// Called only when the official unreplied_count signal (see pendingPartyFor) already says the
+// ball is with the User — resolves WHO within RDC by reading the real conversation thread's
+// last genuine reply and who it was addressed to, instead of leaving the generic "Pending with
+// User" placeholder. Never used to decide Technician vs User itself; that stays purely
+// unreplied_count's call.
+//  - no genuine reply yet at all (only auto-notices, or nothing) => nothing to resolve; caller
+//    keeps the generic placeholder and falls back to the request's own creation date for
+//    pending_since_date.
+//  - otherwise => named from whoever that last reply's recipients resolve to (real names, known
+//    vendor domains collapsed to one bucket each — see vendorNameForEmail — the shared helpdesk
+//    mailbox excluded since it's never itself a person to wait on), since that reply's own
+//    timestamp.
+// This also drives pending_since_date directly off the real ManageEngine message timestamp
+// instead of whenever our own 30-minute sync happened to notice the field differ — otherwise a
+// pure data-quality correction (like resolving a stale placeholder into a real name) would reset
+// "pending since" to today even though the ball never actually changed hands.
+// Returns null on anything unresolvable so the caller falls back to the generic placeholder and
+// leaves pending_since_date untouched.
+async function resolvePendingWithName(config, remoteId) {
+  const conversations = await fetchConversations(config, remoteId);
+  const real = conversations.filter(isGenuineCorrespondence);
+
+  const emailToName = new Map();
+  for (const entry of real) {
+    const email = entry?.created_by?.email_id;
+    const name = entry?.created_by?.name;
+    if (email && name) emailToName.set(String(email).toLowerCase(), name);
+  }
+
+  const lastReply = real[0]; // conversations are fetched sort_order: desc, filter preserves order
+  if (!lastReply) return null;
+  const sinceDate = dateTimeFromApi(lastReply.created_time, config.timeZone)?.slice(0, 10) || null;
+
+  const recipients = await fetchNotificationRecipients(config, remoteId, lastReply.id);
+  if (!recipients.length) return { pendingWith: null, sinceDate };
+
+  const names = recipients
+    .filter(email => String(email).toLowerCase() !== config.helpdeskEmail)
+    .map(email => displayNameForRecipient(email, emailToName, config))
+    .filter(Boolean);
+  const deduped = [...new Set(names)];
+  return { pendingWith: deduped.length ? normalizePendingWith(deduped.join(',')) : null, sinceDate };
 }
 
 async function fetchRequestPage(config, startIndex, forceTokenRefresh = false, searchCriteria = null) {
@@ -281,8 +444,8 @@ function comparable(value) {
   return String(value).trim();
 }
 
-async function applyRequestUpdate(conn, local, remote, config) {
-  const desired = normalizeRequest(remote, config);
+async function applyRequestUpdate(conn, local, remote, config, pendingOverride = null) {
+  const desired = normalizeRequest(remote, config, pendingOverride);
   const changes = [];
 
   const values = {
@@ -300,6 +463,7 @@ async function applyRequestUpdate(conn, local, remote, config) {
   if (desired.manageengine_pending_party || desired.status === 'Closed') {
     values.manageengine_pending_party = desired.manageengine_pending_party;
     values.pending_with = desired.pending_with;
+    if (desired.pending_since_date) values.pending_since_date = desired.pending_since_date;
   }
   if (desired.creation_date) values.creation_date = desired.creation_date;
   if (desired.manageengine_status && desired.status === 'Closed') {
@@ -354,10 +518,10 @@ async function finishRun(runId, status, counts, message = null) {
   ]);
 }
 
-async function executeSync(triggeredBy = 'schedule') {
-  const config = getConfig();
+async function executeSync(triggeredBy = 'schedule', { maxPages } = {}) {
+  const config = { ...getConfig(), ...(maxPages ? { maxPages } : {}) };
   const missing = missingConfig(config);
-  if (!config.enabled && triggeredBy === 'schedule') {
+  if (!config.enabled && (triggeredBy === 'schedule' || triggeredBy === 'deep-schedule')) {
     return { skipped: true, message: 'ManageEngine automatic sync is disabled' };
   }
   if (missing.length) throw new Error(`ManageEngine sync is not configured: missing ${missing.join(', ')}`);
@@ -366,9 +530,9 @@ async function executeSync(triggeredBy = 'schedule') {
   const counts = { localSrs: 0, scanned: 0, matched: 0, updated: 0, created: 0, unchanged: 0, missing: 0, errorCount: 0 };
   try {
     const [localRows] = await pool.query(`
-      SELECT id, sr_number, status, scope, pending_with, assigned_to, type, creation_date,
-             created_by_name, closed_date, manageengine_status, manageengine_pending_party,
-             manageengine_created_at, manageengine_closed_at
+      SELECT id, sr_number, status, scope, pending_with, pending_since_date, assigned_to, type,
+             creation_date, created_by_name, closed_date, manageengine_status,
+             manageengine_pending_party, manageengine_created_at, manageengine_closed_at
       FROM srs
       WHERE category = 'SR' AND is_deleted = 0
     `);
@@ -379,13 +543,31 @@ async function executeSync(triggeredBy = 'schedule') {
     counts.matched = localRows.filter(row => remoteResult.matches.has(String(row.sr_number).trim())).length;
     counts.missing = localRows.length - counts.matched;
 
+    // Resolve the real recipient names and since-date before opening the transaction — these
+    // are slow network calls (up to two per affected request) and shouldn't hold a DB connection
+    // or extend the transaction while they run. Only for requests unreplied_count already says
+    // are pending with the User — Technician-side keeps the assigned technician's own name,
+    // no lookup needed. A failure here just leaves that one request on the generic "Pending with
+    // User" placeholder and its existing pending_since_date, rather than failing the whole sync.
+    const pendingOverrides = new Map();
+    for (const local of localRows) {
+      const remote = remoteResult.matches.get(String(local.sr_number).trim());
+      if (!remote || pendingPartyFor(remote) !== 'User') continue;
+      try {
+        const override = await resolvePendingWithName(config, remote.id);
+        if (override) pendingOverrides.set(remote.id, override);
+      } catch (error) {
+        console.warn(`ManageEngine sync: could not resolve pending-with recipients for request ${remote.id}: ${error.message}`);
+      }
+    }
+
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
       for (const local of localRows) {
         const remote = remoteResult.matches.get(String(local.sr_number).trim());
         if (!remote) continue;
-        const changedFields = await applyRequestUpdate(conn, local, remote, config);
+        const changedFields = await applyRequestUpdate(conn, local, remote, config, pendingOverrides.get(remote.id) || null);
         if (changedFields) counts.updated++;
         else counts.unchanged++;
       }
@@ -410,9 +592,9 @@ async function executeSync(triggeredBy = 'schedule') {
   }
 }
 
-async function runManageEngineSync(triggeredBy = 'schedule') {
+async function runManageEngineSync(triggeredBy = 'schedule', options = {}) {
   if (activeRun) return { alreadyRunning: true, ...(await activeRun) };
-  activeRun = executeSync(triggeredBy);
+  activeRun = executeSync(triggeredBy, options);
   try {
     return await activeRun;
   } finally {
@@ -437,6 +619,7 @@ async function getSyncStatus() {
 function initManageEngineScheduler() {
   const config = getConfig();
   if (cronTask) { cronTask.stop(); cronTask = null; }
+  if (deepSyncCronTask) { deepSyncCronTask.stop(); deepSyncCronTask = null; }
   if (!config.enabled) {
     console.log('ManageEngine automatic sync disabled');
     return;
@@ -452,6 +635,23 @@ function initManageEngineScheduler() {
   });
   console.log(`ManageEngine sync scheduled every ${config.intervalMinutes} minutes`);
 
+  // Separate once-daily deep pass (see deepSyncMaxPages/deepSyncCronPattern in getConfig) that
+  // scans far deeper than the regular 30-minute sync, to pick up local SRs old enough to have
+  // scrolled past the regular scan window. The activeRun guard in runManageEngineSync means this
+  // simply waits its turn if a regular sync happens to be in flight at the same moment, rather
+  // than running two syncs concurrently.
+  if (config.deepSyncEnabled) {
+    if (cron.validate(config.deepSyncCronPattern)) {
+      deepSyncCronTask = cron.schedule(config.deepSyncCronPattern, () => {
+        runManageEngineSync('deep-schedule', { maxPages: config.deepSyncMaxPages })
+          .catch(error => console.error('Scheduled deep ManageEngine sync failed:', error.message));
+      });
+      console.log(`ManageEngine deep sync scheduled (cron "${config.deepSyncCronPattern}", up to ${config.deepSyncMaxPages} pages)`);
+    } else {
+      console.warn(`ManageEngine deep sync not scheduled; invalid MANAGEENGINE_DEEP_SYNC_CRON "${config.deepSyncCronPattern}"`);
+    }
+  }
+
   if (config.runOnStart) {
     setTimeout(() => {
       runManageEngineSync('startup').catch(error => console.error('Startup ManageEngine sync failed:', error.message));
@@ -460,6 +660,7 @@ function initManageEngineScheduler() {
 }
 
 module.exports = {
+  displayNameForRecipient,
   getConfig,
   getSyncStatus,
   initManageEngineScheduler,
@@ -468,6 +669,8 @@ module.exports = {
   mapStatus,
   normalizeRequest,
   pendingPartyFor,
+  resolvePendingWithName,
   runManageEngineSync,
   serviceDeskApiDomainFor,
+  vendorNameForEmail,
 };
