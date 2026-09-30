@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const { pool } = require('../db/pool');
 const { authenticate, requireRole } = require('../middleware/auth');
-const { getSyncStatus, runManageEngineSync } = require('../services/manageengine-sync');
+const { getConfig, getSyncStatus, runManageEngineSync } = require('../services/manageengine-sync');
 
 const router = express.Router();
 router.use(authenticate);
@@ -16,8 +16,16 @@ router.get('/sync-status', async (_req, res, next) => {
   try { res.json(await getSyncStatus()); } catch (error) { next(error); }
 });
 
-router.post('/sync-now', async (_req, res, next) => {
-  try { res.json(await runManageEngineSync('manual')); } catch (error) { next(error); }
+// A plain manual sync only scans the same ~10,000-newest window as the regular 30-minute
+// job (see maxPages in getConfig) — fine for recently-touched SRs, but an SR raised long ago
+// can sit outside that window entirely. `deep: true` runs the same deeper pass the once-daily
+// scheduled job uses (deepSyncMaxPages), on demand, so an admin doesn't have to wait for the
+// next 3pm run just to pick up a straggler.
+router.post('/sync-now', async (req, res, next) => {
+  try {
+    const options = req.body?.deep ? { maxPages: getConfig().deepSyncMaxPages } : {};
+    res.json(await runManageEngineSync('manual', options));
+  } catch (error) { next(error); }
 });
 
 // Minimal RFC4180-ish CSV parser: handles quoted fields, embedded commas, and doubled

@@ -166,7 +166,7 @@ export const manageEngineImportAPI = {
   parse: (formData) => api.post('/manageengine-import/parse', formData),
   apply: (data) => api.post('/manageengine-import/apply', data),
   syncStatus: () => api.get('/manageengine-import/sync-status', { cacheMs: 5_000 }),
-  syncNow: () => api.post('/manageengine-import/sync-now'),
+  syncNow: (deep = false) => api.post('/manageengine-import/sync-now', deep ? { deep: true } : {}),
 };
 
 export const contactsAPI = {

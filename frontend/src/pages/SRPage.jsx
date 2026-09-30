@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
-  Table, Button, Tag, Input,
+  Table, Button, Dropdown, Tag, Input,
   message, Typography, Row, Col, Card, Statistic
 } from 'antd';
 import { PlusOutlined, ReloadOutlined, FileExcelOutlined, ClearOutlined, SyncOutlined } from '@ant-design/icons';
@@ -396,10 +396,10 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
     finally { setExporting(false); }
   }
 
-  async function handleManageEngineSync() {
+  async function handleManageEngineSync(deep = false) {
     setSyncingManageEngine(true);
     try {
-      const res = await manageEngineImportAPI.syncNow();
+      const res = await manageEngineImportAPI.syncNow(deep);
       const summary = res.data;
       const resultParts = [
         `${summary.updated || 0} updated`,
@@ -408,7 +408,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
       if (summary.missing) resultParts.push(`${summary.missing} not found`);
       message.success({
         key: MANAGEENGINE_MESSAGE_KEY,
-        content: `ManageEngine sync complete: ${resultParts.join(', ')}`,
+        content: `ManageEngine ${deep ? 'deep ' : ''}sync complete: ${resultParts.join(', ')}`,
       });
       await Promise.all([fetchSRs(), fetchStats(), fetchFilterOptions()]);
     } catch (e) {
@@ -531,9 +531,20 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
           </Col>
           {isAdmin && !isDigitization && (
             <Col>
-              <Button icon={<SyncOutlined />} loading={syncingManageEngine} onClick={handleManageEngineSync}>
+              <Dropdown.Button
+                icon={<SyncOutlined />}
+                loading={syncingManageEngine}
+                onClick={() => handleManageEngineSync(false)}
+                menu={{
+                  items: [{
+                    key: 'deep',
+                    label: 'Deep sync (reaches older SRs, slower)',
+                  }],
+                  onClick: () => handleManageEngineSync(true),
+                }}
+              >
                 Sync SRs from ManageEngine
-              </Button>
+              </Dropdown.Button>
             </Col>
           )}
           {canEdit && (
