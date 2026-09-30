@@ -116,23 +116,35 @@ function AssignedToEcdReport() {
   const rawColumns = useMemo(() => [
     {
       title: 'SR Number', dataIndex: 'sr_number', width: 110, fixed: 'left',
+      sorter: (a, b) => Number(a.sr_number) - Number(b.sr_number),
       render: (v, row) => (
         <Button type="link" style={{ padding: 0, fontWeight: 600, fontSize: 13 }} onClick={() => openDetail(row)}>
           {v}
         </Button>
       ),
     },
-    { title: 'SR Date', dataIndex: 'sr_date', width: 110, render: fmt },
-    { title: 'Status', dataIndex: 'status', width: 100, render: v => <Tag color={STATUS_COLORS[v]}>{v}</Tag> },
+    {
+      title: 'SR Date', dataIndex: 'sr_date', width: 110, render: fmt,
+      sorter: (a, b) => new Date(a.sr_date || 0) - new Date(b.sr_date || 0),
+    },
+    {
+      title: 'Status', dataIndex: 'status', width: 100, render: v => <Tag color={STATUS_COLORS[v]}>{v}</Tag>,
+      filters: Object.keys(STATUS_COLORS).map(status => ({ text: status, value: status })),
+      onFilter: (value, row) => row.status === value,
+    },
     {
       title: 'Comment', dataIndex: 'last_comment', width: 180,
       render: (_, row) => <CommentCell srId={row.id} lastComment={row.last_comment} lastCommentAt={row.last_comment_at} />,
     },
-    { title: 'Changes', dataIndex: 'change_count', width: 90, align: 'center' },
+    {
+      title: 'Changes', dataIndex: 'change_count', width: 90, align: 'center',
+      sorter: (a, b) => (a.change_count || 0) - (b.change_count || 0),
+    },
     ...Array.from({ length: ecdColumnCount }, (_, i) => ({
       title: `ECD${i + 1}`,
       dataIndex: `ecd_${i}`,
       width: 115,
+      sorter: (a, b) => new Date(a.ecd_sequence[i] || 0) - new Date(b.ecd_sequence[i] || 0),
       render: (_, row) => fmt(row.ecd_sequence[i]) || '—',
     })),
   ], [ecdColumnCount, openDetail]);
