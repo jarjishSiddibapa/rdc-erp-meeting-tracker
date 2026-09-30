@@ -398,6 +398,15 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
 
   async function handleManageEngineSync(deep = false) {
     setSyncingManageEngine(true);
+    // A deep pass scans up to 2000 pages and can take several minutes with no other visible
+    // feedback besides the button's spinner — without this, it looks identical to "did nothing".
+    message.loading({
+      key: MANAGEENGINE_MESSAGE_KEY,
+      content: deep
+        ? 'Deep sync started — this scans much further back and can take several minutes...'
+        : 'Syncing with ManageEngine...',
+      duration: 0,
+    });
     try {
       const res = await manageEngineImportAPI.syncNow(deep);
       const summary = res.data;
