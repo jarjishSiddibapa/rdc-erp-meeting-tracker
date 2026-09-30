@@ -7,7 +7,6 @@
 # Dependencies and generated frontend output
 **/node_modules/
 frontend/dist/
-frontend/public/login-bg.webp
 
 # Runtime data, database exports, uploads, and logs
 backend/data/
