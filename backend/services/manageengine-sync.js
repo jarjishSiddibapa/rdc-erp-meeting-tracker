@@ -55,7 +55,7 @@ function getConfig() {
     // stragglers, without paying that cost on every 30-minute run.
     deepSyncEnabled: envFlag('MANAGEENGINE_DEEP_SYNC_ENABLED', true),
     deepSyncMaxPages: Math.max(1, Number.parseInt(process.env.MANAGEENGINE_DEEP_SYNC_MAX_PAGES, 10) || 2000),
-    deepSyncCronPattern: String(process.env.MANAGEENGINE_DEEP_SYNC_CRON || '0 15 * * *').trim(),
+    deepSyncCronPattern: String(process.env.MANAGEENGINE_DEEP_SYNC_CRON || '0 3 * * *').trim(),
   };
 }
 
@@ -317,6 +317,36 @@ function displayNameForRecipient(email, emailToName, config) {
   return vendorNameForEmail(lower, config) || normalizePersonName(emailToName.get(lower) || titleCaseFromEmail(email));
 }
 
+// Fetches a request's real conversation thread and returns its last genuine (non-automated)
+// reply plus the full genuine list — shared by both pending_since_date resolution (either
+// direction) and pending_with's User-side name resolution below, so the conversation list is
+// only ever fetched once per request per sync.
+async function fetchLastGenuineReply(config, remoteId) {
+  const conversations = await fetchConversations(config, remoteId);
+  const real = conversations.filter(isGenuineCorrespondence);
+  return { real, lastReply: real[0] || null }; // sort_order: desc, filter preserves order
+}
+
+function sinceFromReply(reply, timeZone) {
+  if (!reply) return null;
+  const dateTime = dateTimeFromApi(reply.created_time, timeZone);
+  return dateTime ? { sinceDate: dateTime.slice(0, 10), sinceDateTime: dateTime } : null;
+}
+
+// The ball changes hands the moment either side sends a genuine reply, regardless of which
+// direction — so pending_since_date should track that reply's own timestamp on both the
+// Technician and the User side, not whenever our own 30-minute sync happened to notice the
+// field differ (which would reset "pending since" to today on a pure data-quality correction,
+// e.g. resolving a stale placeholder into a real name, even though the ball never changed
+// hands). One conversations-list API call; cheap enough to run for every matched request at
+// this app's scale (see resolvePendingWithName for the pricier per-recipient lookup, User-side
+// only). Returns null when there's no genuine reply yet (freshly raised, still with the
+// technician since day one) so the caller falls back to the request's own creation date.
+async function resolvePendingSince(config, remoteId) {
+  const { lastReply } = await fetchLastGenuineReply(config, remoteId);
+  return sinceFromReply(lastReply, config.timeZone);
+}
+
 // Called only when the official unreplied_count signal (see pendingPartyFor) already says the
 // ball is with the User — resolves WHO within RDC by reading the real conversation thread's
 // last genuine reply and who it was addressed to, instead of leaving the generic "Pending with
@@ -328,16 +358,13 @@ function displayNameForRecipient(email, emailToName, config) {
 //  - otherwise => named from whoever that last reply's recipients resolve to (real names, known
 //    vendor domains collapsed to one bucket each — see vendorNameForEmail — the shared helpdesk
 //    mailbox excluded since it's never itself a person to wait on), since that reply's own
-//    timestamp.
-// This also drives pending_since_date directly off the real ManageEngine message timestamp
-// instead of whenever our own 30-minute sync happened to notice the field differ — otherwise a
-// pure data-quality correction (like resolving a stale placeholder into a real name) would reset
-// "pending since" to today even though the ball never actually changed hands.
+//    timestamp (see resolvePendingSince/sinceFromReply).
 // Returns null on anything unresolvable so the caller falls back to the generic placeholder and
 // leaves pending_since_date untouched.
 async function resolvePendingWithName(config, remoteId) {
-  const conversations = await fetchConversations(config, remoteId);
-  const real = conversations.filter(isGenuineCorrespondence);
+  const { real, lastReply } = await fetchLastGenuineReply(config, remoteId);
+  if (!lastReply) return null;
+  const since = sinceFromReply(lastReply, config.timeZone);
 
   const emailToName = new Map();
   for (const entry of real) {
@@ -346,19 +373,15 @@ async function resolvePendingWithName(config, remoteId) {
     if (email && name) emailToName.set(String(email).toLowerCase(), name);
   }
 
-  const lastReply = real[0]; // conversations are fetched sort_order: desc, filter preserves order
-  if (!lastReply) return null;
-  const sinceDate = dateTimeFromApi(lastReply.created_time, config.timeZone)?.slice(0, 10) || null;
-
   const recipients = await fetchNotificationRecipients(config, remoteId, lastReply.id);
-  if (!recipients.length) return { pendingWith: null, sinceDate };
+  if (!recipients.length) return { pendingWith: null, ...since };
 
   const names = recipients
     .filter(email => String(email).toLowerCase() !== config.helpdeskEmail)
     .map(email => displayNameForRecipient(email, emailToName, config))
     .filter(Boolean);
   const deduped = [...new Set(names)];
-  return { pendingWith: deduped.length ? normalizePendingWith(deduped.join(',')) : null, sinceDate };
+  return { pendingWith: deduped.length ? normalizePendingWith(deduped.join(',')) : null, ...since };
 }
 
 async function fetchRequestPage(config, startIndex, forceTokenRefresh = false, searchCriteria = null) {
@@ -486,9 +509,17 @@ async function applyRequestUpdate(conn, local, remote, config, pendingOverride =
       [...changes.map(change => change.newValue), local.id]
     );
     for (const change of changes) {
+      // pending_with's history entry should read "since the real mail", not "since whenever
+      // this sync happened to run" — use the resolved reply's own timestamp when we have one
+      // (see resolvePendingWithName/resolvePendingSince) instead of the row's default NOW().
+      const changedAt = change.field === 'pending_with' ? pendingOverride?.sinceDateTime || null : null;
       await conn.execute(
-        'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by) VALUES (?, ?, ?, ?, NULL)',
-        [local.id, change.field, change.oldValue, change.newValue]
+        changedAt
+          ? 'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by, changed_at) VALUES (?, ?, ?, ?, NULL, ?)'
+          : 'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by) VALUES (?, ?, ?, ?, NULL)',
+        changedAt
+          ? [local.id, change.field, change.oldValue, change.newValue, changedAt]
+          : [local.id, change.field, change.oldValue, change.newValue]
       );
     }
   } else {
@@ -543,21 +574,26 @@ async function executeSync(triggeredBy = 'schedule', { maxPages } = {}) {
     counts.matched = localRows.filter(row => remoteResult.matches.has(String(row.sr_number).trim())).length;
     counts.missing = localRows.length - counts.matched;
 
-    // Resolve the real recipient names and since-date before opening the transaction — these
-    // are slow network calls (up to two per affected request) and shouldn't hold a DB connection
-    // or extend the transaction while they run. Only for requests unreplied_count already says
-    // are pending with the User — Technician-side keeps the assigned technician's own name,
-    // no lookup needed. A failure here just leaves that one request on the generic "Pending with
-    // User" placeholder and its existing pending_since_date, rather than failing the whole sync.
+    // Resolve the real since-date (and, on the User side, the recipient names) before opening
+    // the transaction — these are slow network calls and shouldn't hold a DB connection or
+    // extend the transaction while they run. User-side requests get the pricier lookup (two API
+    // calls) since pending_with's name comes from it too; Technician-side only needs the
+    // cheaper one-call since-date. A failure here just leaves that one request on its existing
+    // pending_with/pending_since_date, rather than failing the whole sync.
     const pendingOverrides = new Map();
     for (const local of localRows) {
       const remote = remoteResult.matches.get(String(local.sr_number).trim());
-      if (!remote || pendingPartyFor(remote) !== 'User') continue;
+      if (!remote) continue;
       try {
-        const override = await resolvePendingWithName(config, remote.id);
+        const party = pendingPartyFor(remote);
+        const override = party === 'User'
+          ? await resolvePendingWithName(config, remote.id)
+          : party === 'Technician'
+            ? await resolvePendingSince(config, remote.id)
+            : null;
         if (override) pendingOverrides.set(remote.id, override);
       } catch (error) {
-        console.warn(`ManageEngine sync: could not resolve pending-with recipients for request ${remote.id}: ${error.message}`);
+        console.warn(`ManageEngine sync: could not resolve pending-since for request ${remote.id}: ${error.message}`);
       }
     }
 
@@ -669,6 +705,7 @@ module.exports = {
   mapStatus,
   normalizeRequest,
   pendingPartyFor,
+  resolvePendingSince,
   resolvePendingWithName,
   runManageEngineSync,
   serviceDeskApiDomainFor,

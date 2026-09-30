@@ -20,7 +20,7 @@ router.get('/sync-status', async (_req, res, next) => {
 // job (see maxPages in getConfig) — fine for recently-touched SRs, but an SR raised long ago
 // can sit outside that window entirely. `deep: true` runs the same deeper pass the once-daily
 // scheduled job uses (deepSyncMaxPages), on demand, so an admin doesn't have to wait for the
-// next 3pm run just to pick up a straggler.
+// next 3am run just to pick up a straggler.
 router.post('/sync-now', async (req, res, next) => {
   try {
     const options = req.body?.deep ? { maxPages: getConfig().deepSyncMaxPages } : {};
