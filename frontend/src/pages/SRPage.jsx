@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
-  Table, Button, Dropdown, Tag, Input,
+  Table, Button, Tag, Input,
   message, Typography, Row, Col, Card, Statistic
 } from 'antd';
-import { PlusOutlined, ReloadOutlined, FileExcelOutlined, ClearOutlined, SyncOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined, FileExcelOutlined, ClearOutlined, SyncOutlined, HistoryOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { manageEngineImportAPI, srAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -211,7 +211,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
   const statsAbortRef = useRef(null);
 
   const [exporting, setExporting] = useState(false);
-  const [syncingManageEngine, setSyncingManageEngine] = useState(false);
+  const [syncingManageEngine, setSyncingManageEngine] = useState(null); // null | 'shallow' | 'deep'
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingSR, setEditingSR] = useState(null);
@@ -397,7 +397,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
   }
 
   async function handleManageEngineSync(deep = false) {
-    setSyncingManageEngine(true);
+    setSyncingManageEngine(deep ? 'deep' : 'shallow');
     // A deep pass scans up to 2000 pages and can take several minutes with no other visible
     // feedback besides the button's spinner — without this, it looks identical to "did nothing".
     message.loading({
@@ -426,7 +426,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
         content: e.response?.data?.message || 'ManageEngine sync failed. Check the API configuration and server log.',
       });
     } finally {
-      setSyncingManageEngine(false);
+      setSyncingManageEngine(null);
     }
   }
 
@@ -539,23 +539,29 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
             </Button>
           </Col>
           {isAdmin && !isDigitization && (
-            <Col>
-              <Dropdown.Button
-                icon={<SyncOutlined />}
-                loading={syncingManageEngine}
-                onClick={() => handleManageEngineSync(false)}
-                trigger={['click']}
-                menu={{
-                  items: [{
-                    key: 'deep',
-                    label: 'Deep sync (reaches older SRs, slower)',
-                  }],
-                  onClick: () => handleManageEngineSync(true),
-                }}
-              >
-                Sync SRs from ManageEngine
-              </Dropdown.Button>
-            </Col>
+            <>
+              <Col>
+                <Button
+                  icon={<SyncOutlined />}
+                  loading={syncingManageEngine === 'shallow'}
+                  disabled={!!syncingManageEngine && syncingManageEngine !== 'shallow'}
+                  onClick={() => handleManageEngineSync(false)}
+                >
+                  Sync SRs from ManageEngine
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  icon={<HistoryOutlined />}
+                  loading={syncingManageEngine === 'deep'}
+                  disabled={!!syncingManageEngine && syncingManageEngine !== 'deep'}
+                  onClick={() => handleManageEngineSync(true)}
+                  title="Reaches older SRs outside the regular sync's scan window; slower."
+                >
+                  Deep Sync
+                </Button>
+              </Col>
+            </>
           )}
           {canEdit && (
             <Col>
