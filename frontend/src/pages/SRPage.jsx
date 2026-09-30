@@ -544,6 +544,7 @@ export default function SRPage({ category, excludeClosed = false, initialSearch 
                 icon={<SyncOutlined />}
                 loading={syncingManageEngine}
                 onClick={() => handleManageEngineSync(false)}
+                trigger={['click']}
                 menu={{
                   items: [{
                     key: 'deep',
