@@ -20,8 +20,9 @@ const STATUS_COLORS = {
 
 function fmt(d) { return d ? dayjs(d).format('DD-MMM-YYYY') : ''; }
 
-// Fixed to Deloitte — matched case-insensitively against Assigned To so "deloitte" /
-// "DELOITTE" / "Deloitte" entered anywhere all roll up into the same report.
+// Fixed to Deloitte — matched as a substring against Assigned To (see reports.js's
+// assigned_to LIKE %Deloitte%) so both the PDF importer's bare "Deloitte" and the
+// ManageEngine sync's full "Deloitte ERP Support" roll up into the same report.
 function AssignedToEcdReport() {
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState(null);

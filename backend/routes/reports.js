@@ -24,9 +24,9 @@ router.get('/assigned-to-ecd', async (req, res, next) => {
         (SELECT c.comment FROM sr_comments c WHERE c.sr_id = srs.id AND c.is_deleted = 0 ORDER BY c.commented_at DESC LIMIT 1) as last_comment,
         (SELECT c.commented_at FROM sr_comments c WHERE c.sr_id = srs.id AND c.is_deleted = 0 ORDER BY c.commented_at DESC LIMIT 1) as last_comment_at
       FROM srs
-      WHERE category = ? AND assigned_to = ? AND is_deleted = 0
+      WHERE category = ? AND assigned_to LIKE ? AND is_deleted = 0
       ORDER BY CAST(sr_number AS SIGNED) ASC, sr_number ASC
-    `, [category, assignedTo.trim()]);
+    `, [category, `%${assignedTo.trim()}%`]);
 
     if (srs.length === 0) return res.json({ data: [], max_changes: 0 });
 
