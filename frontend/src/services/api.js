@@ -181,6 +181,8 @@ export const pendingRemindersAPI = {
   preview: () => api.get('/pending-reminders/preview'),
   send: (keys) => api.post('/pending-reminders/send', { keys }),
   history: () => api.get('/pending-reminders/history'),
+  getSettings: () => api.get('/pending-reminders/settings'),
+  updateSettings: (data) => api.put('/pending-reminders/settings', data),
 };
 
 export const userAPI = {

@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import {
   Card, Button, Table, Alert, Space, Typography,
   Row, Col, Result, Upload, Tabs, Tag, Collapse, Select, Popconfirm, message,
-  Modal, Form, Input
+  Modal, Form, Input, Switch, TimePicker
 } from 'antd';
 import {
   FileExcelOutlined, DownloadOutlined, UploadOutlined, FilePdfOutlined, SyncOutlined, StopOutlined,
@@ -1040,9 +1040,88 @@ function ContactsManager() {
   );
 }
 
-// ── Send Pending Reminders (manual, admin-triggered) ──
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  .map((label, value) => ({ label, value }));
+
+// Next time the weekly job will fire, from the saved day/time (server clock == this network's clock).
+function nextAutomaticRun(settings) {
+  let next = dayjs().day(settings.day_of_week).hour(settings.hour).minute(settings.minute).second(0).millisecond(0);
+  if (!next.isAfter(dayjs())) next = next.add(7, 'day');
+  return next;
+}
+
+// Weekly automatic send: the same email the manual button sends, on a configurable weekday and
+// time, with an on/off switch. Only people who already have an email on file are included.
+function AutoReminderSettings() {
+  const [settings, setSettings] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  async function fetchSettings() {
+    try {
+      const res = await pendingRemindersAPI.getSettings();
+      setSettings(res.data);
+    } catch { message.error('Failed to load automatic reminder settings'); }
+  }
+
+  useEffect(() => { fetchSettings(); }, []);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const res = await pendingRemindersAPI.updateSettings(settings);
+      setSettings(res.data);
+      message.success(res.data.enabled ? 'Automatic weekly reminders saved' : 'Automatic reminders are off');
+    } catch (e) {
+      message.error(e.response?.data?.message || 'Failed to save settings');
+    } finally { setSaving(false); }
+  }
+
+  return (
+    <Card size="small" loading={!settings} title="Automatic weekly reminders" style={{ marginBottom: 24 }}>
+      {settings && (
+        <Space direction="vertical" size={14} style={{ width: '100%' }}>
+          <Space align="center" size={12}>
+            <Switch checked={!!settings.enabled} onChange={v => setSettings({ ...settings, enabled: v })} />
+            <Text>{settings.enabled ? 'Reminders are sent automatically every week' : 'Automatic sending is off - use the manual send below'}</Text>
+          </Space>
+
+          <Space align="center" size={12} wrap>
+            <Text>Send every</Text>
+            <Select
+              style={{ width: 140 }} options={WEEKDAYS} disabled={!settings.enabled}
+              value={settings.day_of_week} onChange={v => setSettings({ ...settings, day_of_week: v })}
+            />
+            <Text>at</Text>
+            <TimePicker
+              format="hh:mm A" use12Hours allowClear={false} disabled={!settings.enabled}
+              value={dayjs().hour(settings.hour).minute(settings.minute)}
+              onChange={v => v && setSettings({ ...settings, hour: v.hour(), minute: v.minute() })}
+            />
+          </Space>
+
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            Goes to everyone with an email on file, same list as the manual send below. People missing an email are
+            skipped - add theirs here or in Pending-With Contacts.
+            {!!settings.enabled && <> Next automatic send: <b>{nextAutomaticRun(settings).format('dddd, DD-MMM-YYYY hh:mm A')}</b>.</>}
+          </Text>
+
+          {settings.last_run_at && (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Last automatic run: {dayjs(settings.last_run_at).format('DD-MMM-YYYY hh:mm A')} - {settings.last_run_message}
+            </Text>
+          )}
+
+          <BrandButton loading={saving} onClick={handleSave}>Save Schedule</BrandButton>
+        </Space>
+      )}
+    </Card>
+  );
+}
+
+// ── Send Pending Reminders ──
 // One email per person (except Deloitte, tracked separately via the weekly PDF) listing
-// everything currently pending with them — fired by hand, e.g. the day before a meeting.
+// everything currently pending with them — sent automatically each week (AutoReminderSettings)
+// and still fireable by hand, e.g. the day before a meeting.
 function SendPendingReminders() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1195,9 +1274,12 @@ function SendPendingReminders() {
 
   return (
     <div>
+      <AutoReminderSettings />
+
+      <Title level={5} style={{ marginTop: 0 }}>Send now</Title>
       <Paragraph type="secondary" style={{ marginBottom: 20 }}>
         Everyone except Deloitte currently named in Pending With on an open SR, with everything
-        that's pending against them. Fire this manually - e.g. the day before a meeting - so each
+        that's pending against them. Send manually at any time - e.g. the day before a meeting - so each
         person gets an email listing exactly what's pending with them. Missing an email? Add one
         inline below; it's saved to Pending-With Contacts for next time too.
       </Paragraph>

@@ -22,6 +22,7 @@ const pendingRemindersRoutes = require('./routes/pending-reminders');
 const { initDb, pool } = require('./db/database');
 const { verifyMailer } = require('./services/mailer');
 const { initScheduler } = require('./services/backup');
+const { initPendingReminderScheduler } = require('./services/pending-reminders');
 const { initManageEngineScheduler } = require('./services/manageengine-sync');
 const { startHeartbeat, logShutdown, logCrash } = require('./services/heartbeat');
 
@@ -142,6 +143,7 @@ const PORT = process.env.PORT || 777;
 async function start() {
   await initDb();
   await initScheduler();
+  await initPendingReminderScheduler();
   initManageEngineScheduler();
   const server = app.listen(PORT, () => {
     console.log(`ERP Meeting Tracker API running on http://localhost:${PORT}`);

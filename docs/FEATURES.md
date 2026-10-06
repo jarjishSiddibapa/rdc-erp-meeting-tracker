@@ -46,8 +46,9 @@ the [architecture guide](ARCHITECTURE.md).
 - Untracked remote requests are ignored, regardless of category or status.
 - Source status, exact created/closed timestamps, requester, category, and technician mapping.
 - Pending side derived from official `unreplied_count`, with explicit pending statuses taking precedence.
-- Technician-side work shows Status `Pending` and Pending With as the Assigned To technician;
-  user-side work shows `Pending with User` in both fields.
+- Technician-side work shows Status `Pending`; user-side work shows `Pending with User`.
+  Pending With is maintained manually and never written by the sync; Pending Since comes from the
+  time of the last genuine mail in the request's conversation.
 - `Deloitte ERP Support` classified as External; other technicians classified as Internal.
 - Missing remote requests remain unchanged and soft-deleted records are never recreated.
 - Per-run counts for scanned, matched, updated, unchanged, missing, and errors.
@@ -90,6 +91,13 @@ the [architecture guide](ARCHITECTURE.md).
 - Configuration status and latest run details.
 - Immediate guarded sync using the same service as the scheduler.
 - Visible outcome counts without exposing OAuth credentials.
+
+### Pending reminders
+
+- One email per person listing everything pending with them (Deloitte and ignored contacts excluded).
+- Manual send to any selected people at any time, with inline fixing of missing emails.
+- Optional automatic weekly send: admin-configurable weekday and time with an on/off switch (off by
+  default). Only people with an email on file are included; the last automatic run's outcome is shown.
 
 ## Reports
 

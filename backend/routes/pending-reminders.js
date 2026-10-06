@@ -1,77 +1,13 @@
 const express = require('express');
 const { pool } = require('../db/pool');
 const { authenticate, requireRole } = require('../middleware/auth');
-const { splitPendingWith, isRealPersonName } = require('../utils/pendingWith');
-const { sendPendingReminderEmail } = require('../services/mailer');
+const {
+  buildReminderGroups, sendReminderGroups, getSettings, reschedulePendingReminders,
+} = require('../services/pending-reminders');
 
 const router = express.Router();
 router.use(authenticate);
 router.use(requireRole('admin'));
-
-const RAISED_DATE = `COALESCE(NULLIF(TRIM(s.creation_date), ''), DATE(s.created_at))`;
-
-// Deloitte is tracked separately (the weekly PDF import already covers them) — this feature
-// is specifically for reminding the RDC-side and other named people, so any pending_with
-// token that names Deloitte in any form ("Deloitte", "Deloitte ERP Support") is left out.
-// isRealPersonName (see utils/pendingWith.js) filters out the ManageEngine status placeholder
-// on top of this — that one's excluded everywhere, not just here.
-function isDeloitte(name) {
-  return name.toLowerCase().includes('deloitte');
-}
-
-// Builds one group per PERSON currently named in an open SR's Pending With field (excluding
-// Deloitte and anyone marked "ignored" in the contacts directory - ignored contacts remain
-// valid Pending With names, they're just never sent a reminder). Grouped by resolved email
-// (not by name) so two name-variants for the same person ("Aniket" / "Aniket Sawant") that
-// share one contact email get merged into a single email rather than two separate ones;
-// a name with no email on file yet can't be merged with anything, so it stays its own group
-// keyed by name until an email is added. Recomputed fresh from the DB every time this is
-// called — never trust a client-supplied SR list for what actually gets emailed.
-async function buildReminderGroups() {
-  const [rows] = await pool.query(`
-    SELECT
-      s.sr_number, s.description, s.status, s.pending_with, s.expected_closure_date,
-      DATEDIFF(CURDATE(), COALESCE(
-        (SELECT MAX(DATE(h.changed_at)) FROM sr_history h WHERE h.sr_id = s.id AND h.field_changed = 'pending_with' AND h.is_deleted = 0),
-        ${RAISED_DATE}
-      )) as pending_since_days
-    FROM srs s
-    WHERE s.category = 'SR' AND s.is_deleted = 0 AND s.status != 'Closed'
-  `);
-
-  const [contactRows] = await pool.query('SELECT id, name, email, is_ignored FROM contacts WHERE is_deleted = 0');
-  const contactByLowerName = new Map(contactRows.map(c => [c.name.toLowerCase(), c]));
-
-  const groups = new Map();
-  for (const row of rows) {
-    for (const name of splitPendingWith(row.pending_with)) {
-      if (!isRealPersonName(name) || isDeloitte(name)) continue;
-      const contact = contactByLowerName.get(name.toLowerCase());
-      if (contact?.is_ignored) continue;
-
-      const email = contact?.email || null;
-      const key = email ? `email:${email.toLowerCase()}` : `name:${name.toLowerCase()}`;
-      let group = groups.get(key);
-      if (!group) {
-        group = { key, name, email, contactId: contact?.id || null, srs: [] };
-        groups.set(key, group);
-      } else if (!group.name.split(' / ').includes(name)) {
-        group.name = `${group.name} / ${name}`;
-      }
-      if (!group.srs.some(s => s.sr_number === row.sr_number)) {
-        group.srs.push({
-          sr_number: row.sr_number,
-          description: row.description,
-          status: row.status,
-          expected_closure_date: row.expected_closure_date,
-          pending_since_days: row.pending_since_days,
-        });
-      }
-    }
-  }
-
-  return [...groups.values()].sort((a, b) => b.srs.length - a.srs.length);
-}
 
 router.get('/preview', async (req, res, next) => {
   try {
@@ -89,36 +25,7 @@ router.post('/send', async (req, res, next) => {
     if (requestedKeys.size === 0) return res.status(400).json({ message: 'Select at least one person to send to' });
 
     const groups = (await buildReminderGroups()).filter(g => requestedKeys.has(g.key));
-    const sent = [];
-    const failed = [];
-
-    for (const group of groups) {
-      const srNumbers = group.srs.map(s => s.sr_number).join(', ');
-      if (!group.email) {
-        failed.push({ name: group.name, message: 'No email on file for this contact' });
-        await pool.execute(
-          'INSERT INTO pending_reminder_log (recipient_name, recipient_email, sr_count, sr_numbers, status, message, sent_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [group.name, null, group.srs.length, srNumbers, 'failed', 'No email on file for this contact', req.user.id]
-        );
-        continue;
-      }
-      try {
-        await sendPendingReminderEmail({ to: group.email, name: group.name, srs: group.srs });
-        sent.push({ name: group.name, email: group.email, srCount: group.srs.length });
-        await pool.execute(
-          'INSERT INTO pending_reminder_log (recipient_name, recipient_email, sr_count, sr_numbers, status, sent_by) VALUES (?, ?, ?, ?, ?, ?)',
-          [group.name, group.email, group.srs.length, srNumbers, 'sent', req.user.id]
-        );
-      } catch (e) {
-        failed.push({ name: group.name, message: e.message });
-        await pool.execute(
-          'INSERT INTO pending_reminder_log (recipient_name, recipient_email, sr_count, sr_numbers, status, message, sent_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [group.name, group.email, group.srs.length, srNumbers, 'failed', e.message, req.user.id]
-        );
-      }
-    }
-
-    res.json({ sent, failed });
+    res.json(await sendReminderGroups(groups, req.user.id));
   } catch (e) { next(e); }
 });
 
@@ -130,6 +37,38 @@ router.get('/history', async (req, res, next) => {
       ORDER BY l.sent_at DESC LIMIT 100
     `);
     res.json(rows);
+  } catch (e) { next(e); }
+});
+
+router.get('/settings', async (req, res, next) => {
+  try {
+    res.json(await getSettings());
+  } catch (e) { next(e); }
+});
+
+router.put('/settings', async (req, res, next) => {
+  try {
+    const { enabled, day_of_week, hour, minute } = req.body;
+    const d = Number(day_of_week), h = Number(hour), m = Number(minute);
+    if (!Number.isInteger(d) || d < 0 || d > 6) return res.status(400).json({ message: 'Day must be 0 (Sunday) to 6 (Saturday)' });
+    if (!Number.isInteger(h) || h < 0 || h > 23) return res.status(400).json({ message: 'Hour must be 0-23' });
+    if (!Number.isInteger(m) || m < 0 || m > 59) return res.status(400).json({ message: 'Minute must be 0-59' });
+
+    const current = await getSettings();
+    if (current.id) {
+      await pool.execute(
+        'UPDATE pending_reminder_settings SET enabled = ?, day_of_week = ?, hour = ?, minute = ?, updated_by = ? WHERE id = ?',
+        [enabled ? 1 : 0, d, h, m, req.user.id, current.id]
+      );
+    } else {
+      await pool.execute(
+        'INSERT INTO pending_reminder_settings (enabled, day_of_week, hour, minute, updated_by) VALUES (?, ?, ?, ?, ?)',
+        [enabled ? 1 : 0, d, h, m, req.user.id]
+      );
+    }
+
+    await reschedulePendingReminders();
+    res.json(await getSettings());
   } catch (e) { next(e); }
 });
 

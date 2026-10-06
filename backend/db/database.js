@@ -212,6 +212,23 @@ async function createTables() {
       INDEX idx_reminder_log_sent_at (sent_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
+
+  // Weekly automatic send of the pending reminders. Off by default so upgrading never starts
+  // emailing people unprompted. day_of_week follows cron (0 = Sunday ... 6 = Saturday).
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS pending_reminder_settings (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      enabled TINYINT(1) NOT NULL DEFAULT 0,
+      day_of_week TINYINT NOT NULL DEFAULT 1,
+      hour TINYINT NOT NULL DEFAULT 9,
+      minute TINYINT NOT NULL DEFAULT 0,
+      last_run_at DATETIME NULL,
+      last_run_message TEXT NULL,
+      is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+      updated_by INT NULL,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
 }
 
 // The users table already existed with the old constraints (username required, email
