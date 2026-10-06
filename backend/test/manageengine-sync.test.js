@@ -1,19 +1,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  displayNameForRecipient,
   matchTrackedRequests,
   mapStatus,
   normalizeRequest,
   pendingPartyFor,
   serviceDeskApiDomainFor,
-  vendorNameForEmail,
 } = require('../services/manageengine-sync');
 
 const config = {
   externalTechnician: 'Deloitte ERP Support',
-  vendorIdsName: 'IDS',
-  vendorEndelName: 'Endel',
   timeZone: 'Asia/Kolkata',
 };
 
@@ -58,7 +54,7 @@ test('maps a Deloitte ticket to External and preserves full timestamps', () => {
 
   assert.equal(request.scope, 'External');
   assert.equal(request.status, 'Pending');
-  assert.equal(request.pending_with, 'Deloitte ERP Support');
+  assert.equal(Object.hasOwn(request, 'pending_with'), false);
   assert.equal(request.manageengine_pending_party, 'Technician');
   // requester is who actually raised the ticket; created_by is often just ManageEngine's own
   // email-ingestion actor ("System") and only used as a fallback when requester is absent.
@@ -81,14 +77,11 @@ test('maps a technician response to the requester without inventing closure time
   assert.equal(request.scope, 'Internal');
   assert.equal(request.status, 'Pending with User');
   assert.equal(request.manageengine_pending_party, 'User');
-  assert.equal(request.pending_with, 'Pending with User');
   assert.equal(request.manageengine_closed_at, null);
   assert.equal(request.closed_date, null);
 });
 
-test('Technician vs User is decided purely by unreplied_count, ignoring any pendingOverride', () => {
-  // unreplied_count > 0 means Technician-side, full stop — a pendingOverride can only ever
-  // rename who it's pending with on the User side (see normalizeRequest), never flip the party.
+test('Technician vs User is decided purely by unreplied_count; the override only supplies the since-date', () => {
   const request = normalizeRequest({
     display_id: '234957',
     status: { name: 'Open' },
@@ -96,11 +89,37 @@ test('Technician vs User is decided purely by unreplied_count, ignoring any pend
     technician: { name: 'Nagesh Tiwari' },
     requester: { name: 'Anesh Gaikwad' },
     category: { name: 'Oracle ERP' },
-  }, config, { pendingWith: 'Someone Else' });
+    created_time: { value: '1725082200000' },
+  }, config, { sinceDate: '2026-09-19', sinceDateTime: '2026-09-19 15:14:00' });
 
   assert.equal(request.status, 'Pending');
   assert.equal(request.manageengine_pending_party, 'Technician');
-  assert.equal(request.pending_with, 'Nagesh Tiwari');
+  assert.equal(request.pending_since_date, '2026-09-19');
+});
+
+test('pending_since_date falls back to the creation date when there is no genuine reply yet', () => {
+  const request = normalizeRequest({
+    display_id: '234958',
+    status: { name: 'Open' },
+    unreplied_count: 2,
+    technician: { name: 'Nagesh Tiwari' },
+    created_time: { value: '1725082200000' },
+  }, config, null);
+
+  assert.equal(request.pending_since_date, '2024-08-31');
+});
+
+test('the sync never produces a pending_with value (it is maintained manually)', () => {
+  for (const unreplied of [0, 3]) {
+    const request = normalizeRequest({
+      display_id: '1',
+      status: { name: 'Open' },
+      unreplied_count: unreplied,
+      technician: { name: 'Nagesh Tiwari' },
+      requester: { name: 'Anesh Gaikwad' },
+    }, config, null);
+    assert.equal(Object.hasOwn(request, 'pending_with'), false);
+  }
 });
 
 test('strips ManageEngine\'s own department suffix from created_by_name on every sync, not just once', () => {
@@ -130,10 +149,9 @@ test('renames the created_by_name typo\' d "Suresh Kumar S" on every sync', () =
   assert.equal(request.created_by_name, 'Suresh Kumar');
 });
 
-test('strips the technician\'s own department suffix out of both assigned_to and pending_with', () => {
+test('strips the technician\'s own department suffix out of assigned_to', () => {
   // The suffix/typo fix must apply to every field a ManageEngine person name can flow into, not
-  // just created_by_name — technician.name feeds assigned_to directly and, when the ball is with
-  // the technician, is also the pending_with fallback (see normalizeRequest).
+  // just created_by_name — technician.name feeds assigned_to directly (see normalizeRequest).
   const request = normalizeRequest({
     display_id: '235146',
     status: { name: 'Open' },
@@ -143,7 +161,6 @@ test('strips the technician\'s own department suffix out of both assigned_to and
     category: { name: 'Oracle ERP' },
   }, config);
   assert.equal(request.assigned_to, 'Mohd. Haseeb Khan');
-  assert.equal(request.pending_with, 'Mohd. Haseeb Khan');
 });
 
 test('renames the typo\'d "Suresh Kumar S" when it is the assigned technician, not just the requester', () => {
@@ -156,22 +173,6 @@ test('renames the typo\'d "Suresh Kumar S" when it is the assigned technician, n
     category: { name: 'Oracle ERP' },
   }, config);
   assert.equal(request.assigned_to, 'Suresh Kumar');
-  assert.equal(request.pending_with, 'Suresh Kumar');
-});
-
-test('a pendingOverride names the real recipients instead of the generic Pending with User placeholder', () => {
-  const request = normalizeRequest({
-    display_id: '223784',
-    status: { name: 'Open' },
-    unreplied_count: 0,
-    technician: { name: 'Nagesh Tiwari' },
-    requester: { name: 'Ruchit Jain' },
-    category: { name: 'Oracle ERP' },
-  }, config, { pendingWith: 'Kanhaiya Jha,Ruchit Jain' });
-
-  assert.equal(request.status, 'Pending with User');
-  assert.equal(request.manageengine_pending_party, 'User');
-  assert.equal(request.pending_with, 'Kanhaiya Jha,Ruchit Jain');
 });
 
 test('preserves authoritative Closed and On Hold statuses', () => {
@@ -195,20 +196,6 @@ test('external-technician matching is trim-aware and case-insensitive', () => {
   };
   assert.equal(normalizeRequest(request, config).scope, 'External');
   assert.equal(normalizeRequest(request, config).assigned_to, 'deloitte erp support');
-});
-
-test('collapses a Deloitte, IDS, or Endel recipient address to its configured vendor bucket', () => {
-  assert.equal(vendorNameForEmail('someone@deloitte.com', config), 'Deloitte ERP Support');
-  assert.equal(vendorNameForEmail('govind@idstechnologies.co.in', config), 'IDS');
-  assert.equal(vendorNameForEmail('anyone@endel.digital', config), 'Endel');
-  assert.equal(vendorNameForEmail('nagesh.tiwari@rdc.in', config), null);
-});
-
-test('displayNameForRecipient resolves a vendor domain before falling back to a real name', () => {
-  assert.equal(displayNameForRecipient('govind@idstechnologies.co.in', new Map(), config), 'IDS');
-  assert.equal(displayNameForRecipient('anyone@endel.digital', new Map(), config), 'Endel');
-  const emailToName = new Map([['suresh.kumar@rdc.in', 'Suresh Kumar']]);
-  assert.equal(displayNameForRecipient('suresh.kumar@rdc.in', emailToName, config), 'Suresh Kumar');
 });
 
 test('matches only request IDs already tracked locally', () => {

@@ -135,7 +135,7 @@ router.get('/', async (req, res, next) => {
           DATEDIFF(CURDATE(), CASE WHEN s.creation_date IS NOT NULL THEN s.creation_date ELSE DATE(s.created_at) END) as days_since_raised,
           -- Days since Pending With was last set to whoever it's CURRENTLY with — not the SR's
           -- total age. s.pending_since_date is set directly from the real ManageEngine message
-          -- timestamp (see manageengine-sync.js's resolvePendingWithName) or, on a manual edit,
+          -- timestamp (see manageengine-sync.js's resolvePendingSince) or, on a manual edit,
           -- the edit date — either way the actual date the ball changed hands, not whenever a
           -- 30-minute sync happened to notice. Falls back to the older sr_history-diff-based
           -- date (pre-dates this column) and finally the raise date if it has never changed hands.
