@@ -81,7 +81,7 @@ test('maps a technician response to the requester without inventing closure time
   assert.equal(request.closed_date, null);
 });
 
-test('Technician vs User is decided purely by unreplied_count; the override only supplies the since-date', () => {
+test('Technician vs User is decided purely by unreplied_count', () => {
   const request = normalizeRequest({
     display_id: '234957',
     status: { name: 'Open' },
@@ -90,23 +90,22 @@ test('Technician vs User is decided purely by unreplied_count; the override only
     requester: { name: 'Anesh Gaikwad' },
     category: { name: 'Oracle ERP' },
     created_time: { value: '1725082200000' },
-  }, config, { sinceDate: '2026-09-19', sinceDateTime: '2026-09-19 15:14:00' });
+  }, config);
 
   assert.equal(request.status, 'Pending');
   assert.equal(request.manageengine_pending_party, 'Technician');
-  assert.equal(request.pending_since_date, '2026-09-19');
 });
 
-test('pending_since_date falls back to the creation date when there is no genuine reply yet', () => {
+test('the sync never produces a pending_since_date (it is maintained manually)', () => {
   const request = normalizeRequest({
     display_id: '234958',
     status: { name: 'Open' },
     unreplied_count: 2,
     technician: { name: 'Nagesh Tiwari' },
     created_time: { value: '1725082200000' },
-  }, config, null);
+  }, config);
 
-  assert.equal(request.pending_since_date, '2024-08-31');
+  assert.equal('pending_since_date' in request, false);
 });
 
 test('the sync never produces a pending_with value (it is maintained manually)', () => {

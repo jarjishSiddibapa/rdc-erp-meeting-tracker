@@ -132,7 +132,6 @@ async function sendPendingReminderEmail({ to, name, srs }) {
       <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-family: monospace; font-size: 13px;">${escapeHtml(sr.sr_number)}</td>
       <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${escapeHtml(sr.description || '—')}</td>
       <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${escapeHtml(sr.status)}</td>
-      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px; text-align: right;">${sr.pending_since_days}d</td>
     </tr>
   `).join('');
 
@@ -154,12 +153,10 @@ async function sendPendingReminderEmail({ to, name, srs }) {
                 <th style="padding: 0 6px 6px;">SR No.</th>
                 <th style="padding: 0 6px 6px;">Description</th>
                 <th style="padding: 0 6px 6px;">Status</th>
-                <th style="padding: 0 6px 6px; text-align: right;">Pending Since</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
           </table>
-          <p style="font-size: 13px; color: #6b7280;">"Pending" above is how long it's been sitting with you specifically, not how old the SR is overall.</p>
         </div>
       </div>
     `,

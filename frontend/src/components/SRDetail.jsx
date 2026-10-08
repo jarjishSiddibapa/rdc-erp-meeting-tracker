@@ -100,6 +100,7 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
         status:                sr.status,
         created_by_name:       sr.created_by_name || '',
         pending_with:          sr.pending_with ? sr.pending_with.split(',').map(s => s.trim()).filter(Boolean) : [],
+        pending_since_date:    toDay(sr.pending_since_date),
         assigned_to:           sr.assigned_to || '',
         expected_closure_date: toDay(sr.expected_closure_date),
         project_name:          sr.project_name || '',
@@ -122,6 +123,7 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
         creation_date:         fromDay(values.creation_date),
         expected_closure_date: fromDay(values.expected_closure_date),
         target_date:           fromDay(values.target_date),
+        pending_since_date:    fromDay(values.pending_since_date),
       };
       // Only admin can set Closed via edit form
       if (payload.status === 'Closed' && !isAdmin) {
@@ -369,7 +371,7 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
       {editMode && (
         <Form form={form} layout="vertical" style={{ marginBottom: 16 }}>
           <Row gutter={16}>
-            <Col xs={24} sm={12}>
+            <Col xs={24} sm={8}>
               <Form.Item name="status" label="Status" rules={[{ required: true }]}>
                 <Select>
                   {(isAdmin ? ALL_STATUSES : BASE_STATUSES).map(s => (
@@ -378,9 +380,14 @@ export default function SRDetail({ sr: initialSR, open, onClose, onUpdated, onCl
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12}>
+            <Col xs={24} sm={8}>
               <Form.Item name="pending_with" label="Pending With">
                 <Select mode="tags" options={pendingWithOptions} filterOption={filterOption} tokenSeparators={[',']} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Form.Item name="pending_since_date" label="Pending Since">
+                <DatePicker style={{ width: '100%' }} format="DD-MMM-YYYY" />
               </Form.Item>
             </Col>
           </Row>

@@ -1260,7 +1260,6 @@ function SendPendingReminders() {
     { title: 'SR No', dataIndex: 'sr_number', width: 100 },
     { title: 'Description', dataIndex: 'description', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
     { title: 'Status', dataIndex: 'status', width: 130, render: v => <Tag>{v}</Tag> },
-    { title: 'Pending', dataIndex: 'pending_since_days', width: 90, render: v => `${v}d` },
   ];
 
   const historyColumns = [

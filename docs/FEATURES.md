@@ -47,8 +47,7 @@ the [architecture guide](ARCHITECTURE.md).
 - Source status, exact created/closed timestamps, requester, category, and technician mapping.
 - Pending side derived from official `unreplied_count`, with explicit pending statuses taking precedence.
 - Technician-side work shows Status `Pending`; user-side work shows `Pending with User`.
-  Pending With is maintained manually and never written by the sync; Pending Since comes from the
-  time of the last genuine mail in the request's conversation.
+  Pending With and Pending Since are maintained manually and never written by the sync.
 - `Deloitte ERP Support` classified as External; other technicians classified as Internal.
 - Missing remote requests remain unchanged and soft-deleted records are never recreated.
 - Per-run counts for scanned, matched, updated, unchanged, missing, and errors.

@@ -120,7 +120,7 @@ function normalizePersonName(name) {
   return stripped === 'Suresh Kumar S' ? 'Suresh Kumar' : stripped;
 }
 
-function normalizeRequest(request, config = getConfig(), pendingOverride = null) {
+function normalizeRequest(request, config = getConfig()) {
   const remoteStatus = String(request?.status?.name || '').trim();
   const mappedStatus = mapStatus(remoteStatus);
   const technician = normalizePersonName(String(request?.technician?.name || '').trim() || null);
@@ -146,12 +146,8 @@ function normalizeRequest(request, config = getConfig(), pendingOverride = null)
     status,
     manageengine_status: remoteStatus || null,
     manageengine_pending_party: pendingParty,
-    // pending_with is deliberately NOT produced here: it is maintained manually by users and the
-    // sync never writes it. The date the CURRENT party actually took the ball comes from the real
-    // ManageEngine message timestamp (see resolvePendingSince) rather than whenever our own sync
-    // happened to notice — falls back to the request's own creation date when there's no real
-    // reply yet (freshly raised, still with the technician since day one) or the lookup didn't run.
-    pending_since_date: pendingOverride?.sinceDate || (createdAt ? createdAt.slice(0, 10) : null),
+    // pending_with and pending_since_date are deliberately NOT produced here: they are maintained
+    // manually by users and the sync never writes them.
     assigned_to: technician,
     scope: namesMatch(technician, config.externalTechnician)
       ? 'External'
@@ -229,50 +225,6 @@ function assertApiSuccess(payload) {
   if (!failure) return;
   const message = failure.messages?.[0]?.message || failure.message || failure.status_code || 'unknown API error';
   throw new Error(`ManageEngine API rejected the request: ${message}`);
-}
-
-// Fetches a request's recent conversation entries (newest first) — the source of the real mail
-// timestamp that pending_since_date is derived from. One API call per request.
-async function fetchConversations(config, remoteId) {
-  const token = await refreshAccessToken(config);
-  const inputData = { list_info: { row_count: 5, sort_field: 'created_time', sort_order: 'desc' } };
-  const url = new URL(`${requestsUrl(token.apiDomain, config.portal)}/${remoteId}/conversations`);
-  url.searchParams.set('input_data', JSON.stringify(inputData));
-  const response = await fetchWithRetry(url, {
-    headers: { Accept: ACCEPT, Authorization: `Zoho-oauthtoken ${token.accessToken}` },
-  });
-  const payload = await response.json();
-  assertApiSuccess(payload);
-  return Array.isArray(payload.conversations) ? payload.conversations : [];
-}
-
-// A request's /conversations feed mixes genuine correspondence (real emails/notes the
-// requester can see) with ManageEngine's own automated notices ("technician intimation" mail
-// sent the moment a request is assigned, etc). Only the former carries show_to_requester: true
-// — the automated notices don't, and their author is always the synthetic "System" user. Any
-// reply-direction inference has to ignore the latter, or a freshly-raised, never-touched
-// request (two auto-notices, zero real replies) reads as if the technician had already
-// answered.
-function isGenuineCorrespondence(entry) {
-  return entry?.show_to_requester === true;
-}
-
-function sinceFromReply(reply, timeZone) {
-  if (!reply) return null;
-  const dateTime = dateTimeFromApi(reply.created_time, timeZone);
-  return dateTime ? { sinceDate: dateTime.slice(0, 10), sinceDateTime: dateTime } : null;
-}
-
-// The ball changes hands the moment either side sends a genuine reply, regardless of which
-// direction — so pending_since_date tracks that reply's own timestamp on both the Technician and
-// the User side, not whenever our own 30-minute sync happened to notice the status differ. One
-// conversations-list API call per matched open request. Returns null when there's no genuine
-// reply yet (freshly raised, still with the technician since day one) so the caller falls back
-// to the request's own creation date.
-async function resolvePendingSince(config, remoteId) {
-  const conversations = await fetchConversations(config, remoteId);
-  const lastReply = conversations.find(isGenuineCorrespondence) || null; // sort_order: desc
-  return sinceFromReply(lastReply, config.timeZone);
 }
 
 async function fetchRequestPage(config, startIndex, forceTokenRefresh = false, searchCriteria = null) {
@@ -358,8 +310,8 @@ function comparable(value) {
   return String(value).trim();
 }
 
-async function applyRequestUpdate(conn, local, remote, config, pendingOverride = null) {
-  const desired = normalizeRequest(remote, config, pendingOverride);
+async function applyRequestUpdate(conn, local, remote, config) {
+  const desired = normalizeRequest(remote, config);
   const changes = [];
 
   const values = {
@@ -374,13 +326,10 @@ async function applyRequestUpdate(conn, local, remote, config, pendingOverride =
     values.status = desired.status;
     values.manageengine_status = desired.manageengine_status;
   }
-  // pending_with is never written here — it is maintained manually. Only the pending side and
-  // the date that side took the ball (the real mail time) come from ManageEngine.
+  // pending_with and pending_since_date are never written here — they are maintained manually.
+  // Only the pending side (Technician/User) comes from ManageEngine.
   if (desired.manageengine_pending_party || desired.status === 'Closed') {
     values.manageengine_pending_party = desired.manageengine_pending_party;
-    if (desired.manageengine_pending_party && desired.pending_since_date) {
-      values.pending_since_date = desired.pending_since_date;
-    }
   }
   if (desired.creation_date) values.creation_date = desired.creation_date;
   if (desired.manageengine_status && desired.status === 'Closed') {
@@ -403,19 +352,9 @@ async function applyRequestUpdate(conn, local, remote, config, pendingOverride =
       [...changes.map(change => change.newValue), local.id]
     );
     for (const change of changes) {
-      // A change into a pending status should read "since the real mail", not "since whenever
-      // this sync happened to run" — use the resolved reply's own timestamp when we have one
-      // (see resolvePendingSince) instead of the row's default NOW().
-      const changedAt = change.field === 'status' && (change.newValue === 'Pending' || change.newValue === 'Pending with User')
-        ? pendingOverride?.sinceDateTime || null
-        : null;
       await conn.execute(
-        changedAt
-          ? 'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by, changed_at) VALUES (?, ?, ?, ?, NULL, ?)'
-          : 'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by) VALUES (?, ?, ?, ?, NULL)',
-        changedAt
-          ? [local.id, change.field, change.oldValue, change.newValue, changedAt]
-          : [local.id, change.field, change.oldValue, change.newValue]
+        'INSERT INTO sr_history (sr_id, field_changed, old_value, new_value, changed_by) VALUES (?, ?, ?, ?, NULL)',
+        [local.id, change.field, change.oldValue, change.newValue]
       );
     }
   } else {
@@ -457,7 +396,7 @@ async function executeSync(triggeredBy = 'schedule', { maxPages } = {}) {
   const counts = { localSrs: 0, scanned: 0, matched: 0, updated: 0, created: 0, unchanged: 0, missing: 0, errorCount: 0 };
   try {
     const [localRows] = await pool.query(`
-      SELECT id, sr_number, status, scope, pending_since_date, assigned_to, type,
+      SELECT id, sr_number, status, scope, assigned_to, type,
              creation_date, created_by_name, closed_date, manageengine_status,
              manageengine_pending_party, manageengine_created_at, manageengine_closed_at
       FROM srs
@@ -470,29 +409,13 @@ async function executeSync(triggeredBy = 'schedule', { maxPages } = {}) {
     counts.matched = localRows.filter(row => remoteResult.matches.has(String(row.sr_number).trim())).length;
     counts.missing = localRows.length - counts.matched;
 
-    // Resolve the real since-date (the last genuine mail's time) for every request that has a
-    // pending side, before opening the transaction — this is a slow network call and shouldn't
-    // hold a DB connection or extend the transaction while it runs. A failure here just leaves
-    // that one request on its existing pending_since_date, rather than failing the whole sync.
-    const pendingOverrides = new Map();
-    for (const local of localRows) {
-      const remote = remoteResult.matches.get(String(local.sr_number).trim());
-      if (!remote) continue;
-      try {
-        const override = pendingPartyFor(remote) ? await resolvePendingSince(config, remote.id) : null;
-        if (override) pendingOverrides.set(remote.id, override);
-      } catch (error) {
-        console.warn(`ManageEngine sync: could not resolve pending-since for request ${remote.id}: ${error.message}`);
-      }
-    }
-
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
       for (const local of localRows) {
         const remote = remoteResult.matches.get(String(local.sr_number).trim());
         if (!remote) continue;
-        const changedFields = await applyRequestUpdate(conn, local, remote, config, pendingOverrides.get(remote.id) || null);
+        const changedFields = await applyRequestUpdate(conn, local, remote, config);
         if (changedFields) counts.updated++;
         else counts.unchanged++;
       }
@@ -593,7 +516,6 @@ module.exports = {
   mapStatus,
   normalizeRequest,
   pendingPartyFor,
-  resolvePendingSince,
   runManageEngineSync,
   serviceDeskApiDomainFor,
 };

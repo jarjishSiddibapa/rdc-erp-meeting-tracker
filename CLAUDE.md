@@ -213,8 +213,8 @@ Chronological, most-recent-relevant-first, for context on *why* rather than just
   backup scheduler: `pending_reminder_settings` row, rescheduled on save). Off by default; the
   Update Tasks → Send Pending Reminders tab has the on/off switch, weekday and time. The automatic
   run emails only people with an email on file and skips (and reports) the rest; its log rows have
-  `sent_by = NULL`, shown as "System". Reminder "pending" age now uses `srs.pending_since_date`
-  first, matching the SR list.
+  `sent_by = NULL`, shown as "System". The reminder email lists SR No., Description and
+  Status only (no Pending Since column).
 
 - **SR uniqueness and deterministic Deloitte duplicate imports** — added a database-enforced active
   SR-number identity, a legacy duplicate consolidation migration, transaction-time rechecks,
@@ -236,10 +236,9 @@ Chronological, most-recent-relevant-first, for context on *why* rather than just
   Untracked and soft-deleted requests are ignored, descriptions are never overwritten, and
   not-found local records stay unchanged. Pending side comes from the official `unreplied_count` field
   (>0 = Technician, 0 = User), with explicit pending statuses taking precedence. Technician-side
-  work uses local status `Pending`; user-side work uses `Pending with User`. `pending_with` is
-  NEVER written by the sync — it is maintained manually. `pending_since_date` is the timestamp of
-  the last genuine mail (`/conversations`, `show_to_requester` entries) for either side, falling
-  back to the request's creation date. `Closed` and `On Hold` remain authoritative. Exact source
+  work uses local status `Pending`; user-side work uses `Pending with User`. `pending_with` and
+  `pending_since_date` are NEVER written by the sync — both are maintained manually (editable in the
+  SR detail edit form; changing Pending With without setting a date stamps today). `Closed` and `On Hold` remain authoritative. Exact source
   timestamps and the raw source status are stored in `manageengine_*` columns; real field
   changes are written to `sr_history` with a null system actor. Credentials and the offline
   refresh token live only in `backend/.env`.

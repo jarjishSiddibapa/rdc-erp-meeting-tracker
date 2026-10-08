@@ -275,7 +275,8 @@ router.put('/:id', async (req, res, next) => {
 
     const editableFields = [
       'description', 'type', 'creation_date', 'created_by_name', 'pending_with', 'assigned_to',
-      'expected_closure_date', 'status', 'project_name', 'process_owner', 'target_date', 'scope'
+      'expected_closure_date', 'status', 'project_name', 'process_owner', 'target_date', 'scope',
+      'pending_since_date'
     ];
 
     const updates = [];
@@ -293,17 +294,19 @@ router.put('/:id', async (req, res, next) => {
         updates.push(`${f} = ?`);
         params.push(value);
         historyEntries.push({ field: f, old: sr[f], new: value });
-        // A human changing who it's pending with right now IS the hand-off event — record
-        // today as pending_since_date directly, same as the ManageEngine sync does from the
-        // real message timestamp, so "pending since" doesn't fall back to a stale sr_history
-        // diff date.
-        if (f === 'pending_with') {
-          const today = new Date().toISOString().split('T')[0];
-          updates.push('pending_since_date = ?');
-          params.push(today);
-        }
       }
     });
+
+    // pending_with and pending_since_date are maintained by hand (the ManageEngine sync never
+    // writes either). A human changing who it's pending with right now IS the hand-off event, so
+    // default pending_since_date to today — unless this same save also set the date explicitly.
+    const pendingWithChanged = historyEntries.some(h => h.field === 'pending_with');
+    const pendingSinceChanged = historyEntries.some(h => h.field === 'pending_since_date');
+    if (pendingWithChanged && !pendingSinceChanged) {
+      const today = new Date().toISOString().split('T')[0];
+      updates.push('pending_since_date = ?');
+      params.push(today);
+    }
 
     if (req.body.status === 'Closed' && sr.status !== 'Closed') {
       const cd = new Date().toISOString().split('T')[0];
