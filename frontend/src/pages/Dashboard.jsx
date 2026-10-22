@@ -4,7 +4,7 @@ import {
   DatabaseOutlined, TeamOutlined, LockOutlined, LogoutOutlined,
   UserOutlined, ProjectOutlined, CloudServerOutlined,
   FileExcelOutlined, DashboardOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
-  BarChartOutlined,
+  BarChartOutlined, FieldTimeOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
 import { LoadingNotice } from '../components/ui/LoadingNotice';
@@ -16,6 +16,7 @@ const PAGE_LOADERS = {
   SR: () => import('./SRPage'),
   Digitization: () => import('./SRPage'),
   reports: () => import('./Reports'),
+  insights: () => import('./SRInsights'),
   'update-tasks': () => import('./UpdateTasks'),
   users: () => import('./UserManagement'),
   backup: () => import('./BackupSettings'),
@@ -27,6 +28,7 @@ const ChangePassword = lazy(PAGE_LOADERS.password);
 const UpdateTasks = lazy(PAGE_LOADERS['update-tasks']);
 const BackupSettings = lazy(PAGE_LOADERS.backup);
 const Reports = lazy(PAGE_LOADERS.reports);
+const SRInsights = lazy(PAGE_LOADERS.insights);
 
 function preloadPage(key) {
   // Prefetching is opportunistic. A temporary network failure must never create an
@@ -47,8 +49,9 @@ const MENU_ITEMS = [
   { type: 'divider' },
   { key: 'Digitization', icon: <ProjectOutlined />,     label: 'Digitization Projects' },
   { type: 'divider' },
-  { key: 'reports',      icon: <BarChartOutlined />,    label: 'Reports' },
+  { key: 'reports',      icon: <BarChartOutlined />,    label: 'Reports',            adminOnly: true },
   { type: 'divider' },
+  { key: 'insights',     icon: <FieldTimeOutlined />,   label: 'SR Insights', adminOnly: true },
   { key: 'update-tasks', icon: <FileExcelOutlined />,   label: 'Update Tasks',      adminOnly: true },
   { key: 'users',        icon: <TeamOutlined />,        label: 'User Management',   adminOnly: true },
   { key: 'backup',       icon: <CloudServerOutlined />, label: 'Backup Settings',   adminOnly: true },
@@ -60,6 +63,7 @@ const TITLES = {
   SR:           'Service Requests',
   Digitization: 'Digitization Projects',
   reports:      'Reports',
+  insights:     'SR Insights',
   'update-tasks': 'Update Tasks',
   users:        'User Management',
   backup:       'Backup Settings',
@@ -141,6 +145,7 @@ export default function Dashboard() {
       case 'SR':           return <SRPage key="SR" category="SR" excludeClosed initialPendingWith={navTarget.category === 'SR' ? navTarget.pendingWith : ''} />;
       case 'Digitization': return <SRPage key="Digitization" category="Digitization" excludeClosed initialPendingWith={navTarget.category === 'Digitization' ? navTarget.pendingWith : ''} />;
       case 'reports':      return <Reports />;
+      case 'insights':     return <SRInsights />;
       case 'update-tasks': return <UpdateTasks />;
       case 'users':        return <UserManagement />;
       case 'backup':       return <BackupSettings />;

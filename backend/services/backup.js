@@ -5,6 +5,7 @@ const cron = require('node-cron');
 const { pool, DB_NAME } = require('../db/pool');
 const { sendBackupEmail } = require('./mailer');
 const { parseEmailList } = require('../utils/validation');
+const { runExclusive, scheduledBackupRanRecently } = require('../utils/exclusiveRun');
 
 const BACKUP_DIR = path.join(__dirname, '..', 'db-backup');
 if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
@@ -156,12 +157,24 @@ async function emailBackupIfEnabled({ filename, filepath, size, triggeredBy }) {
   }
 }
 
+// If another copy of the app is running against this same database it has the same schedule, so
+// without this check every day's backup (and its email) would be produced once per copy.
+async function runScheduledBackup() {
+  const outcome = await runExclusive('erp-scheduled-backup', async () => {
+    if (await scheduledBackupRanRecently()) return null;
+    return runBackup('schedule');
+  });
+  if (outcome.skipped || outcome.value === null) {
+    console.log('Scheduled backup skipped: another copy of the app already ran it.');
+  }
+}
+
 function scheduleFromSettings(settings) {
   if (cronTask) { cronTask.stop(); cronTask = null; }
   if (!settings.enabled) { console.log('Automatic backups disabled'); return; }
   const pattern = `${settings.minute} ${settings.hour} * * *`;
   cronTask = cron.schedule(pattern, () => {
-    runBackup('schedule').catch(e => console.error('Scheduled backup failed:', e.message));
+    runScheduledBackup().catch(e => console.error('Scheduled backup failed:', e.message));
   });
   console.log(`Automatic backups scheduled daily at ${String(settings.hour).padStart(2, '0')}:${String(settings.minute).padStart(2, '0')}`);
 }

@@ -163,4 +163,73 @@ async function sendPendingReminderEmail({ to, name, srs }) {
   });
 }
 
-module.exports = { transporter, verifyMailer, sendPasswordResetEmail, sendWelcomeEmail, sendBackupEmail, sendPendingReminderEmail };
+function formatAge(days) {
+  if (days === null || days === undefined) return '—';
+  if (days < 1) return 'Today';
+  return `${days} day${days === 1 ? '' : 's'}`;
+}
+
+function formatEmailDate(value) {
+  if (!value) return '—';
+  const [y, m, d] = String(value).slice(0, 10).split('-').map(Number);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${String(d).padStart(2, '0')}-${months[m - 1]}-${y}`;
+}
+
+// Sent to the technician an SR is assigned to in ManageEngine: everything still open under their
+// name, oldest first, with how long each has been open and whether it has passed its expected
+// closure date. `srs` entries come from services/workload-reminders.js groupWorkload().
+async function sendWorkloadReminderEmail({ to, name, srs }) {
+  const brand = '#00B51A';
+  const rows = srs.map(sr => `
+    <tr>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-family: monospace; font-size: 13px;">${escapeHtml(sr.sr_number)}</td>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${escapeHtml(sr.description || '—')}</td>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${escapeHtml(sr.status)}</td>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px; white-space: nowrap;">${escapeHtml(formatAge(sr.age_days))}</td>
+      <td style="padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px; white-space: nowrap;${sr.overdue ? ' color: #cf1322; font-weight: 600;' : ''}">${escapeHtml(formatEmailDate(sr.expected_closure_date))}${sr.overdue ? ' (overdue)' : ''}</td>
+    </tr>
+  `).join('');
+
+  const headline = srs.length === 1
+    ? 'There is 1 Service Request in the ERP Meeting Tracker with you.'
+    : `There are ${srs.length} Service Requests in the ERP Meeting Tracker with you.`;
+
+  const summary = `${srs.length} open`;
+
+  await transporter.sendMail({
+    from: `"RDC Digitization Review" <${process.env.SMTP_USER}>`,
+    to,
+    subject: headline,
+    html: `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 720px; margin: 0 auto; color: #111827;">
+        <div style="background: ${brand}; padding: 20px 24px; border-radius: 8px 8px 0 0;">
+          <h2 style="color: #fff; margin: 0; font-size: 18px;">RDC Digitization Review</h2>
+        </div>
+        <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
+          <p>Hi ${escapeHtml(name)},</p>
+          <p style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">${escapeHtml(headline)}</p>
+          <p style="margin-top: 0;">Oldest first:</p>
+          <p style="font-size: 13px; color: #6b7280; margin: 0;">${escapeHtml(summary)}</p>
+          <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+            <thead>
+              <tr style="text-align: left; font-size: 12px; color: #6b7280;">
+                <th style="padding: 0 6px 6px;">SR No.</th>
+                <th style="padding: 0 6px 6px;">Description</th>
+                <th style="padding: 0 6px 6px;">Status</th>
+                <th style="padding: 0 6px 6px;">Open for</th>
+                <th style="padding: 0 6px 6px;">Expected closure</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+    `,
+  });
+}
+
+module.exports = {
+  transporter, verifyMailer, sendPasswordResetEmail, sendWelcomeEmail, sendBackupEmail,
+  sendPendingReminderEmail, sendWorkloadReminderEmail,
+};

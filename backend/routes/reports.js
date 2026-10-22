@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../db/pool');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 router.use(authenticate);
+router.use(requireRole('admin'));
 
 // Assigned-To ECD history report — for every SR assigned to a given vendor/team, shows the
 // full sequence of values the closure-date field has ever held (not just old→new pairs),

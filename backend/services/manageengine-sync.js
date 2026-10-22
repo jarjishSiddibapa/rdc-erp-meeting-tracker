@@ -310,6 +310,24 @@ function comparable(value) {
   return String(value).trim();
 }
 
+// An admin can close an SR here before the technician has closed it in ManageEngine (typically
+// right before a meeting, after confirming the work is done). For MANUAL_CLOSE_HOLD_HOURS after that
+// manual close the sync must not reopen it just because ManageEngine still says open. Once the hold
+// lapses the sync goes back to treating ManageEngine as the truth, so an SR that was never really
+// closed there reopens. `local.manual_close_hold` is computed in executeSync from sr_history (a status
+// change to Closed made by a user, not by the sync, inside the window).
+const MANUAL_CLOSE_HOLD_HOURS = 24;
+
+function isManualCloseHeld(local, desired) {
+  return local.status === 'Closed' && desired.status !== 'Closed' && !!Number(local.manual_close_hold);
+}
+
+// Everything about the SR still refreshes from ManageEngine except the closed state itself.
+function withoutClosedState(values) {
+  const { status, closed_date: _closedDate, manageengine_closed_at: _closedAt, ...rest } = values;
+  return rest;
+}
+
 async function applyRequestUpdate(conn, local, remote, config) {
   const desired = normalizeRequest(remote, config);
   const changes = [];
@@ -340,7 +358,10 @@ async function applyRequestUpdate(conn, local, remote, config) {
     values.manageengine_closed_at = null;
   }
 
-  for (const [field, newValue] of Object.entries(values)) {
+  const held = isManualCloseHeld(local, desired);
+  const effective = held ? withoutClosedState(values) : values;
+
+  for (const [field, newValue] of Object.entries(effective)) {
     if (comparable(local[field]) === comparable(newValue)) continue;
     changes.push({ field, oldValue: local[field], newValue });
   }
@@ -361,7 +382,7 @@ async function applyRequestUpdate(conn, local, remote, config) {
     await conn.execute('UPDATE srs SET manageengine_last_synced_at = NOW() WHERE id = ?', [local.id]);
   }
 
-  return changes.length;
+  return { changed: changes.length, held };
 }
 
 async function beginRun(triggeredBy) {
@@ -393,15 +414,21 @@ async function executeSync(triggeredBy = 'schedule', { maxPages } = {}) {
   if (missing.length) throw new Error(`ManageEngine sync is not configured: missing ${missing.join(', ')}`);
 
   const runId = await beginRun(triggeredBy);
-  const counts = { localSrs: 0, scanned: 0, matched: 0, updated: 0, created: 0, unchanged: 0, missing: 0, errorCount: 0 };
+  const counts = { localSrs: 0, scanned: 0, matched: 0, updated: 0, created: 0, unchanged: 0, missing: 0, errorCount: 0, heldClosed: 0 };
   try {
     const [localRows] = await pool.query(`
       SELECT id, sr_number, status, scope, assigned_to, type,
              creation_date, created_by_name, closed_date, manageengine_status,
-             manageengine_pending_party, manageengine_created_at, manageengine_closed_at
+             manageengine_pending_party, manageengine_created_at, manageengine_closed_at,
+             EXISTS (
+               SELECT 1 FROM sr_history h
+               WHERE h.sr_id = srs.id AND h.field_changed = 'status' AND h.new_value = 'Closed'
+                 AND h.changed_by IS NOT NULL AND h.is_deleted = 0
+                 AND h.changed_at > NOW() - INTERVAL ? HOUR
+             ) AS manual_close_hold
       FROM srs
       WHERE category = 'SR' AND is_deleted = 0
-    `);
+    `, [MANUAL_CLOSE_HOLD_HOURS]);
     counts.localSrs = localRows.length;
 
     const remoteResult = await fetchMatchingRequests(config, localRows.map(row => row.sr_number));
@@ -415,8 +442,9 @@ async function executeSync(triggeredBy = 'schedule', { maxPages } = {}) {
       for (const local of localRows) {
         const remote = remoteResult.matches.get(String(local.sr_number).trim());
         if (!remote) continue;
-        const changedFields = await applyRequestUpdate(conn, local, remote, config);
-        if (changedFields) counts.updated++;
+        const { changed, held } = await applyRequestUpdate(conn, local, remote, config);
+        if (held) counts.heldClosed++;
+        if (changed) counts.updated++;
         else counts.unchanged++;
       }
       await conn.commit();
@@ -428,9 +456,10 @@ async function executeSync(triggeredBy = 'schedule', { maxPages } = {}) {
     }
 
     const status = counts.missing > 0 ? 'partial' : 'success';
-    const message = counts.missing > 0
-      ? `${counts.missing} local SR(s) were not present in the scanned ManageEngine request list and were left unchanged`
-      : null;
+    const notes = [];
+    if (counts.missing > 0) notes.push(`${counts.missing} local SR(s) were not present in the scanned ManageEngine request list and were left unchanged`);
+    if (counts.heldClosed > 0) notes.push(`${counts.heldClosed} SR(s) closed here but still open in ManageEngine were kept closed (${MANUAL_CLOSE_HOLD_HOURS}h hold)`);
+    const message = notes.length ? notes.join('; ') : null;
     await finishRun(runId, status, counts, message);
     return { runId, status, ...counts, message };
   } catch (error) {
@@ -512,6 +541,10 @@ module.exports = {
   getSyncStatus,
   initManageEngineScheduler,
   isClosedFamily,
+  applyRequestUpdate,
+  isManualCloseHeld,
+  withoutClosedState,
+  MANUAL_CLOSE_HOLD_HOURS,
   matchTrackedRequests,
   mapStatus,
   normalizeRequest,

@@ -13,6 +13,7 @@ import { Reveal, RevealGroup } from '../components/ui/Reveal';
 import TiltCard from '../components/ui/TiltCard';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
 import { LoadingNotice } from '../components/ui/LoadingNotice';
+import { textSorter, numberSorter } from '../utils/tableTools';
 
 const { Title, Text } = Typography;
 const BRAND = '#00B51A';
@@ -137,6 +138,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
       dataIndex: 'name',
       fixed: 'left',
       width: 160,
+      sorter: textSorter('name'),
       // "(Unassigned)" is clickable too. It means real pending SRs with a blank Pending
       // With field, and someone needs to be able to click through to actually go fill that
       // in, not just see a dead label with no way to act on it.
@@ -154,6 +156,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
       ),
       dataIndex: 'pending_now',
       width: 120,
+      sorter: numberSorter('pending_now'),
       render: (value) => <Tag color="blue" style={{ fontWeight: 800 }}>{value}</Tag>,
     },
     {
@@ -163,6 +166,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
       ),
       dataIndex: 'on_hold',
       width: 100,
+      sorter: numberSorter('on_hold'),
       render: (v) => v > 0 ? <Tag color="purple">{v}</Tag> : <Text type="secondary">0</Text>,
     },
     {
@@ -172,6 +176,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
       ),
       dataIndex: 'overdue',
       width: 90,
+      sorter: numberSorter('overdue'),
       render: (v) => v > 0 ? <Tag color="red"><WarningFilled /> {v}</Tag> : <Text type="secondary">0</Text>,
     },
     {
@@ -181,6 +186,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
       ),
       dataIndex: 'added_current_7d',
       width: 110,
+      sorter: numberSorter('added_current_7d'),
       render: (value) => value > 0 ? <Tag color="cyan">{value}</Tag> : <Text type="secondary">0</Text>,
     },
     {
@@ -190,6 +196,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
       ),
       dataIndex: 'closed_current_7d',
       width: 110,
+      sorter: numberSorter('closed_current_7d'),
       render: (value) => value > 0 ? <Tag color="green">{value}</Tag> : <Text type="secondary">0</Text>,
     },
     {
@@ -199,6 +206,7 @@ function PendingTable({ data, loading, category, onNavigate }) {
       ),
       dataIndex: 'pending_now',
       width: 130,
+      sorter: numberSorter('pending_now'),
       render: (v) => (
         <Progress
           percent={total ? Math.round(((v || 0) / total) * 100) : 0}

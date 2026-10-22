@@ -141,6 +141,16 @@ frontend/src/
   while live SR list requests pass `AbortSignal` and deliberately bypass coalescing. Keep heavy
   dependencies behind dynamic imports and do not reintroduce WebGL or page-exit animation for
   the data-heavy shell.
+- **Every data table is searchable and sortable**: use `utils/tableTools.js` (`textSorter`, `numberSorter`,
+  `dateSorter`, `matchesSearch`, `filtersFrom`) and `components/ui/TableSearch.jsx` rather than hand-rolling. Lists that
+  represent events or records open newest first (`defaultSortOrder: 'descend'` on the date column — e.g. the Deloitte
+  report on SR Date, User Management on Created, send/backup history on their timestamps); status/type columns get
+  header filters. When the sort column changes with the table's mode (Resolution Explorer group-by) give the `Table` a
+  `key` so `defaultSortOrder` re-applies.
+- **Charts are interactive**: every chart/visualization shows a hover tooltip and, where a number stands for a set of
+  SRs, opens them on click via `components/ResolutionDrilldown.jsx` (month bars, turnaround-bucket rows, per-type and
+  per-technician rows, Explorer rows and matrix cells). Predicates for "the SRs behind this" live in `utils/drill.js`;
+  they run on the records the Resolution API returns. New visualizations should follow the same pattern.
 - **Table re-render cost**: antd/rc-table treats a new `columns` array reference as changed —
   memoize column builders (`useMemo`/`useCallback`) in table-heavy pages.
 - **Backend query batching**: prefer `WHERE x IN (...)` + in-memory `Map` lookup over N+1
@@ -183,6 +193,43 @@ Focused backend tests exist, but verification also means exercising the real run
 
 Most-recent-relevant-first:
 
+- **24-hour hold on manual closes (ManageEngine sync)** — an admin can close an SR here before the technician has
+  closed it in ManageEngine (e.g. just before a meeting). For 24 hours after that manual close the sync keeps the SR
+  Closed even though ManageEngine still shows it open; every other field keeps refreshing. After 24 hours, if
+  ManageEngine still has it open, the sync reopens it like any other mismatch. A manual close is detected from
+  `sr_history` (a status change to Closed with a non-null `changed_by`, inside the window) so no column or migration is
+  needed; it is evaluated per sync in `executeSync` (`manual_close_hold`) and applied by `isManualCloseHeld` /
+  `withoutClosedState` in `services/manageengine-sync.js`. If ManageEngine itself reports Closed the hold is irrelevant.
+  The run message notes how many SRs were held.
+
+- **SR Insights: Pending with Insights and the Explorer removal** — the sidebar panel is now "SR Insights" with two
+  tabs (`pages/SRInsights.jsx`): "Assigned to Analytics" (the technician analytics below, `pages/ResolutionInsights.jsx`)
+  and "Pending with Insights" (`components/PendingWithInsights.jsx`), which measures how long SRs sit with each person in
+  Pending With. `services/pending-insights.js` rebuilds each SR's holding periods from `sr_history` (`pending_with` and
+  `status` changes): a period runs from the change that gave the SR to a person until the next change or the SR being
+  closed; the running period uses the SR's own Pending Since date. The tab also has a month-by-month chart (finished periods by the month they ended, average days held; `TrendChart` is shared with the Assigned tab via `countKey`/`noun`/`verb` props). Spelling variants of one person ("jarjish" /
+  "Jarjish Siddibapa") are merged when a name is a whole-word prefix of exactly one longer name. Limits are shown, not
+  hidden: a person's first recorded period has no known start (counted as "SRs held", excluded from durations), and an
+  SR whose Pending With never changed and has no Pending Since date is timed from the day it was raised (flagged
+  `estimated`, shown with "~"). Handover times are when the change was recorded here. Route
+  `GET /api/resolution-insights/pending` (admin). The Resolution Explorer tab was removed from Reports
+  (`components/ResolutionExplorer.jsx` is no longer mounted anywhere; the `/explore` API remains).
+
+- **Resolution Insights, Resolution Explorer and workload reminders** — admin-only analytics on how long
+  each ManageEngine technician (`srs.assigned_to`) takes to close SRs. TAT = `manageengine_closed_at` −
+  `manageengine_created_at` in calendar minutes, computed in `services/resolution-insights.js` (pure
+  `shapeRecord`/`summarize`/`explore` functions, unit-tested; SRs without ManageEngine timestamps fall back to
+  date-only values and are flagged `exact: false`). The date range filters *closed* SRs by closed date; open SRs
+  are always a live snapshot. A bare `Deloitte` assignee (PDF import) is folded into `Deloitte ERP Support`.
+  Surfaces: sidebar panel "SR Insights" → "Assigned to Analytics" (`pages/ResolutionInsights.jsx`: KPIs, technician leaderboard,
+  trend, distribution, per-technician drawer; originally also a "Resolution Explorer" tab in Reports, since removed). Routes
+  `/api/resolution-insights/{overview,explore,records}` are admin-only. `services/workload-reminders.js` +
+  Update Tasks → Send Workload Reminders email each technician their open assigned SRs (oldest first, age and
+  overdue flag), same weekly-schedule/log pattern as the pending reminders (`workload_reminder_settings`,
+  `workload_reminder_log`), sharing the contacts directory; Deloitte and ignored contacts are never emailed.
+  `utils/exclusiveRun.js` makes every scheduled backup/reminder run at most once even if two copies of the app
+  share one database (a MySQL `GET_LOCK` plus a "ran in the last 2 minutes" check) — duplicate backup emails on
+  production traced to two app copies running against the same DB.
 - **Weekly automatic pending reminders** — `services/pending-reminders.js` holds the reminder
   grouping/sending shared by the manual route and a node-cron weekly job (same pattern as the
   backup scheduler: `pending_reminder_settings` row, rescheduled on save). Off by default; the
@@ -238,8 +285,12 @@ Most-recent-relevant-first:
   showing "Pending With" people with zero *current* pending SRs.
 - **Dashboard refinements** — SR/Digitization lists default to active-only; home screen's
   Closed tiles removed; auto-refresh after closing an SR; "(Unassigned)" made clickable.
-- **Reports page / Assigned-to-Deloitte tracking** — `srs.assigned_to` column, ECD-history
-  report, wheel-scroll fixed to only pan horizontally on Shift+wheel.
+- **Reports page / Assigned-to-Deloitte tracking** — Reports and SR Insights are both admin-only (sidebar `adminOnly`
+  plus `requireRole('admin')` on `/api/reports` and `/api/resolution-insights`). `srs.assigned_to` column, ECD-history
+  report, wheel-scroll fixed to only pan horizontally on Shift+wheel. The report is now only a
+  "times the closure date was changed" bar chart (`components/EcdChangesChart.jsx`, from `change_count`; the detailed
+  table was removed on request). SR-raised window and status narrow it, clicking a bar opens a drawer of those SRs,
+  and the page offers "Download chart" (PNG) and "Download details (Excel)" (the SRs the chart covers).
 - **Login-page input stutter fix** — mirror-div caret tracking was forcing synchronous
   layout every keystroke; fixed with a cached, minimal-property mirror element.
 - **"Upload Deloitte PDF"** lives inside **Update Tasks** as a second tab, not a Reports

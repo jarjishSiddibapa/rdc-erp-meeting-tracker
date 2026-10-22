@@ -98,14 +98,44 @@ the [architecture guide](ARCHITECTURE.md).
 - Optional automatic weekly send: admin-configurable weekday and time with an on/off switch (off by
   default). Only people with an email on file are included; the last automatic run's outcome is shown.
 
+### Workload reminders
+
+- One email per technician listing every open SR assigned to them in ManageEngine, oldest first, with how
+  long each has been open and whether it is past its expected closure date (Deloitte and ignored contacts excluded).
+- Same manual send, inline email fixing and optional weekly automatic schedule as the pending reminders.
+
+## SR Insights (admin)
+
+Two tabs: **Assigned to Analytics** (below) and **Pending with Insights**.
+
+### Assigned to Analytics
+
+- Average, median and 90th-percentile turnaround (ManageEngine raised time to completed time) per technician,
+  with fastest/slowest, share closed within 1/3/7 days, and current open workload (age, overdue, waiting on user).
+- Month-by-month trend, turnaround distribution, and a by-type-of-request breakdown; per-technician drawer
+  with every SR behind the numbers. Filter by closed-date range, Internal/External, type and technician.
+- Excel export of the summary tables.
+
+### Pending with Insights
+
+- How long SRs sit with each person in Pending With, rebuilt from the SR change log: SRs with them now (and overdue),
+  average and longest wait so far, finished periods with average/median/longest, and how many periods have a known start.
+- A month-by-month chart of finished periods (by the month they ended) with the average days held, plus two other interactive charts (how long pending SRs have been with their current person; how long a hold lasts) and a
+  per-person drawer listing every SR with when it started and how it ended (handed over, SR closed, still with them).
+- Time-based limits are flagged: periods that began before tracking are not timed, and SRs with no history are
+  estimated from the day they were raised (marked ~).
+
 ## Reports
 
 ![Reports](images/reports.png)
 
-- Assigned-to-Deloitte report with SR number, creation date, current status, and latest comment.
-- Full Expected Closure Date sequence reconstructed from audit history.
+- Assigned-to-Deloitte report: an interactive bar chart of how many SRs had their closure date changed 0, 1, 2 ... n times, narrowed by SR-raised window and status; hover for the open/closed split, click a bar to list those SRs.
+- Download the chart as a PNG, or the detailed list (SR number, creation date, status, latest comment and the full Expected Closure Date sequence reconstructed from audit history) as Excel.
 - Accurate revision count that excludes the initial first-time date assignment.
 - Dynamic ECD columns, pagination, refresh, direct SR details, and Excel export.
+- ManageEngine sync keeps an SR that an admin closed here Closed for 24 hours when ManageEngine still shows it open; after that, ManageEngine wins again and the SR reopens.
+- Tables across the app (Deloitte report, User Management, contacts, reminder history, backup history, Resolution views) have search, column sorting and filters, and open newest first where order matters.
+- Resolution charts are interactive: hover for details, click a month, turnaround bucket, type, technician or matrix cell to list the SRs behind it.
 
 ## Users, authentication, and permissions
 

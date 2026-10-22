@@ -13,6 +13,8 @@ import dayjs from 'dayjs';
 import { Reveal } from '../components/ui/Reveal';
 import BrandButton from '../components/ui/BrandButton';
 import { paginationConfig, compactPaginationConfig } from '../utils/pagination';
+import TableSearch from '../components/ui/TableSearch';
+import { matchesSearch, textSorter, dateSorter } from '../utils/tableTools';
 
 const { Option } = Select;
 const { Title, Text, Paragraph } = Typography;
@@ -163,6 +165,9 @@ export default function UserManagement() {
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState(null);
+  const [statusFilter, setStatusFilter] = useState(null);
   const [form] = Form.useForm();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.sm;
@@ -223,18 +228,28 @@ export default function UserManagement() {
   // column builders - avoids handing the Table a new columns array (and new render closures)
   // on every unrelated re-render.
   const columns = useMemo(() => [
-    { title: 'Full Name', dataIndex: 'full_name', render: (v, row) => <>{v}{row.id === currentUser?.id ? <Tag style={{ marginLeft: 8 }}>You</Tag> : ''}</> },
-    { title: 'Email', dataIndex: 'email' },
     {
-      title: 'Role', dataIndex: 'role', render: (v, row) => (
+      title: 'Full Name', dataIndex: 'full_name', sorter: textSorter('full_name'),
+      render: (v, row) => <>{v}{row.id === currentUser?.id ? <Tag style={{ marginLeft: 8 }}>You</Tag> : ''}</>
+    },
+    { title: 'Email', dataIndex: 'email', sorter: textSorter('email') },
+    {
+      title: 'Role', dataIndex: 'role', sorter: textSorter('role'), render: (v, row) => (
         <Space size={4}>
           <Tag color={ROLE_COLORS[v]}>{v.toUpperCase()}</Tag>
           {v === 'viewer' && row.can_edit_digitization === 1 && <Tag color="cyan">CAN EDIT DIGITIZATION</Tag>}
         </Space>
       )
     },
-    { title: 'Status', dataIndex: 'is_active', render: v => <Tag color={v ? 'green' : 'default'}>{v ? 'Active' : 'Inactive'}</Tag> },
-    { title: 'Created', dataIndex: 'created_at', render: v => dayjs(v).format('DD-MMM-YYYY') },
+    {
+      title: 'Status', dataIndex: 'is_active', sorter: (a, b) => (a.is_active ? 1 : 0) - (b.is_active ? 1 : 0),
+      render: v => <Tag color={v ? 'green' : 'default'}>{v ? 'Active' : 'Inactive'}</Tag>
+    },
+    {
+      // Newest accounts first by default, so a user who was just added is at the top.
+      title: 'Created', dataIndex: 'created_at', sorter: dateSorter('created_at'), defaultSortOrder: 'descend',
+      render: v => dayjs(v).format('DD-MMM-YYYY'),
+    },
     {
       title: 'Actions', render: (_, row) => (
         <Tooltip title="Edit">
@@ -243,6 +258,13 @@ export default function UserManagement() {
       )
     }
   ], [currentUser?.id, openEdit]);
+
+  const visibleUsers = useMemo(() => users.filter(u =>
+    (!roleFilter || u.role === roleFilter)
+    && (!statusFilter || (statusFilter === 'active' ? !!u.is_active : !u.is_active))
+    && matchesSearch(search, u.full_name, u.email, u.role)
+  ), [users, search, roleFilter, statusFilter]);
+  const filtering = !!(search || roleFilter || statusFilter);
 
   return (
     <div style={{ width: '100%' }}>
@@ -257,8 +279,21 @@ export default function UserManagement() {
       </Reveal>
 
       <Reveal delay={0.05}>
+        <Space wrap size={[10, 8]} style={{ marginBottom: 12 }}>
+          <TableSearch value={search} onChange={setSearch} placeholder="Search name or email..." />
+          <Select
+            allowClear placeholder="All roles" style={{ width: 140 }} value={roleFilter} onChange={v => setRoleFilter(v || null)}
+            options={[{ value: 'admin', label: 'Admin' }, { value: 'editor', label: 'Editor' }, { value: 'viewer', label: 'Viewer' }]}
+          />
+          <Select
+            allowClear placeholder="Any status" style={{ width: 140 }} value={statusFilter} onChange={v => setStatusFilter(v || null)}
+            options={[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]}
+          />
+          {filtering && <Text type="secondary">{visibleUsers.length} of {users.length} users</Text>}
+        </Space>
         <Table
-          rowKey="id" columns={columns} dataSource={users} loading={loading} size="small" scroll={{ x: 'max-content' }}
+          rowKey="id" columns={columns} dataSource={visibleUsers} loading={loading} size="small" scroll={{ x: 'max-content' }}
+          locale={{ emptyText: filtering ? 'No users match your search' : 'No users' }}
           pagination={paginationConfig('users', { defaultPageSize: 10 })}
         />
       </Reveal>

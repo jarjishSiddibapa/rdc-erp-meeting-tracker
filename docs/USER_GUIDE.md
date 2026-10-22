@@ -82,8 +82,10 @@ The **Upload Deloitte PDF** tab parses the weekly report first. Review the repor
 | --- | --- |
 | ![Assigned-to-Deloitte report](images/reports.png) | ![Backup settings](images/backup-settings.png) |
 
-- **Reports** provides the Assigned-to-Deloitte/ECD-history view. Each ECD column is one real
-  date the SR held; Changes counts revisions after the initial value.
+- **Reports** (administrators only, like SR Insights) shows how many Assigned-to-Deloitte SRs had
+  their Expected Closure Date changed once, twice, and so on; the chart downloads as an image and the
+  per-SR ECD history as Excel. Each ECD column is one real date the SR held; Changes counts revisions
+  after the initial value.
 - **Backup Settings** shows the backup schedule and history, allows an administrator to run a
   backup, and provides controlled download/delete actions.
 - Password reset emails require the SMTP settings in `backend/.env`.

@@ -185,6 +185,21 @@ export const pendingRemindersAPI = {
   updateSettings: (data) => api.put('/pending-reminders/settings', data),
 };
 
+export const workloadRemindersAPI = {
+  preview: () => api.get('/workload-reminders/preview'),
+  send: (keys) => api.post('/workload-reminders/send', { keys }),
+  history: () => api.get('/workload-reminders/history'),
+  getSettings: () => api.get('/workload-reminders/settings'),
+  updateSettings: (data) => api.put('/workload-reminders/settings', data),
+};
+
+export const resolutionAPI = {
+  overview: (params, options) => api.get('/resolution-insights/overview', { ...options, params }),
+  explore: (params, options) => api.get('/resolution-insights/explore', { ...options, params }),
+  records: (params, options) => api.get('/resolution-insights/records', { ...options, params }),
+  pending: (params, options) => api.get('/resolution-insights/pending', { ...options, params }),
+};
+
 export const userAPI = {
   list: () => api.get('/users'),
   create: (data) => api.post('/users', data),

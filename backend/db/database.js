@@ -229,6 +229,40 @@ async function createTables() {
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
+
+  // Workload reminders: tells each technician how many open SRs are assigned to them in
+  // ManageEngine. Same shape (and same off-by-default rule) as the pending reminders above, kept in
+  // its own tables so the two features' schedules and send histories never mix.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS workload_reminder_log (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      recipient_name VARCHAR(255) NOT NULL,
+      recipient_email VARCHAR(255) NULL,
+      sr_count INT NOT NULL DEFAULT 0,
+      sr_numbers TEXT NULL,
+      status VARCHAR(20) NOT NULL,
+      message TEXT NULL,
+      sent_by INT NULL,
+      sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT fk_workload_log_user FOREIGN KEY (sent_by) REFERENCES users(id),
+      INDEX idx_workload_log_sent_at (sent_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS workload_reminder_settings (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      enabled TINYINT(1) NOT NULL DEFAULT 0,
+      day_of_week TINYINT NOT NULL DEFAULT 1,
+      hour TINYINT NOT NULL DEFAULT 9,
+      minute TINYINT NOT NULL DEFAULT 0,
+      last_run_at DATETIME NULL,
+      last_run_message TEXT NULL,
+      is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+      updated_by INT NULL,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
 }
 
 // The users table already existed with the old constraints (username required, email

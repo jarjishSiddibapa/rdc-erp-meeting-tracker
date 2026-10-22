@@ -18,11 +18,14 @@ const deloitteImportRoutes = require('./routes/deloitte-import');
 const manageEngineImportRoutes = require('./routes/manageengine-import');
 const contactsRoutes = require('./routes/contacts');
 const pendingRemindersRoutes = require('./routes/pending-reminders');
+const workloadRemindersRoutes = require('./routes/workload-reminders');
+const resolutionInsightsRoutes = require('./routes/resolution-insights');
 
 const { initDb, pool } = require('./db/database');
 const { verifyMailer } = require('./services/mailer');
 const { initScheduler } = require('./services/backup');
 const { initPendingReminderScheduler } = require('./services/pending-reminders');
+const { initWorkloadReminderScheduler } = require('./services/workload-reminders');
 const { initManageEngineScheduler } = require('./services/manageengine-sync');
 const { startHeartbeat, logShutdown, logCrash } = require('./services/heartbeat');
 
@@ -101,6 +104,8 @@ app.use('/api/deloitte-import', deloitteImportRoutes);
 app.use('/api/manageengine-import', manageEngineImportRoutes);
 app.use('/api/contacts', contactsRoutes);
 app.use('/api/pending-reminders', pendingRemindersRoutes);
+app.use('/api/workload-reminders', workloadRemindersRoutes);
+app.use('/api/resolution-insights', resolutionInsightsRoutes);
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
@@ -144,6 +149,7 @@ async function start() {
   await initDb();
   await initScheduler();
   await initPendingReminderScheduler();
+  await initWorkloadReminderScheduler();
   initManageEngineScheduler();
   const server = app.listen(PORT, () => {
     console.log(`ERP Meeting Tracker API running on http://localhost:${PORT}`);

@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const { pool } = require('../db/pool');
 const { splitPendingWith, isRealPersonName } = require('../utils/pendingWith');
 const { sendPendingReminderEmail } = require('./mailer');
+const { runExclusive, settingsRanRecently } = require('../utils/exclusiveRun');
 
 const RAISED_DATE = `COALESCE(NULLIF(TRIM(s.creation_date), ''), DATE(s.created_at))`;
 
@@ -149,8 +150,12 @@ function scheduleFromSettings(settings) {
   if (cronTask) { cronTask.stop(); cronTask = null; }
   if (!settings.enabled) { console.log('Automatic pending reminders disabled'); return; }
   const pattern = `${settings.minute} ${settings.hour} * * ${settings.day_of_week}`;
+  // Another copy of the app on the same database would otherwise send every reminder twice.
   cronTask = cron.schedule(pattern, () => {
-    runScheduledReminders().catch(e => console.error('Scheduled pending reminders failed:', e.message));
+    runExclusive('erp-pending-reminders', async () => {
+      if (await settingsRanRecently('pending_reminder_settings')) return null;
+      return runScheduledReminders();
+    }).catch(e => console.error('Scheduled pending reminders failed:', e.message));
   });
   console.log(`Automatic pending reminders scheduled (cron "${pattern}")`);
 }

@@ -7,13 +7,15 @@ import {
 } from 'antd';
 import {
   FileExcelOutlined, DownloadOutlined, UploadOutlined, FilePdfOutlined, SyncOutlined, StopOutlined,
-  PlusOutlined, MailOutlined, ContactsOutlined
+  PlusOutlined, MailOutlined, ContactsOutlined, ScheduleOutlined
 } from '@ant-design/icons';
-import { srAPI, csvImportAPI, deloitteImportAPI, manageEngineImportAPI, contactsAPI, pendingRemindersAPI } from '../services/api';
+import { srAPI, csvImportAPI, deloitteImportAPI, manageEngineImportAPI, contactsAPI, pendingRemindersAPI, workloadRemindersAPI } from '../services/api';
 import { Reveal } from '../components/ui/Reveal';
 import BrandButton from '../components/ui/BrandButton';
 import SRDetail from '../components/SRDetail';
 import { compactPaginationConfig } from '../utils/pagination';
+import TableSearch from '../components/ui/TableSearch';
+import { matchesSearch, textSorter, numberSorter, dateSorter, filtersFrom } from '../utils/tableTools';
 
 const { Title, Text, Paragraph } = Typography;
 const { Dragger } = Upload;
@@ -258,6 +260,7 @@ function UploadDeloittePdf() {
   const [parsed, setParsed] = useState(null); // { wip, pendingWithUser }
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+  const [rowSearch, setRowSearch] = useState('');
 
   async function handleUpload(file) {
     setParsing(true); setError(''); setResult(null); setParsed(null); setFileName(file.name);
@@ -303,6 +306,14 @@ function UploadDeloittePdf() {
 
   const reviewColumn = {
     title: 'Review', dataIndex: 'needsReview', width: 110,
+    filters: [
+      { text: 'OK', value: 'ok' }, { text: 'Check manually', value: 'check' },
+      { text: 'Skipped (review / conflict)', value: 'blocked' }, { text: 'Latest ETA kept', value: 'latest' },
+    ],
+    onFilter: (value, row) => (value === 'blocked' ? !row.can_apply
+      : value === 'latest' ? row.can_apply && row.duplicate_resolution === 'latest_eta'
+      : value === 'check' ? row.can_apply && row.duplicate_resolution !== 'latest_eta' && !!row.needsReview
+      : row.can_apply && row.duplicate_resolution !== 'latest_eta' && !row.needsReview),
     render: (v, row) => !row.can_apply
       ? <Tag color="red" title={row.review_reasons?.join('; ')}>{row.duplicate_conflict ? 'Conflict' : 'Review - skipped'}</Tag>
       : row.duplicate_resolution === 'latest_eta'
@@ -312,31 +323,51 @@ function UploadDeloittePdf() {
         : <Tag color="green">OK</Tag>,
   };
 
+  const matchColumn = {
+    title: 'Match', dataIndex: 'matched', width: 150,
+    filters: [{ text: 'Found', value: 'found' }, { text: 'Will create new SR', value: 'new' }],
+    onFilter: (value, row) => (value === 'found') === !!row.matched,
+    render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} duplicateConflict={row.duplicate_conflict} />,
+  };
+  const requestIdColumn = {
+    title: 'SR Number', dataIndex: 'request_id', width: 100,
+    sorter: (a, b) => Number(a.request_id) - Number(b.request_id),
+  };
+  const subjectColumn = { title: 'Subject', dataIndex: 'subject', ellipsis: true, sorter: textSorter('subject'), render: v => v || <Text type="secondary">-</Text> };
+
   const wipColumns = [
-    { title: 'SR Number', dataIndex: 'request_id', width: 100 },
-    { title: 'Subject', dataIndex: 'subject', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
+    requestIdColumn,
+    subjectColumn,
     { title: 'Comment', dataIndex: 'comment', render: v => v || <Text type="secondary">-</Text> },
     {
-      title: 'New Expected Closure', dataIndex: 'eta', width: 150,
+      title: 'New Expected Closure', dataIndex: 'eta', width: 150, sorter: dateSorter('eta'),
       render: (v, row) => <span title={row.eta_source || ''}>{fmtEta(v)}</span>,
     },
-    { title: 'Match', dataIndex: 'matched', width: 150, render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} duplicateConflict={row.duplicate_conflict} /> },
+    matchColumn,
     reviewColumn,
   ];
 
   const pendingColumns = [
-    { title: 'SR Number', dataIndex: 'request_id', width: 100 },
-    { title: 'Subject', dataIndex: 'subject', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
-    { title: 'Current Status', dataIndex: 'current_status', width: 140, render: v => v || <Text type="secondary">-</Text> },
+    requestIdColumn,
+    subjectColumn,
     {
-      title: 'Expected Closure', dataIndex: 'current_ecd', width: 190,
+      title: 'Current Status', dataIndex: 'current_status', width: 140, sorter: textSorter('current_status'),
+      filters: filtersFrom(parsed?.pendingWithUser || [], 'current_status'), onFilter: (value, row) => row.current_status === value,
+      render: v => v || <Text type="secondary">-</Text>,
+    },
+    {
+      title: 'Expected Closure', dataIndex: 'current_ecd', width: 190, sorter: dateSorter('current_ecd'),
       render: v => v
         ? <Space size={4}><Text delete type="secondary">{fmtEta(v)}</Text><Text type="secondary">→ will be cleared</Text></Space>
         : <Text type="secondary">- (already empty)</Text>,
     },
-    { title: 'Match', dataIndex: 'matched', width: 150, render: (v, row) => <MatchTag matched={v} canApply={row.can_apply} duplicateConflict={row.duplicate_conflict} /> },
+    matchColumn,
     reviewColumn,
   ];
+
+  const searchRows = rows => rows.filter(r => matchesSearch(rowSearch, r.request_id, r.subject, r.comment, r.current_status));
+  const wipRows = parsed ? searchRows(parsed.wip) : [];
+  const pendingRows = parsed ? searchRows(parsed.pendingWithUser) : [];
 
   return (
     <div>
@@ -444,17 +475,21 @@ function UploadDeloittePdf() {
 
           <PageCoverage pageSummary={parsed.pageSummary} />
 
-          <Card size="small" title={`Work in Progress (${parsed.wip.length})`}>
+          <TableSearch value={rowSearch} onChange={setRowSearch} placeholder="Search SR number, subject, comment..." width={320} />
+
+          <Card size="small" title={`Work in Progress (${rowSearch ? `${wipRows.length} of ` : ''}${parsed.wip.length})`}>
             <Table
-              rowKey="request_id" size="small" columns={wipColumns} dataSource={parsed.wip}
-              pagination={parsed.wip.length > 10 ? compactPaginationConfig('rows', { defaultPageSize: 10 }) : false}
+              rowKey="request_id" size="small" columns={wipColumns} dataSource={wipRows}
+              locale={{ emptyText: rowSearch ? 'No rows match your search' : 'No rows' }}
+              pagination={wipRows.length > 10 ? compactPaginationConfig('rows', { defaultPageSize: 10 }) : false}
             />
           </Card>
 
-          <Card size="small" title={`Pending with User (${parsed.pendingWithUser.length})`}>
+          <Card size="small" title={`Pending with User (${rowSearch ? `${pendingRows.length} of ` : ''}${parsed.pendingWithUser.length})`}>
             <Table
-              rowKey="request_id" size="small" columns={pendingColumns} dataSource={parsed.pendingWithUser}
-              pagination={parsed.pendingWithUser.length > 10 ? compactPaginationConfig('rows', { defaultPageSize: 10 }) : false}
+              rowKey="request_id" size="small" columns={pendingColumns} dataSource={pendingRows}
+              locale={{ emptyText: rowSearch ? 'No rows match your search' : 'No rows' }}
+              pagination={pendingRows.length > 10 ? compactPaginationConfig('rows', { defaultPageSize: 10 }) : false}
             />
           </Card>
 
@@ -521,6 +556,7 @@ function UpdateFromManageEngine() {
   const [detailSR, setDetailSR] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [closingId, setClosingId] = useState(null);
+  const [closeSearch, setCloseSearch] = useState('');
 
   async function refreshSyncStatus() {
     try {
@@ -650,10 +686,18 @@ function UpdateFromManageEngine() {
   }
 
   const closeColumns = [
-    { title: 'SR Number', dataIndex: 'sr_number', width: 100 },
-    { title: 'Description', dataIndex: 'description', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
-    { title: 'Current Status', dataIndex: 'current_status', width: 130, render: v => <Tag>{v}</Tag> },
-    { title: 'ManageEngine Status', dataIndex: 'manageengine_status', width: 160, render: v => <Tag color="red">{v}</Tag> },
+    { title: 'SR Number', dataIndex: 'sr_number', width: 100, sorter: (a, b) => Number(a.sr_number) - Number(b.sr_number) },
+    { title: 'Description', dataIndex: 'description', ellipsis: true, sorter: textSorter('description'), render: v => v || <Text type="secondary">-</Text> },
+    {
+      title: 'Current Status', dataIndex: 'current_status', width: 130, sorter: textSorter('current_status'),
+      filters: filtersFrom(parsed?.toClose || [], 'current_status'), onFilter: (value, row) => row.current_status === value,
+      render: v => <Tag>{v}</Tag>,
+    },
+    {
+      title: 'ManageEngine Status', dataIndex: 'manageengine_status', width: 160, sorter: textSorter('manageengine_status'),
+      filters: filtersFrom(parsed?.toClose || [], 'manageengine_status'), onFilter: (value, row) => row.manageengine_status === value,
+      render: v => <Tag color="red">{v}</Tag>,
+    },
   ];
 
   // Resolvable right here instead of just being reported: click the SR number for the full
@@ -662,13 +706,14 @@ function UpdateFromManageEngine() {
   const ambiguousColumns = [
     {
       title: 'SR Number', dataIndex: 'sr_number', width: 110,
+      sorter: (a, b) => Number(a.sr_number) - Number(b.sr_number),
       render: (v, row) => (
         <Button type="link" style={{ padding: 0, fontWeight: 600 }} onClick={() => openAmbiguousDetail(row)}>
           {v}
         </Button>
       ),
     },
-    { title: 'Description', dataIndex: 'description', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
+    { title: 'Description', dataIndex: 'description', ellipsis: true, sorter: textSorter('description'), render: v => v || <Text type="secondary">-</Text> },
     {
       title: 'Resolve', width: 200,
       render: (_, row) => (
@@ -687,6 +732,7 @@ function UpdateFromManageEngine() {
   ];
 
   const totalActions = selectedCloseKeys.length;
+  const closeRows = (parsed?.toClose || []).filter(r => matchesSearch(closeSearch, r.sr_number, r.description, r.current_status, r.manageengine_status));
 
   return (
     <div>
@@ -798,10 +844,14 @@ function UpdateFromManageEngine() {
           )}
 
           <Card size="small" title={`SRs to close (${parsed.toClose.length})`}>
+            {parsed.toClose.length > 5 && (
+              <TableSearch value={closeSearch} onChange={setCloseSearch} placeholder="Search SR number or description..." style={{ marginBottom: 10 }} />
+            )}
             <Table
-              rowKey="sr_id" size="small" columns={closeColumns} dataSource={parsed.toClose}
+              rowKey="sr_id" size="small" columns={closeColumns} dataSource={closeRows}
               rowSelection={{ selectedRowKeys: selectedCloseKeys, onChange: setSelectedCloseKeys }}
-              pagination={parsed.toClose.length > 10 ? compactPaginationConfig('SRs', { defaultPageSize: 10 }) : false}
+              locale={{ emptyText: closeSearch ? 'No SRs match your search' : 'Nothing to close' }}
+              pagination={closeRows.length > 10 ? compactPaginationConfig('SRs', { defaultPageSize: 10 }) : false}
             />
           </Card>
 
@@ -863,6 +913,7 @@ function ContactsManager() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState('');
   const [form] = Form.useForm();
 
   async function fetchContacts() {
@@ -928,15 +979,16 @@ function ContactsManager() {
     } catch (e) { message.error(e.response?.data?.message || 'Failed to restore contact'); }
   }
 
-  const active   = contacts.filter(c => !c.is_deleted && !c.is_ignored);
-  const ignored  = contacts.filter(c => !c.is_deleted && c.is_ignored);
-  const inactive = contacts.filter(c => c.is_deleted);
+  const matching = contacts.filter(c => matchesSearch(search, c.name, c.email));
+  const active   = matching.filter(c => !c.is_deleted && !c.is_ignored);
+  const ignored  = matching.filter(c => !c.is_deleted && c.is_ignored);
+  const inactive = matching.filter(c => c.is_deleted);
 
   // A filter (not just a visual cue) on the Email column, so an admin working through the
   // directory can isolate exactly the entries still missing one and fill them in one after
   // another, instead of scanning the whole alphabetical list by eye.
   const baseColumns = [
-    { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
+    { title: 'Name', dataIndex: 'name', defaultSortOrder: 'ascend', sorter: (a, b) => a.name.localeCompare(b.name) },
     {
       title: 'Email', dataIndex: 'email',
       render: v => v || <Text type="secondary">No email on file</Text>,
@@ -1009,8 +1061,9 @@ function ContactsManager() {
         from names already in use; add or fix entries here as needed. Ignored people stay valid
         Pending With names but are permanently skipped when sending reminders.
       </Paragraph>
-      <div style={{ marginBottom: 12 }}>
+      <div style={{ marginBottom: 12, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         <BrandButton icon={<PlusOutlined />} onClick={openAdd}>Add Contact</BrandButton>
+        <TableSearch value={search} onChange={setSearch} placeholder="Search name or email..." />
       </div>
       <Card>
         <Tabs
@@ -1052,13 +1105,13 @@ function nextAutomaticRun(settings) {
 
 // Weekly automatic send: the same email the manual button sends, on a configurable weekday and
 // time, with an on/off switch. Only people who already have an email on file are included.
-function AutoReminderSettings() {
+function AutoReminderSettings({ api, title }) {
   const [settings, setSettings] = useState(null);
   const [saving, setSaving] = useState(false);
 
   async function fetchSettings() {
     try {
-      const res = await pendingRemindersAPI.getSettings();
+      const res = await api.getSettings();
       setSettings(res.data);
     } catch { message.error('Failed to load automatic reminder settings'); }
   }
@@ -1068,7 +1121,7 @@ function AutoReminderSettings() {
   async function handleSave() {
     setSaving(true);
     try {
-      const res = await pendingRemindersAPI.updateSettings(settings);
+      const res = await api.updateSettings(settings);
       setSettings(res.data);
       message.success(res.data.enabled ? 'Automatic weekly reminders saved' : 'Automatic reminders are off');
     } catch (e) {
@@ -1077,7 +1130,7 @@ function AutoReminderSettings() {
   }
 
   return (
-    <Card size="small" loading={!settings} title="Automatic weekly reminders" style={{ marginBottom: 24 }}>
+    <Card size="small" loading={!settings} title={title} style={{ marginBottom: 24 }}>
       {settings && (
         <Space direction="vertical" size={14} style={{ width: '100%' }}>
           <Space align="center" size={12}>
@@ -1118,11 +1171,11 @@ function AutoReminderSettings() {
   );
 }
 
-// ── Send Pending Reminders ──
-// One email per person (except Deloitte, tracked separately via the weekly PDF) listing
-// everything currently pending with them — sent automatically each week (AutoReminderSettings)
-// and still fireable by hand, e.g. the day before a meeting.
-function SendPendingReminders() {
+// ── Reminder panel (shared by Pending and Workload reminders) ──
+// One email per person (except Deloitte, tracked separately via the weekly PDF) listing their SRs -
+// sent automatically each week (AutoReminderSettings) and still fireable by hand, e.g. the day
+// before a meeting. `api` is the matching API group; `copy` holds the wording and any extra columns.
+function ReminderPanel({ api, copy }) {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState([]);
@@ -1135,26 +1188,27 @@ function SendPendingReminders() {
   const [resolveModalOpen, setResolveModalOpen] = useState(false);
   const [resolveDrafts, setResolveDrafts] = useState({});
   const [resolvingKey, setResolvingKey] = useState(null);
+  const [search, setSearch] = useState('');
 
   const unresolvedGroups = (preview?.groups || []).filter(g => !g.email);
 
   async function fetchPreview() {
     setLoading(true);
     try {
-      const res = await pendingRemindersAPI.preview();
+      const res = await api.preview();
       setPreview(res.data);
       // Only someone with a known email can actually be sent to - pre-select exactly that set
       // so "Send Reminders" does the right thing with zero extra clicks in the common case.
       // Groups are keyed by resolved email (not name) so two name-variants sharing one contact
       // merge into a single send instead of emailing the same person twice.
       setSelectedKeys(res.data.groups.filter(g => g.email).map(g => g.key));
-    } catch { message.error('Failed to load pending reminders'); }
+    } catch { message.error(copy.loadError); }
     finally { setLoading(false); }
   }
 
   async function fetchHistory() {
     try {
-      const res = await pendingRemindersAPI.history();
+      const res = await api.history();
       setHistory(res.data);
     } catch { /* history is a nice-to-have, not worth surfacing an error for */ }
   }
@@ -1180,7 +1234,7 @@ function SendPendingReminders() {
     setSending(true);
     setResult(null);
     try {
-      const res = await pendingRemindersAPI.send(selectedKeys);
+      const res = await api.send(selectedKeys);
       setResult(res.data);
       message.success(`Sent to ${res.data.sent.length} of ${selectedKeys.length}`);
       await fetchPreview();
@@ -1227,10 +1281,17 @@ function SendPendingReminders() {
     } finally { setResolvingKey(null); }
   }
 
+  const groups = (preview?.groups || []).filter(g => matchesSearch(
+    search, g.name, g.email, g.srs.map(s => `${s.sr_number} ${s.description || ''}`).join(' '),
+  ));
+
   const columns = [
-    { title: 'Name', dataIndex: 'name', width: 180 },
+    { title: 'Name', dataIndex: 'name', width: 180, sorter: textSorter('name') },
     {
       title: 'Email', dataIndex: 'email', width: 280,
+      filters: [{ text: 'Missing email', value: 'missing' }, { text: 'Has email', value: 'has' }],
+      onFilter: (value, row) => (value === 'missing' ? !row.email : !!row.email),
+      sorter: (a, b) => String(a.email || '').localeCompare(String(b.email || '')),
       render: (v, row) => {
         if (editingEmailFor === row.key) {
           return (
@@ -1253,34 +1314,45 @@ function SendPendingReminders() {
         );
       },
     },
-    { title: 'Pending SRs', dataIndex: 'srCount', width: 110, render: v => <Tag color="blue">{v}</Tag> },
+    { title: copy.countTitle, dataIndex: 'srCount', width: 110, defaultSortOrder: 'descend', sorter: numberSorter('srCount'), render: v => <Tag color="blue">{v}</Tag> },
   ];
 
   const srColumns = [
-    { title: 'SR No', dataIndex: 'sr_number', width: 100 },
-    { title: 'Description', dataIndex: 'description', ellipsis: true, render: v => v || <Text type="secondary">-</Text> },
-    { title: 'Status', dataIndex: 'status', width: 130, render: v => <Tag>{v}</Tag> },
+    { title: 'SR No', dataIndex: 'sr_number', width: 100, sorter: (a, b) => Number(a.sr_number) - Number(b.sr_number) },
+    { title: 'Description', dataIndex: 'description', ellipsis: true, sorter: textSorter('description'), render: v => v || <Text type="secondary">-</Text> },
+    { title: 'Status', dataIndex: 'status', width: 130, sorter: textSorter('status'), render: v => <Tag>{v}</Tag> },
+    ...(copy.extraSrColumns || []),
   ];
 
   const historyColumns = [
-    { title: 'Recipient', dataIndex: 'recipient_name', width: 160 },
-    { title: 'Email', dataIndex: 'recipient_email', render: v => v || <Text type="secondary">-</Text> },
-    { title: 'SRs', dataIndex: 'sr_count', width: 70 },
-    { title: 'Status', dataIndex: 'status', width: 100, render: v => v === 'sent' ? <Tag color="green">Sent</Tag> : <Tag color="red">Failed</Tag> },
-    { title: 'Sent By', dataIndex: 'sent_by_name', width: 140, render: v => v || <Text type="secondary">System</Text> },
-    { title: 'Sent At', dataIndex: 'sent_at', width: 170, render: v => dayjs(v).format('DD-MMM-YYYY hh:mm A') },
+    { title: 'Recipient', dataIndex: 'recipient_name', width: 160, sorter: textSorter('recipient_name') },
+    { title: 'Email', dataIndex: 'recipient_email', sorter: textSorter('recipient_email'), render: v => v || <Text type="secondary">-</Text> },
+    { title: 'SRs', dataIndex: 'sr_count', width: 70, sorter: numberSorter('sr_count') },
+    {
+      title: 'Status', dataIndex: 'status', width: 100,
+      filters: [{ text: 'Sent', value: 'sent' }, { text: 'Failed', value: 'failed' }], onFilter: (value, row) => row.status === value,
+      render: v => v === 'sent' ? <Tag color="green">Sent</Tag> : <Tag color="red">Failed</Tag>,
+    },
+    {
+      title: 'Sent By', dataIndex: 'sent_by_name', width: 140, sorter: textSorter('sent_by_name'),
+      filters: [{ text: 'System (automatic)', value: '' }, ...filtersFrom(history, 'sent_by_name')],
+      onFilter: (value, row) => (row.sent_by_name || '') === value,
+      render: v => v || <Text type="secondary">System</Text>,
+    },
+    {
+      // Most recent send first.
+      title: 'Sent At', dataIndex: 'sent_at', width: 170, defaultSortOrder: 'descend', sorter: dateSorter('sent_at'),
+      render: v => dayjs(v).format('DD-MMM-YYYY hh:mm A'),
+    },
   ];
 
   return (
     <div>
-      <AutoReminderSettings />
+      <AutoReminderSettings api={api} title={copy.scheduleTitle} />
 
       <Title level={5} style={{ marginTop: 0 }}>Send now</Title>
       <Paragraph type="secondary" style={{ marginBottom: 20 }}>
-        Everyone except Deloitte currently named in Pending With on an open SR, with everything
-        that's pending against them. Send manually at any time - e.g. the day before a meeting - so each
-        person gets an email listing exactly what's pending with them. Missing an email? Add one
-        inline below; it's saved to Pending-With Contacts for next time too.
+        {copy.intro}
       </Paragraph>
 
       {preview?.unresolvedCount > 0 && (
@@ -1291,8 +1363,9 @@ function SendPendingReminders() {
       )}
 
       <Card size="small" style={{ marginBottom: 16 }}>
+        <TableSearch value={search} onChange={setSearch} placeholder="Search name, email or SR number..." width={300} style={{ marginBottom: 10 }} />
         <Table
-          rowKey="key" size="small" loading={loading} columns={columns} dataSource={preview?.groups || []}
+          rowKey="key" size="small" loading={loading} columns={columns} dataSource={groups}
           expandable={{ expandedRowRender: row => <Table rowKey="sr_number" size="small" columns={srColumns} dataSource={row.srs} pagination={false} /> }}
           rowSelection={{
             selectedRowKeys: selectedKeys,
@@ -1300,7 +1373,7 @@ function SendPendingReminders() {
             getCheckboxProps: row => ({ disabled: !row.email }),
           }}
           pagination={false}
-          locale={{ emptyText: 'Nothing pending with anyone right now' }}
+          locale={{ emptyText: copy.empty }}
         />
       </Card>
 
@@ -1330,7 +1403,7 @@ function SendPendingReminders() {
           locale={{ emptyText: 'Everyone now has an email on file' }}
           columns={[
             { title: 'Name', dataIndex: 'name' },
-            { title: 'Pending SRs', dataIndex: 'srCount', width: 90, render: v => <Tag color="blue">{v}</Tag> },
+            { title: copy.countTitle, dataIndex: 'srCount', width: 90, render: v => <Tag color="blue">{v}</Tag> },
             {
               title: 'Resolve', width: 320,
               render: (_, row) => (
@@ -1379,6 +1452,43 @@ function SendPendingReminders() {
   );
 }
 
+const PENDING_COPY = {
+  scheduleTitle: 'Automatic weekly reminders',
+  loadError: 'Failed to load pending reminders',
+  countTitle: 'Pending SRs',
+  empty: 'Nothing pending with anyone right now',
+  intro: `Everyone except Deloitte currently named in Pending With on an open SR, with everything
+    that's pending against them. Send manually at any time - e.g. the day before a meeting - so each
+    person gets an email listing exactly what's pending with them. Missing an email? Add one
+    inline below; it's saved to Pending-With Contacts for next time too.`,
+};
+
+function SendPendingReminders() {
+  return <ReminderPanel api={pendingRemindersAPI} copy={PENDING_COPY} />;
+}
+
+const WORKLOAD_COPY = {
+  scheduleTitle: 'Automatic weekly workload reminders',
+  loadError: 'Failed to load workload reminders',
+  countTitle: 'Assigned SRs',
+  empty: 'Nothing is assigned to anyone right now',
+  intro: `Everyone an open SR is assigned to in ManageEngine (the technician), except Deloitte, with every open SR
+    under their name - oldest first, with how long it has been open and whether it is past its expected
+    closure date. Send manually at any time, or let the weekly schedule do it. Missing an email? Add one inline
+    below; it's saved to Pending-With Contacts, which is the shared address book for all reminders.`,
+  extraSrColumns: [
+    { title: 'Open for', dataIndex: 'age_days', width: 100, sorter: numberSorter('age_days'), render: v => (v === null || v === undefined ? '-' : `${v}d`) },
+    {
+      title: 'Expected closure', dataIndex: 'expected_closure_date', width: 160, sorter: dateSorter('expected_closure_date'),
+      render: (v, row) => (v ? <Text type={row.overdue ? 'danger' : undefined}>{dayjs(v).format('DD-MMM-YYYY')}{row.overdue ? ' (overdue)' : ''}</Text> : '-'),
+    },
+  ],
+};
+
+function SendWorkloadReminders() {
+  return <ReminderPanel api={workloadRemindersAPI} copy={WORKLOAD_COPY} />;
+}
+
 export default function UpdateTasks() {
   return (
     <Reveal>
@@ -1392,6 +1502,7 @@ export default function UpdateTasks() {
             { key: 'manageengine', label: <Space><SyncOutlined />Update from ManageEngine</Space>, children: <UpdateFromManageEngine /> },
             { key: 'contacts', label: <Space><ContactsOutlined />Pending-With Contacts</Space>, children: <ContactsManager /> },
             { key: 'reminders', label: <Space><MailOutlined />Send Pending Reminders</Space>, children: <SendPendingReminders /> },
+            { key: 'workload', label: <Space><ScheduleOutlined />Send Workload Reminders</Space>, children: <SendWorkloadReminders /> },
           ]}
         />
       </div>

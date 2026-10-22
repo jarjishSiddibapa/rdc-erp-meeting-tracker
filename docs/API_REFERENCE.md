@@ -59,9 +59,25 @@ The response is:
 | Method | Endpoint | Access | Purpose |
 | --- | --- | --- | --- |
 | `GET` | `/api/stats/dashboard` | Authenticated | Current SR KPIs, rolling periods, and pending-owner workload |
-| `GET` | `/api/reports/assigned-to-ecd` | Authenticated | Expected Closure Date sequence by assignment/category |
+| `GET` | `/api/reports/assigned-to-ecd` | Admin | Expected Closure Date sequence by assignment/category |
 
 `/api/reports/assigned-to-ecd` requires `assignedTo` and accepts `category` (default `SR`).
+
+### SR Insights and workload reminders (admin only)
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/resolution-insights/overview` | Summary, per-technician rows, monthly trend, distribution, by-type/scope, filter facets |
+| `GET` | `/api/resolution-insights/explore` | Pivot by `groupBy` (`technician`, `month`, `week`, `type`, `scope`), optional `thenBy` cross-tab |
+| `GET` | `/api/resolution-insights/records` | The SRs behind the figures with computed turnaround/age (`state=all\|closed\|open`) |
+| `GET` | `/api/resolution-insights/pending` | Pending with Insights: per-person holding periods, summary, duration distributions (`from`/`to` = when finished periods ended, `technician` = people) |
+| `GET` | `/api/workload-reminders/preview` | Technicians and their open assigned SRs |
+| `POST` | `/api/workload-reminders/send` | Send to selected recipient keys |
+| `GET` / `PUT` | `/api/workload-reminders/settings` | Weekly automatic schedule |
+| `GET` | `/api/workload-reminders/history` | Recent sends |
+
+All insight endpoints accept `from`/`to` (closed date, `YYYY-MM-DD`), `scope`, `type`, `technician` (comma-separated)
+and `search`.
 
 ## Users
 

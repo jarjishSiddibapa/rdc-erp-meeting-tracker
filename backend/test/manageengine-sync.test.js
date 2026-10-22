@@ -1,9 +1,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
+  applyRequestUpdate,
   matchTrackedRequests,
   mapStatus,
   normalizeRequest,
+  isManualCloseHeld,
   pendingPartyFor,
   serviceDeskApiDomainFor,
 } = require('../services/manageengine-sync');
@@ -205,4 +207,65 @@ test('matches only request IDs already tracked locally', () => {
   assert.deepEqual([...matches.keys()], ['20001']);
   assert.equal(matches.get('20001'), tracked);
   assert.equal(matches.has('20002'), false);
+});
+
+// An SR closed here while ManageEngine still shows it open stays closed for the hold window.
+function fakeConnection() {
+  const calls = [];
+  return { calls, execute: async (sql, params) => { calls.push({ sql, params }); } };
+}
+
+const openInManageEngine = {
+  display_id: '500', status: { name: 'Open' }, unreplied_count: '1',
+  technician: { name: 'Atish Kshirsagar' }, category: { name: 'Reports' },
+  created_time: { value: String(Date.UTC(2026, 9, 1, 4, 30)) },
+};
+
+function localClosed(overrides = {}) {
+  return {
+    id: 7, sr_number: '500', status: 'Closed', scope: 'Internal', assigned_to: 'Atish Kshirsagar', type: 'Reports',
+    creation_date: '2026-10-01', created_by_name: null, closed_date: '2026-10-16', manageengine_status: 'Open',
+    manageengine_pending_party: 'Technician', manageengine_created_at: '2026-10-01 10:00:00', manageengine_closed_at: null,
+    manual_close_hold: 1, ...overrides,
+  };
+}
+
+const updatedSql = conn => conn.calls.filter(c => c.sql.startsWith('UPDATE srs SET') && c.sql.includes('status ='));
+
+test('a manual close is kept while the hold is active even though ManageEngine still says open', async () => {
+  const conn = fakeConnection();
+  const result = await applyRequestUpdate(conn, localClosed(), openInManageEngine, config);
+  assert.equal(result.held, true);
+  assert.equal(updatedSql(conn).length, 0, 'status must not be rewritten');
+  assert.ok(!conn.calls.some(c => c.params?.includes?.('closed_date')), 'no closed_date history');
+});
+
+test('other fields still refresh from ManageEngine while a manual close is held', async () => {
+  const conn = fakeConnection();
+  const result = await applyRequestUpdate(conn, localClosed({ assigned_to: 'Someone Else' }), openInManageEngine, config);
+  assert.equal(result.held, true);
+  assert.equal(result.changed, 1);
+  assert.match(conn.calls[0].sql, /assigned_to = \?/);
+  assert.doesNotMatch(conn.calls[0].sql, /status = |closed_date/);
+});
+
+test('once the hold lapses the sync reopens an SR that ManageEngine still shows open', async () => {
+  const conn = fakeConnection();
+  const result = await applyRequestUpdate(conn, localClosed({ manual_close_hold: 0 }), openInManageEngine, config);
+  assert.equal(result.held, false);
+  assert.match(conn.calls[0].sql, /status = /);
+  assert.ok(conn.calls[0].params.includes('Pending'));
+  assert.ok(conn.calls[0].params.includes(null), 'closed_date is cleared');
+});
+
+test('when ManageEngine agrees the SR is closed the hold does not matter', async () => {
+  const conn = fakeConnection();
+  const closedRemote = { ...openInManageEngine, status: { name: 'Closed' }, completed_time: { value: String(Date.UTC(2026, 9, 16, 5, 0)) } };
+  const result = await applyRequestUpdate(conn, localClosed(), closedRemote, config);
+  assert.equal(result.held, false);
+  assert.ok(conn.calls.some(c => c.params.includes('2026-10-16 10:30:00')), 'ManageEngine closed time is recorded');
+});
+
+test('an SR that is not closed locally is never held', () => {
+  assert.equal(isManualCloseHeld(localClosed({ status: 'Open' }), { status: 'Pending' }), false);
 });

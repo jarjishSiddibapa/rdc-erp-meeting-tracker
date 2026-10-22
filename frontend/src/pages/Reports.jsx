@@ -1,15 +1,17 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { Typography, Tabs, Table, Tag, Card, Empty, message, Button } from 'antd';
-import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
-import { reportsAPI, srAPI } from '../services/api';
+import { Typography, Tabs, Table, Tag, Empty, message, Button, Segmented, DatePicker, Select, Drawer, Spin } from 'antd';
+import { DownloadOutlined, FileExcelOutlined, ReloadOutlined } from '@ant-design/icons';
+import { reportsAPI } from '../services/api';
 import { Reveal } from '../components/ui/Reveal';
-import ResizableTitle from '../components/ui/ResizableTitle';
-import SRDetail from '../components/SRDetail';
-import CommentCell from '../components/CommentCell';
 import { paginationConfig } from '../utils/pagination';
+import TableSearch from '../components/ui/TableSearch';
+import { matchesSearch, textSorter, dateSorter } from '../utils/tableTools';
+import EcdChangesChart, { downloadChartPng } from '../components/EcdChangesChart';
+import { Panel, PRESETS } from '../components/ResolutionWidgets';
 
 const { Title } = Typography;
+const { RangePicker } = DatePicker;
 
 const VENDOR = 'Deloitte';
 
@@ -20,19 +22,67 @@ const STATUS_COLORS = {
 
 function fmt(d) { return d ? dayjs(d).format('DD-MMM-YYYY') : ''; }
 
+const plural = (n, one, many) => (n === 1 ? one : many);
+
+// The SR Date window the chart is narrowed to: "last 30 days" means SRs raised in the last 30 days.
+function presetStart(preset) {
+  if (['30', '90', '180'].includes(preset)) return dayjs().subtract(Number(preset), 'day').startOf('day');
+  if (preset === 'year') return dayjs().startOf('year');
+  return null;
+}
+
+// Clicking a bar lists the SRs behind it - an on-demand drill-down, not a standing table.
+function ChangesDrawer({ changes, rows, onClose }) {
+  const [search, setSearch] = useState('');
+  const shown = useMemo(
+    () => rows.filter(r => matchesSearch(search, r.sr_number, r.status, r.last_comment)),
+    [rows, search],
+  );
+  const columns = useMemo(() => [
+    { title: 'SR Number', dataIndex: 'sr_number', width: 110, sorter: (a, b) => Number(a.sr_number) - Number(b.sr_number) },
+    {
+      title: 'SR Date', dataIndex: 'sr_date', width: 110, render: fmt, defaultSortOrder: 'descend',
+      sorter: (a, b) => dateSorter('sr_date')(a, b) || Number(a.sr_number) - Number(b.sr_number),
+    },
+    {
+      title: 'Status', dataIndex: 'status', width: 120, render: v => <Tag color={STATUS_COLORS[v]}>{v}</Tag>,
+      filters: Object.keys(STATUS_COLORS).map(status => ({ text: status, value: status })),
+      onFilter: (value, row) => row.status === value,
+      sorter: textSorter('status'),
+    },
+    {
+      title: 'Latest closure date', width: 140,
+      sorter: (a, b) => new Date(a.ecd_sequence.at(-1) || 0) - new Date(b.ecd_sequence.at(-1) || 0),
+      render: (_, row) => fmt(row.ecd_sequence.at(-1)) || '—',
+    },
+  ], []);
+
+  return (
+    <Drawer
+      open={changes !== null} onClose={onClose} width={560} destroyOnHidden
+      title={changes === null ? '' : `${rows.length} ${plural(rows.length, 'SR', 'SRs')} with ${changes} closure-date ${plural(changes, 'change', 'changes')}`}
+    >
+      <TableSearch value={search} onChange={setSearch} placeholder="Search SR number, status, comment..." width="100%" />
+      <Table
+        style={{ marginTop: 12 }} rowKey="sr_number" size="small" columns={columns} dataSource={shown}
+        locale={{ emptyText: 'No SRs match your search' }}
+        pagination={paginationConfig('SRs', { defaultPageSize: 20 })}
+      />
+    </Drawer>
+  );
+}
+
 // Fixed to Deloitte — matched as a substring against Assigned To (see reports.js's
 // assigned_to LIKE %Deloitte%) so both the PDF importer's bare "Deloitte" and the
 // ManageEngine sync's full "Deloitte ERP Support" roll up into the same report.
 function AssignedToEcdReport() {
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState(null);
-  const [colWidths, setColWidths] = useState({});
-  const tableWrapRef = useRef(null);
-
-  // Clicking an SR Number opens the exact same detail/edit panel the SR page uses, so an
-  // SR can be managed (edited, commented on, closed) without leaving the report.
-  const [detailSR, setDetailSR] = useState(null);
-  const [detailOpen, setDetailOpen] = useState(false);
+  const [preset, setPreset] = useState('all');
+  const [range, setRange] = useState(null);
+  const [statuses, setStatuses] = useState([]);
+  const [changesPicked, setChangesPicked] = useState(null);
+  const svgRef = useRef(null);
 
   async function fetchReport() {
     setLoading(true);
@@ -46,130 +96,59 @@ function AssignedToEcdReport() {
 
   useEffect(() => { fetchReport(); }, []);
 
-  const openDetail = useCallback(async (row) => {
-    try {
-      const res = await srAPI.get(row.id);
-      setDetailSR(res.data);
-      setDetailOpen(true);
-    } catch { message.error('Failed to load details'); }
-  }, []);
+  // The SR-raised window and status narrow the chart; clicking a bar lists the SRs behind it.
+  const scoped = useMemo(() => {
+    const from = preset === 'custom' ? range?.[0]?.startOf('day') : presetStart(preset);
+    const to = preset === 'custom' ? range?.[1]?.endOf('day') : null;
+    return (report?.data || []).filter(r => {
+      if (statuses.length && !statuses.includes(r.status)) return false;
+      if (from || to) {
+        const raised = r.sr_date ? dayjs(r.sr_date) : null;
+        if (!raised || (from && raised.isBefore(from)) || (to && raised.isAfter(to))) return false;
+      }
+      return true;
+    });
+  }, [report, preset, range, statuses]);
 
-  async function handleCloseSR(sr) {
-    try {
-      await srAPI.close(sr.id);
-      message.success(`${sr.sr_number} closed`);
-      fetchReport();
-    } catch (e) { message.error(e.response?.data?.message || 'Failed to close'); }
+  // A narrowed-down view may no longer contain the picked count; drop the pick rather than keep an empty list open.
+  const pickedCount = changesPicked !== null && scoped.some(r => r.change_count === changesPicked) ? changesPicked : null;
+  useEffect(() => { if (changesPicked !== null && pickedCount === null) setChangesPicked(null); }, [changesPicked, pickedCount]);
+  const pickedRows = useMemo(
+    () => (pickedCount === null ? [] : scoped.filter(r => r.change_count === pickedCount)),
+    [scoped, pickedCount],
+  );
+
+  // Column count follows the longest sequence actually present in the data.
+  const ecdColumnCount = Math.max(1, ...scoped.map(r => r.ecd_sequence.length));
+
+  function filterSummary() {
+    const parts = [];
+    if (preset === 'custom' && range?.[0] && range?.[1]) parts.push(`SRs raised ${range[0].format('DD-MMM-YYYY')} to ${range[1].format('DD-MMM-YYYY')}`);
+    else if (preset !== 'all' && preset !== 'custom') parts.push(`SRs raised: ${PRESETS.find(p => p.value === preset)?.label.toLowerCase()}`);
+    if (statuses.length) parts.push(`Status: ${statuses.join(', ')}`);
+    return [`Assigned to ${VENDOR}`, `${scoped.length} ${plural(scoped.length, 'SR', 'SRs')}`, ...parts, `as of ${dayjs().format('DD-MMM-YYYY')}`].join(' · ');
   }
 
-  async function handleReopenSR(sr) {
+  async function handleDownloadChart() {
+    if (!svgRef.current) return;
     try {
-      await srAPI.reopen(sr.id);
-      message.success(`${sr.sr_number} reopened`);
-      fetchReport();
-    } catch (e) { message.error(e.response?.data?.message || 'Failed to reopen'); }
+      await downloadChartPng(svgRef.current, {
+        title: 'How many times the closure date was changed',
+        subtitle: filterSummary(),
+        filename: `Closure_date_changes_${VENDOR}_${dayjs().format('YYYY-MM-DD')}.png`,
+      });
+    } catch { message.error('Could not save the chart image'); }
   }
 
-  async function handleDeleteSR(id) {
-    try {
-      await srAPI.delete(id);
-      message.success('Deleted');
-      fetchReport();
-    } catch (e) { message.error(e.response?.data?.message || 'Delete failed'); }
-  }
-
-  async function handleSetOnHoldSR(sr) {
-    try {
-      await srAPI.update(sr.id, { status: 'On Hold' });
-      message.success(`${sr.sr_number} put on hold`);
-      fetchReport();
-    } catch (e) { message.error(e.response?.data?.message || 'Failed to update status'); }
-  }
-
-  // Column count follows the longest sequence actually present in the data — the backend's
-  // change_count counts raw history rows, which can outnumber the real sequence when a
-  // change's new_value was blank (filtered out), so basing it on max_changes alone left a
-  // trailing all-"—" column. Deriving it from ecd_sequence.length avoids that entirely.
-  const ecdColumnCount = Math.max(1, ...(report?.data || []).map(r => r.ecd_sequence.length));
-
-  // Wheel-to-pan: this table can grow wide (one column per closure-date push), so Shift+wheel
-  // scrolls it sideways — the standard convention (Excel, Sheets, GitHub diffs all use it).
-  // Deliberately gated on shiftKey, not just "wheel over the table": an earlier version reacted
-  // to plain vertical scrolling too, which hijacked normal page scroll the moment the table
-  // needed horizontal room, making the whole panel feel like it scrolled both ways at once.
-  useEffect(() => {
-    const el = tableWrapRef.current?.querySelector('.ant-table-content');
-    if (!el) return;
-    function onWheel(e) {
-      if (!e.shiftKey) return;
-      if (el.scrollWidth <= el.clientWidth) return;
-      e.preventDefault();
-      el.scrollLeft += e.deltaY;
-    }
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, [report, ecdColumnCount]);
-
-  // Memoized on their real inputs (same reasoning as SRPage.jsx's columns) — this table's
-  // column count is data-driven and can grow wide, so rebuilding it on unrelated re-renders
-  // (e.g. every column-drag updating colWidths) was wasted work.
-  const rawColumns = useMemo(() => [
-    {
-      title: 'SR Number', dataIndex: 'sr_number', width: 110, fixed: 'left',
-      sorter: (a, b) => Number(a.sr_number) - Number(b.sr_number),
-      render: (v, row) => (
-        <Button type="link" style={{ padding: 0, fontWeight: 600, fontSize: 13 }} onClick={() => openDetail(row)}>
-          {v}
-        </Button>
-      ),
-    },
-    {
-      title: 'SR Date', dataIndex: 'sr_date', width: 110, render: fmt,
-      sorter: (a, b) => new Date(a.sr_date || 0) - new Date(b.sr_date || 0),
-    },
-    {
-      title: 'Status', dataIndex: 'status', width: 100, render: v => <Tag color={STATUS_COLORS[v]}>{v}</Tag>,
-      filters: Object.keys(STATUS_COLORS).map(status => ({ text: status, value: status })),
-      onFilter: (value, row) => row.status === value,
-    },
-    {
-      title: 'Comment', dataIndex: 'last_comment', width: 180,
-      render: (_, row) => <CommentCell srId={row.id} lastComment={row.last_comment} lastCommentAt={row.last_comment_at} />,
-    },
-    {
-      title: 'Changes', dataIndex: 'change_count', width: 90, align: 'center',
-      sorter: (a, b) => (a.change_count || 0) - (b.change_count || 0),
-    },
-    ...Array.from({ length: ecdColumnCount }, (_, i) => ({
-      title: `ECD${i + 1}`,
-      dataIndex: `ecd_${i}`,
-      width: 115,
-      sorter: (a, b) => new Date(a.ecd_sequence[i] || 0) - new Date(b.ecd_sequence[i] || 0),
-      render: (_, row) => fmt(row.ecd_sequence[i]) || '—',
-    })),
-  ], [ecdColumnCount, openDetail]);
-
-  // Drag-to-resize column headers, same pattern as the SR/Digitization table.
-  const columns = useMemo(() => rawColumns.map(col => {
-    const width = colWidths[col.dataIndex] ?? col.width;
-    if (!width) return col;
-    return {
-      ...col,
-      width,
-      onHeaderCell: () => ({
-        width,
-        onResize: (_e, { size }) => {
-          setColWidths(w => ({ ...w, [col.dataIndex]: Math.max(60, size.width) }));
-        },
-      }),
-    };
-  }), [rawColumns, colWidths]);
-
+  // The detailed list that used to sit under the chart: the SRs the chart currently covers.
   async function handleExport() {
-    if (!report?.data?.length) return;
+    if (!scoped.length) return;
     const XLSX = await import('xlsx');
-    const rows = report.data.map(r => {
-      const out = { 'SR Number': r.sr_number, 'SR Date': fmt(r.sr_date), Status: r.status, Changes: r.change_count };
+    const rows = scoped.map(r => {
+      const out = {
+        'SR Number': r.sr_number, 'SR Date': fmt(r.sr_date), Status: r.status,
+        Comment: r.last_comment || '', Changes: r.change_count,
+      };
       for (let i = 0; i < ecdColumnCount; i++) out[`ECD${i + 1}`] = fmt(r.ecd_sequence[i]) || '';
       return out;
     });
@@ -179,60 +158,66 @@ function AssignedToEcdReport() {
     XLSX.writeFile(wb, `Assigned_to_${VENDOR}_${dayjs().format('YYYY-MM-DD')}.xlsx`);
   }
 
+  const hasData = !!report?.data?.length;
+
   return (
     <div>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16, alignItems: 'center', justifyContent: 'flex-end' }}>
-        <Button icon={<ReloadOutlined />} onClick={fetchReport} loading={loading} title="Refresh" />
-        <Button icon={<DownloadOutlined />} disabled={!report?.data?.length} onClick={handleExport}>
-          Export Excel
-        </Button>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16, alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ color: '#8c8c8c', fontSize: 12 }}>SRs raised:</span>
+          <Segmented
+            options={PRESETS} value={preset}
+            onChange={p => { setPreset(p); if (p !== 'custom') setRange(null); }}
+          />
+          {preset === 'custom' && (
+            <RangePicker
+              format="DD-MMM-YYYY" allowClear value={range} onChange={setRange}
+              disabledDate={d => d.isAfter(dayjs(), 'day')}
+            />
+          )}
+          <Select
+            mode="multiple" allowClear maxTagCount="responsive" placeholder="All statuses" style={{ minWidth: 180, maxWidth: 320 }}
+            value={statuses} onChange={setStatuses}
+            options={Object.keys(STATUS_COLORS).map(s => ({ value: s, label: s }))}
+          />
+          {(preset !== 'all' || statuses.length > 0) && (
+            <Button onClick={() => { setPreset('all'); setRange(null); setStatuses([]); }}>Reset</Button>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <Button icon={<ReloadOutlined />} onClick={fetchReport} loading={loading} title="Refresh" />
+          <Button icon={<DownloadOutlined />} disabled={!scoped.length} onClick={handleDownloadChart}>
+            Download chart
+          </Button>
+          <Button
+            icon={<FileExcelOutlined />} disabled={!scoped.length} onClick={handleExport}
+            title={`Detailed list of the ${scoped.length} ${plural(scoped.length, 'SR', 'SRs')} in the chart, with every closure date`}
+          >
+            Download details (Excel)
+          </Button>
+        </div>
       </div>
 
-      <Card size="small" className="shadow-soft" style={{ borderRadius: 10 }} styles={{ body: { padding: 8 } }}>
-        {report && report.data.length === 0 ? (
-          <Empty description={`No SRs currently assigned to ${VENDOR}`} style={{ margin: '24px 0' }} />
-        ) : (
-          <div ref={tableWrapRef}>
-            <Table
-              rowKey="sr_number"
-              columns={columns}
-              components={{ header: { cell: ResizableTitle } }}
-              dataSource={report?.data || []}
-              loading={loading}
-              size="small"
-              bordered
-              scroll={{ x: 'max-content' }}
-              pagination={paginationConfig('SRs', { defaultPageSize: 20 })}
-            />
-          </div>
-        )}
-      </Card>
+      <Panel title="How many times the closure date was changed">
+        {!report && loading ? <div style={{ textAlign: 'center', padding: 40 }}><Spin /></div>
+          : report && !hasData ? <Empty description={`No SRs currently assigned to ${VENDOR}`} style={{ margin: '24px 0' }} />
+            : <EcdChangesChart rows={scoped} selected={pickedCount} onSelect={setChangesPicked} svgRef={svgRef} />}
+      </Panel>
 
-      <SRDetail
-        sr={detailSR}
-        open={detailOpen}
-        onClose={() => setDetailOpen(false)}
-        onUpdated={updated => { setDetailSR(updated); fetchReport(); }}
-        onCloseSR={handleCloseSR}
-        onReopenSR={handleReopenSR}
-        onSetOnHold={handleSetOnHoldSR}
-        onDelete={handleDeleteSR}
-      />
+      <ChangesDrawer changes={pickedCount} rows={pickedRows} onClose={() => setChangesPicked(null)} />
     </div>
   );
 }
 
 export default function Reports() {
+  const items = [
+    { key: 'assigned-deloitte', label: 'Assigned to Deloitte', children: <AssignedToEcdReport /> },
+  ];
   return (
     <Reveal>
       <div style={{ width: '100%' }}>
         <Title level={5}>Reports</Title>
-        <Tabs
-          defaultActiveKey="assigned-deloitte"
-          items={[
-            { key: 'assigned-deloitte', label: 'Assigned to Deloitte', children: <AssignedToEcdReport /> },
-          ]}
-        />
+        <Tabs defaultActiveKey="assigned-deloitte" items={items} />
       </div>
     </Reveal>
   );

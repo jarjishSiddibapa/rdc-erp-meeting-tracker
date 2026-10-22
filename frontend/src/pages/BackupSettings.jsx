@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Card, Switch, TimePicker, Input, Button, Table, Tag, Space, Typography,
   message, Popconfirm, Tooltip, Statistic, Row, Col
@@ -14,6 +14,8 @@ import { Reveal } from '../components/ui/Reveal';
 import TiltCard from '../components/ui/TiltCard';
 import BrandButton from '../components/ui/BrandButton';
 import { paginationConfig } from '../utils/pagination';
+import TableSearch from '../components/ui/TableSearch';
+import { matchesSearch, textSorter, numberSorter, dateSorter, filtersFrom } from '../utils/tableTools';
 
 const { Title, Text } = Typography;
 
@@ -114,18 +116,35 @@ export default function BackupSettings() {
     }
   }
 
+  const [historySearch, setHistorySearch] = useState('');
+  const visibleHistory = useMemo(
+    () => history.filter(h => matchesSearch(historySearch, h.filename, h.status, h.triggered_by)),
+    [history, historySearch],
+  );
+
   const columns = [
-    { title: 'File', dataIndex: 'filename', ellipsis: true },
-    { title: 'Status', dataIndex: 'status', width: 110, render: v => STATUS_TAG[v] || v },
-    { title: 'Size', dataIndex: 'size_bytes', width: 100, render: formatBytes },
-    { title: 'Triggered', dataIndex: 'triggered_by', width: 100, render: v => <Tag>{v}</Tag> },
+    { title: 'File', dataIndex: 'filename', ellipsis: true, sorter: textSorter('filename') },
+    {
+      title: 'Status', dataIndex: 'status', width: 110, render: v => STATUS_TAG[v] || v,
+      filters: filtersFrom(history, 'status'), onFilter: (value, row) => row.status === value,
+    },
+    { title: 'Size', dataIndex: 'size_bytes', width: 100, sorter: numberSorter('size_bytes'), render: formatBytes },
+    {
+      title: 'Triggered', dataIndex: 'triggered_by', width: 100, render: v => <Tag>{v}</Tag>,
+      filters: filtersFrom(history, 'triggered_by'), onFilter: (value, row) => row.triggered_by === value,
+    },
     {
       title: 'Emailed', dataIndex: 'email_status', width: 100,
+      filters: [{ text: 'Sent', value: 'sent' }, { text: 'Failed', value: 'failed' }, { text: 'Not emailed', value: '' }],
+      onFilter: (value, row) => (row.email_status || '') === value,
       render: (v, row) => v ? (
         <Tooltip title={row.email_message}>{EMAIL_STATUS_TAG[v] || v}</Tooltip>
       ) : <Text type="secondary">—</Text>,
     },
-    { title: 'Started', dataIndex: 'started_at', width: 190, render: v => dayjs(v).format('DD-MMM-YYYY hh:mm:ss A') },
+    {
+      title: 'Started', dataIndex: 'started_at', width: 190, defaultSortOrder: 'descend', sorter: dateSorter('started_at'),
+      render: v => dayjs(v).format('DD-MMM-YYYY hh:mm:ss A'),
+    },
     {
       title: 'Actions', width: 110, render: (_, row) => (
         <Space>
@@ -230,8 +249,9 @@ export default function BackupSettings() {
 
       <Reveal delay={0.1}>
         <Card size="small" title="Backup History" style={{ marginTop: 16 }}>
+          <TableSearch value={historySearch} onChange={setHistorySearch} placeholder="Search file name..." style={{ marginBottom: 10 }} />
           <Table
-            rowKey="id" size="small" columns={columns} dataSource={history} loading={loading}
+            rowKey="id" size="small" columns={columns} dataSource={visibleHistory} loading={loading}
             pagination={paginationConfig('backups', { defaultPageSize: 10 })}
             scroll={{ x: 'max-content' }}
           />
